@@ -9,6 +9,12 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
+    // Jenkins corre en localhost y GitHub no puede llamarlo con un webhook: revisa el repositorio cada
+    // ~5 min y construye si hay commits nuevos. Se registra al terminar el primer build con este Jenkinsfile.
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
     environment {
         // Caché de dependencias persistente en el volumen de Jenkins.
         MAVEN_REPO = "${env.JENKINS_HOME}/.m2/repository"

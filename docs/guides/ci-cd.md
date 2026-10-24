@@ -327,7 +327,7 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 El arranque falla si no existe `docker/jenkins/.env`. Ese archivo define el usuario y la contraseña del administrador (`JENKINS_ADMIN_USER`, `JENKINS_ADMIN_PASSWORD`; la plantilla trae `admin` / `admin`, cámbialos si quieres) y el repositorio y la rama que construye el job (`REPO_URL`, `REPO_BRANCH=master`).
 
-Abre <http://localhost:8080>, entra con el usuario y la contraseña de `docker/jenkins/.env` y ejecuta el job **contract-api** con **Build Now**. La primera ejecución tarda unos minutos porque descarga dependencias e imágenes. Los detalles (variables, fork, limpieza) están en su [README](../../docker/jenkins/README.md).
+Abre <http://localhost:8080>, entra con el usuario y la contraseña de `docker/jenkins/.env` y ejecuta el job **contract-api** con **Build Now** una vez. La primera ejecución tarda unos minutos porque descarga dependencias e imágenes. A partir de ahí Jenkins construye solo: sondea `master` cada ~5 minutos (`pollSCM` en el `Jenkinsfile`, porque GitHub no puede enviar webhooks a `localhost`) y lanza un build si hay commits nuevos. Los detalles (variables, fork, limpieza) están en su [README](../../docker/jenkins/README.md).
 
 Jenkins es solo de práctica: el CI oficial que valida cada push a `master` es GitHub Actions ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)).
 

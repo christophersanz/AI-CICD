@@ -20,8 +20,10 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 La primera vez tarda unos minutos (construye la imagen e instala los plugins). Cuando `docker logs contract-api-jenkins` muestre `Jenkins is fully up and running`:
 
 1. Abre http://localhost:8080 e inicia sesión con `admin` / la contraseña de `JENKINS_ADMIN_PASSWORD` en `.env`.
-2. Entra al job **contract-api** y pulsa **Build Now** (o **Construir ahora**).
+2. Entra al job **contract-api** y pulsa **Build Now** (o **Construir ahora**) una vez.
 3. Revisa el avance en **Console Output** y, al terminar, los resultados de las pruebas y el informe de cobertura en los artefactos del build.
+
+Desde ese primer build, Jenkins **construye solo**: el `Jenkinsfile` declara `pollSCM('H/5 * * * *')`, así que revisa `REPO_BRANCH` en GitHub cada ~5 minutos y lanza un build cuando hay commits nuevos (en **Changes** aparecen los commits incluidos). Se usa sondeo porque GitHub no puede llamar a un Jenkins en `localhost` con un webhook. El registro de cada sondeo está en **Git Polling Log** del job.
 
 No hay asistente inicial: los plugins, el usuario y el job se crean al arrancar con *Configuration as Code* (`casc.yaml`).
 

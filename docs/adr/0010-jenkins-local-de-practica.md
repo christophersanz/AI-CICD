@@ -11,6 +11,7 @@ El CI/CD oficial es GitHub Actions (ADR-0009), que descartó Jenkins como plataf
 
 - Se versiona un `Jenkinsfile` declarativo en la raíz con las mismas etapas que el job de CI: `./mvnw clean verify` (pruebas, Testcontainers y umbral de cobertura) y `docker build` de la imagen. No publica en GHCR.
 - Jenkins se entrega al alumno en `docker/jenkins/` (`docker-compose.yml`, `Dockerfile`, `plugins.txt`, `casc.yaml`): imagen `jenkins/jenkins:lts-jdk21` con el cliente de Docker y `buildx`, plugins preinstalados y *Configuration as Code* (JCasC) que crea el usuario administrador y el job `contract-api` sin asistente inicial. El repositorio y la rama del job son configurables por variables de entorno.
+- El job se dispara solo por sondeo (`pollSCM('H/5 * * * *')` en el `Jenkinsfile`): revisa la rama cada ~5 minutos y construye si hay commits nuevos. No se usa webhook porque GitHub no puede llegar a un Jenkins en `localhost` sin exponerlo con un túnel. El disparador se registra al terminar el primer build, que se lanza a mano.
 - Jenkins usa el Docker del host montando `docker.sock`; por eso Testcontainers necesita `TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal`. Solo escucha en `127.0.0.1`.
 - GitHub Actions sigue siendo el CI oficial que valida cada push a `master`.
 
