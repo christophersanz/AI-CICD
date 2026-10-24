@@ -6,7 +6,7 @@ Guía práctica para trabajar con el flujo de integración y entrega continua de
 
 1. [Visión general](#1-visión-general)
 2. [Requisitos](#2-requisitos)
-3. [Flujo de trabajo con GitHub Flow](#3-flujo-de-trabajo-con-github-flow)
+3. [Flujo de trabajo en una sola rama](#3-flujo-de-trabajo-en-una-sola-rama)
 4. [Protección de `master` (ruleset)](#4-protección-de-master-ruleset)
 5. [El pipeline de GitHub Actions](#5-el-pipeline-de-github-actions)
 6. [Publicar una versión](#6-publicar-una-versión)
@@ -20,22 +20,19 @@ Guía práctica para trabajar con el flujo de integración y entrega continua de
 
 ```mermaid
 flowchart LR
-    A[Rama feature/*] -->|push| B[Pull Request]
-    B --> C{CI<br/>build + pruebas<br/>+ cobertura + imagen}
-    C -->|rojo| A
-    C -->|verde| D[Squash and merge<br/>a master]
-    D --> E[CI en master]
-    E --> F[(GHCR<br/>latest, sha)]
-    E --> G[(Docker Hub<br/>latest, sha)]
-    D -.->|tag vX.Y.Z| H[CI del tag]
+    A[Commit en master<br/>en local] -->|push| E{CI en master<br/>build + pruebas<br/>+ cobertura + imagen}
+    E -->|rojo| A
+    E -->|verde| F[(GHCR<br/>latest, sha)]
+    E -->|verde| G[(Docker Hub<br/>latest, sha)]
+    A -.->|tag vX.Y.Z| H[CI del tag]
     H --> I[(GHCR y Docker Hub<br/>X.Y.Z, X.Y)]
 ```
 
 | Evento | Build y pruebas | Imagen | Publicación |
 |---|:-:|:-:|---|
-| Pull Request a `master` | ✅ | se construye | ninguna |
-| Push a `master` (merge) | ✅ | se construye | `latest` y sha corto |
+| Push a `master` | ✅ | se construye | `latest` y sha corto |
 | Tag `vX.Y.Z` | ✅ | se construye | `X.Y.Z` y `X.Y` |
+| Pull Request a `master` (opcional) | ✅ | se construye | ninguna |
 | Manual (*Run workflow*) | ✅ | se construye | según la rama elegida |
 
 ## 2. Requisitos
@@ -45,16 +42,15 @@ flowchart LR
 - JDK 21 solo si compilas en local (`./mvnw` descarga Maven).
 - Git Bash o PowerShell. Los comandos indican en cuál se ejecutan cuando la sintaxis difiere.
 
-## 3. Flujo de trabajo con GitHub Flow
+## 3. Flujo de trabajo en una sola rama
 
-`master` siempre es desplegable y **nunca recibe commits directos**. Todo cambio entra por Pull Request.
+`master` es la única rama de larga vida: se trabaja en local sobre ella y se hace push directo. Como el CI se ejecuta **después** del push, verifica en local antes de subir.
 
-### 3.1 Crear la rama
+### 3.1 Actualizar la copia local
 
 ```bash
 git checkout master
 git pull
-git checkout -b feature/mi-cambio        # o fix/<tema>, docs/<tema>
 ```
 
 ### 3.2 Trabajar y verificar en local
@@ -68,40 +64,31 @@ Los mensajes de commit van en español, en imperativo y explican el porqué:
 ```bash
 git add <archivos>
 git commit -m "Validar el formato del correo al registrar empleados"
-git push -u origin feature/mi-cambio
 ```
 
-### 3.3 Abrir el Pull Request
-
-1. GitHub muestra **Compare & pull request** tras el push; o entra a *Pull requests → New pull request*.
-2. Completa la plantilla: en **Qué cambia** describe el cambio y su motivo; marca la checklist.
-3. Espera los dos checks: **Build, pruebas y cobertura** e **Imagen Docker**.
-
-### 3.4 Integrar
-
-- Si GitHub indica **This branch is out-of-date with the base branch**, pulsa **Update branch** y espera de nuevo el CI.
-- Con los checks en verde: **Squash and merge** → **Confirm**. Es el único método permitido: cada PR queda como un solo commit en `master`.
-- Borra la rama (botón **Delete branch**) y actualiza tu copia local:
+### 3.3 Subir y revisar el CI
 
 ```bash
-git checkout master
-git pull
-git branch -D feature/mi-cambio      # -D porque con squash git no reconoce la rama como integrada
+git pull --rebase        # si alguien más subió cambios (no se permite force push)
+git push
 ```
+
+Revisa la ejecución en *Actions → CI/CD*. Si queda en rojo, corrígelo con un **commit nuevo** en `master`: no se reescribe el historial ya subido.
+
+Para un cambio grande o que quieras revisar antes, puedes abrir una rama corta y un Pull Request a `master`: el CI se ejecuta igual sobre el PR, pero no es obligatorio.
 
 ## 4. Protección de `master` (ruleset)
 
-La regla `main-protegida` está versionada en [`.github/ruleset/main-protegida.json`](../../.github/ruleset/main-protegida.json):
+La regla `master-protegida` está versionada en [`.github/ruleset/master-protegida.json`](../../.github/ruleset/master-protegida.json) y se aplica a la rama por defecto:
 
 | Regla | Efecto |
 |---|---|
-| Pull Request obligatorio | No se puede hacer push directo a `master`. Sin aprobaciones mínimas (un único desarrollador no puede aprobar su propio PR). |
-| Solo *squash* | Un commit por PR en `master`. |
-| Checks requeridos | `Build, pruebas y cobertura` e `Imagen Docker` deben estar en verde. |
-| Rama al día | La rama debe incluir los últimos cambios de `master` antes de integrarse. |
-| Sin force push ni borrado | Protege el historial de `master`. |
+| Sin force push | No se puede reescribir el historial de `master` (`git push --force` se rechaza). |
+| Sin borrado | `master` no se puede eliminar. |
 
-**Configurarla en un repositorio nuevo o en tu fork:** *Settings → Rules → Rulesets → New ruleset → Import a ruleset* y selecciona el JSON. Los checks requeridos solo aparecen en el buscador después de que el workflow se haya ejecutado una vez.
+El push directo está permitido: no se exige Pull Request ni checks previos.
+
+**Configurarla en un repositorio nuevo o en tu fork:** *Settings → Rules → Rulesets → New ruleset → Import a ruleset* y selecciona el JSON.
 
 > En un repositorio **privado** con plan Free, GitHub permite crear la regla pero **no la aplica** (aparece con un ícono amarillo). Hace falta que el repositorio sea público o un plan Pro/Team. Con la regla activa el ícono es verde.
 
@@ -124,7 +111,7 @@ Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). 
 ### 5.2 Job `Imagen Docker`
 
 - Construye la imagen con el [`Dockerfile`](../../Dockerfile) multi-stage: compila con el Maven Wrapper (sin pruebas, ya se ejecutaron), extrae las capas de Spring Boot y genera una imagen con JRE 21, usuario sin privilegios y perfil `prod`.
-- En un PR solo la construye (comprueba que el `Dockerfile` funciona). En `master` y en tags, además la publica (sección 7).
+- En un push a `master` y en tags la construye y la publica (sección 7). En un PR opcional solo la construye.
 - Usa la caché de GitHub Actions para las capas, así que las ejecuciones siguientes son más rápidas.
 
 ### 5.3 Ejecutar el pipeline a mano
@@ -151,7 +138,7 @@ git tag v0.2.0
 git push origin v0.2.0
 ```
 
-El pipeline publica la imagen con las etiquetas `0.2.0` y `0.2`. `latest` no cambia con un tag: solo avanza con los merges a `master`.
+El pipeline publica la imagen con las etiquetas `0.2.0` y `0.2`. `latest` no cambia con un tag: solo avanza con los push a `master`.
 
 Opcional: *Releases → Draft a new release*, elige el tag, pulsa **Generate release notes** y **Publish release**.
 
@@ -339,7 +326,7 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 Abre <http://localhost:8080>, entra con `admin` / `admin` y ejecuta el job **contract-api** con **Build Now**. La primera ejecución tarda unos minutos porque descarga dependencias e imágenes. Los detalles (variables, fork, limpieza) están en su [README](../../docker/jenkins/README.md).
 
-Jenkins es solo de práctica: el check que protege `master` es el de GitHub Actions ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)).
+Jenkins es solo de práctica: el CI oficial que valida cada push a `master` es GitHub Actions ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)).
 
 ## 11. Problemas frecuentes
 
@@ -352,8 +339,8 @@ Jenkins es solo de práctica: el check que protege `master` es el de GitHub Acti
 | SonarCloud: *You are running CI analysis while Automatic Analysis is enabled* | Análisis automático activo | Desactivarlo (sección 5.4, paso 2) |
 | El job falla en *Quality Gate* | El código nuevo no cumple el Quality Gate (issues, cobertura) | Revisar el panel de SonarCloud y corregir |
 | El ruleset aparece con ícono amarillo | Repositorio privado con plan Free | Hacer público el repositorio o usar un plan Pro/Team (sección 4) |
-| *This branch is out-of-date with the base branch* | `master` avanzó después de abrir el PR | **Update branch** y esperar el CI |
-| *Squash and merge* deshabilitado | Checks pendientes o en rojo, o rama desactualizada | Revisar el job fallido en *Checks*; actualizar la rama |
+| `git push` rechazado: *Cannot force-push to this branch* | El ruleset `master-protegida` impide reescribir el historial | No usar `--force`: `git pull --rebase` y luego `git push`; corregir errores con un commit nuevo |
+| `git push` rechazado: *Updates were rejected because the remote contains work…* | `master` en GitHub tiene commits que no tienes en local | `git pull --rebase` y luego `git push` |
 | El build falla por cobertura | `domain` o `application` por debajo del 80 % de líneas | Añadir pruebas; ver el informe en el artefacto **reports** |
 | `Login en Docker Hub` aparece *skipped* | El workflow no ve la variable `DOCKERHUB_USERNAME` (se creó como secreto o en un *Environment*) | Crearla en la pestaña **Variables** del repositorio y ejecutar *Run workflow* |
 | `Login en Docker Hub` falla con `unauthorized` | Token sin permiso *Write*, vencido o de otra cuenta | Generar un token **Read & Write** de la cuenta correcta y actualizar `DOCKERHUB_TOKEN` |

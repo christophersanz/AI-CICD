@@ -14,7 +14,7 @@ API REST para la gestión de contratos laborales. Java 21, Spring Boot 3, Clean 
 | [docs/technical.md](docs/technical.md) | Estado implementado: endpoints, seguridad, configuración, base de datos y CI/CD |
 | [docs/adr/](docs/adr/) | Decisiones de arquitectura (CI/CD: ADR-0009; SonarCloud: ADR-0011) |
 | [docs/guides/arquitectura.md](docs/guides/arquitectura.md) | Guía visual de la arquitectura: contexto, módulos, puertos y adaptadores, dominio, flujos de petición, tokens y errores |
-| [docs/guides/ci-cd.md](docs/guides/ci-cd.md) | Guía de CI/CD: flujo de PR, pipeline, versiones, imágenes en GHCR y Docker Hub, ejecución y Jenkins local |
+| [docs/guides/ci-cd.md](docs/guides/ci-cd.md) | Guía de CI/CD: flujo de trabajo en `master`, pipeline, versiones, imágenes en GHCR y Docker Hub, ejecución y Jenkins local |
 | [docs/design/003-security-local-testing.md](docs/design/003-security-local-testing.md) | Probar la API en local con PowerShell y Postman |
 
 ## Levantar todo con Docker (recomendado)
@@ -57,4 +57,4 @@ La imagen usa el perfil `prod`: no tiene valores por defecto ni clave efímera, 
 
 ## Flujo de trabajo
 
-GitHub Flow ([ADR-0009](docs/adr/0009-ci-cd-github-actions.md)): rama `feature/*` desde `master` → Pull Request → CI en verde → merge. El pipeline compila, ejecuta las pruebas (incluidas las de Testcontainers), exige una cobertura ≥ 80 % en `domain` y `application`, analiza el código en SonarCloud (si está configurado) y construye la imagen; al integrar en `master`, la publica en GHCR y, si está configurado, en Docker Hub.
+Una sola rama, `master` ([ADR-0009](docs/adr/0009-ci-cd-github-actions.md)): commits en local, `./mvnw clean verify` y push directo (sin force push). En cada push el pipeline compila, ejecuta las pruebas (incluidas las de Testcontainers), exige una cobertura ≥ 80 % en `domain` y `application`, analiza el código en SonarCloud (si está configurado) y construye y publica la imagen en GHCR y, si está configurado, en Docker Hub.

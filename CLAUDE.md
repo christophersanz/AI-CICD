@@ -10,7 +10,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | @docs/business-rules.md | Glosario, entidades, invariantes, casos de uso y estados del dominio | Antes de implementar o cambiar lógica de negocio |
 | docs/technical.md | Estado implementado: endpoints, seguridad, variables de entorno, esquema de BD, build y CI/CD | Al cambiar endpoints, configuración, migraciones o el pipeline (actualizarlo en el mismo cambio) |
 | docs/guides/arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
-| docs/guides/ci-cd.md | Guía práctica de CI/CD: flujo de PR, pipeline, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
+| docs/guides/ci-cd.md | Guía práctica de CI/CD: flujo de trabajo en `master`, pipeline, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
 | @docs/prompts/prompts.md | Prompts reutilizables para tareas frecuentes | Al iniciar una tarea recurrente (nuevo caso de uso, revisión, ADR, etc.) |
 
 ## 1. Descripción del proyecto
@@ -35,7 +35,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | Documentación API | springdoc-openapi (OpenAPI 3) |
 | Observabilidad | Micrometer + OpenTelemetry, logs estructurados en JSON |
 | Pruebas | JUnit 5, AssertJ, Mockito, Testcontainers, spring-security-test; cobertura con JaCoCo (≥ 80 % de líneas en `domain` y `application`) |
-| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional), GitHub Flow (ADR-0009); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
+| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional), una sola rama `master` con push directo (ADR-0009); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
 
 ## 3. Comandos habituales
 
@@ -48,10 +48,10 @@ docker build -t contract-api .        # Construir la imagen (perfil prod)
 docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d --build  # Jenkins local de práctica (ADR-0010)
 ```
 
-## 3.1 Flujo de Git (GitHub Flow, ADR-0009)
+## 3.1 Flujo de Git (una sola rama, ADR-0009)
 
-- `master` está protegida y siempre es desplegable: **nunca se hace commit ni push directo a `master`**.
-- Cada cambio va en una rama desde `master`: `feature/<tema>`, `fix/<tema>` o `docs/<tema>`, y entra por Pull Request con el CI en verde.
+- `master` es la **única rama**: se trabaja en local sobre ella y se hace push directo. Antes de cada push, `./mvnw clean verify` en verde; el CI se ejecuta después del push.
+- `master` no admite force push ni borrado (ruleset `master-protegida`): nunca se reescribe el historial ya subido; un fallo se corrige con un commit nuevo.
 - Los mensajes de commit van en español, en imperativo y describen el porqué.
 - Una versión se publica con un tag `vX.Y.Z` sobre `master`; el pipeline publica la imagen con esa etiqueta.
 

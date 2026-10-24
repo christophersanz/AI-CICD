@@ -11,8 +11,8 @@ La API vivía como una carpeta más del repositorio del curso, junto a otras ver
 ## Decisión
 
 - **Repositorio propio** (originalmente `GalaxyTraining/CURS-000617-CICD`, extraído con `git subtree split`; esta copia vive en `christophersanz/AI-CICD`).
-- **Rama principal `master`** (2026-10-24): es la única rama de larga vida y la rama por defecto en GitHub; el workflow escucha `master`. El ruleset conserva el nombre `main-protegida` y apunta a la rama por defecto (`~DEFAULT_BRANCH`).
-- **GitHub Flow:** `master` siempre desplegable; el trabajo se hace en ramas `feature/*`, `fix/*` o `docs/*` y entra por Pull Request con el CI en verde. Protección de `master` con el ruleset `main-protegida` (`.github/ruleset/main-protegida.json`): PR obligatorio (sin aprobaciones mínimas, solo *squash*), rama al día con `master`, checks `Build, pruebas y cobertura` e `Imagen Docker` requeridos, sin force push ni borrado.
+- **Una sola rama, `master`** (revisado el 2026-10-24; antes GitHub Flow con ramas `feature/*` y PR obligatorio hacia `main`): es la única rama de larga vida y la rama por defecto. Se trabaja en local sobre `master` y se hace push directo; el workflow se ejecuta en cada push. Los Pull Requests a `master` siguen disparando el CI, pero son opcionales.
+- **Protección de `master`** con el ruleset `master-protegida` (`.github/ruleset/master-protegida.json`), aplicado a la rama por defecto: sin force push ni borrado. No exige PR ni checks previos.
 - **GitHub Actions** (`.github/workflows/ci-cd.yml`):
   - `build`: `./mvnw clean verify` con JDK 21, incluidas las pruebas con Testcontainers y la cobertura JaCoCo; publica los informes y un resumen de cobertura.
   - `image`: construye la imagen con el `Dockerfile` multi-stage; en un PR solo la construye, en `master` la publica en `ghcr.io` (`latest` + sha corto) y en un tag `vX.Y.Z` con las etiquetas de versión. Las mismas etiquetas se publican también en Docker Hub (`docker.io/<usuario>/ai-cicd`) si el repositorio define la variable `DOCKERHUB_USERNAME` y el secreto `DOCKERHUB_TOKEN` (token de acceso con permiso *Read & Write*); sin ellos, por ejemplo en un fork, solo se publica en GHCR.
@@ -26,10 +26,12 @@ La API vivía como una carpeta más del repositorio del curso, junto a otras ver
 1. **Mantener la API en el repositorio del curso con filtros por ruta.** Pro: sin repositorio nuevo. Contra: protección de rama, etiquetas de versión y permisos mezclados con el resto del curso.
 2. **GitFlow (`develop`, `release/*`).** Pro: útil con versiones planificadas. Contra: más ramas y ceremonia de la que necesita un equipo pequeño con despliegue continuo.
 3. **Jenkins o GitLab CI.** Pro: autoalojables. Contra: infraestructura adicional; el código ya está en GitHub y GHCR viene integrado.
+4. **GitHub Flow con PR obligatorio y checks requeridos** (diseño inicial). Pro: ningún cambio llega a `master` sin el CI en verde. Contra: ceremonia innecesaria para un único desarrollador que trabaja en local sobre una sola rama; se puede recuperar endureciendo el ruleset.
 
 ## Consecuencias
 
-- Positivas: ningún cambio llega a `master` sin compilar, sin pruebas en verde ni por debajo del umbral de cobertura; cada integración en `master` produce una imagen versionada.
+- Positivas: flujo simple para un único desarrollador; cada push a `master` se compila, se prueba, se mide su cobertura y produce una imagen versionada; el historial de `master` no se puede reescribir.
+- Negativas del flujo de una sola rama: el CI valida **después** del push, así que un cambio roto puede llegar a `master` (y a la imagen `latest`) si no se ejecuta `./mvnw clean verify` antes; se corrige con un commit nuevo. Si el equipo crece, volver a exigir PR y checks en el ruleset.
 - Negativas: las pruebas con Testcontainers alargan el pipeline; el ruleset se versiona en `.github/ruleset/` pero se importa a mano en GitHub (Settings → Rules → Rulesets) y cualquier cambio hay que replicarlo allí; se aplica porque el repositorio es público (en uno privado requiere plan Pro o Team).
 - Docker Hub limita las descargas anónimas por IP: un aula que comparte IP puede alcanzar el límite; con `docker login` el límite es mayor.
 - Seguimiento: el análisis estático con SonarCloud se incorporó en ADR-0011. Despliegue (CD a un entorno), análisis de seguridad (CodeQL/Dependabot) y pruebas de API con Postman CLI quedan fuera de esta decisión.

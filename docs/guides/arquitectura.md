@@ -67,11 +67,10 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    DEV[Rama feature/*] --> PR[Pull Request]
-    PR --> CI{GitHub Actions<br/>clean verify + imagen}
-    CI -->|merge| MAIN[master]
-    MAIN --> GHCR[(GHCR)]
-    MAIN -.->|si está configurado| DH[(Docker Hub)]
+    DEV[Commit en master<br/>en local] -->|push| MAIN[master]
+    MAIN --> CI{GitHub Actions<br/>clean verify + imagen}
+    CI -->|verde| GHCR[(GHCR)]
+    CI -.->|si está configurado| DH[(Docker Hub)]
     GHCR --> RUN[docker run<br/>con variables DB_* y SECURITY_JWT_*]
 ```
 
