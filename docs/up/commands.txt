@@ -1,0 +1,100 @@
+Levantar la imagen publicada (perfil prod) en macOS / zsh
+=========================================================
+Credenciales del admin de prod: usuario admin / contraseña Admin-Prueba-2026 (solo de prueba).
+No escribas tokens de GitHub ni de Docker Hub en este archivo: se piden con read -s.
+
+1. Claves JWT y variables de entorno (una sola vez)
+---------------------------------------------------
+mkdir -p ~/contract-api-prod
+cd ~/contract-api-prod
+
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private.pem
+openssl pkey -in private.pem -pubout -out public.pem
+
+PUB=$(awk '{printf "%s\\n", $0}' public.pem)
+PRIV=$(awk '{printf "%s\\n", $0}' private.pem)
+# Contraseña del admin de prod: Admin-Prueba-2026 (solo de prueba; 12-64 caracteres).
+# El admin se crea con ella en el primer arranque; cambiarla aquí después no la actualiza.
+ADMIN_PW='Admin-Prueba-2026'
+
+# Base propia (contracts_prod): así el admin se crea con ADMIN_PW. Con la base
+# "contracts" de docker compose ya existe un admin con otra contraseña y el login da 401.
+cat > prod.env <<EOF
+DB_URL=jdbc:postgresql://host.docker.internal:5432/contracts_prod
+DB_USERNAME=contract
+DB_PASSWORD=contract
+SECURITY_JWT_PUBLIC_KEY=$PUB
+SECURITY_JWT_PRIVATE_KEY=$PRIV
+SECURITY_BOOTSTRAP_ADMIN_USERNAME=admin
+SECURITY_BOOTSTRAP_ADMIN_PASSWORD=$ADMIN_PW
+EOF
+
+chmod 600 private.pem prod.env
+unset PUB PRIV ADMIN_PW
+ls -l private.pem public.pem prod.env
+
+# Crear la base contracts_prod en el PostgreSQL de docker compose (una sola vez)
+docker exec contract-api-postgres psql -U contract -d postgres -c "CREATE DATABASE contracts_prod OWNER contract"
+
+
+2. Descargar la imagen
+----------------------
+# Docker Hub (pública, sin login)
+docker pull --platform linux/amd64 christopherdocker/ai-cicd:latest
+
+# GHCR (privada): token classic con read:packages, sin escribirlo en el comando
+read -s "t?Token GHCR: "; echo
+print -r -- "$t" | docker login ghcr.io -u christophersanz --password-stdin
+unset t
+
+Token
+ghp_xxxxxxxxxxxxxxxxx
+
+docker pull --platform linux/amd64 ghcr.io/christophersanz/ai-cicd:latest
+
+# Desde el container registry
+docker pull christopherdocker/ai-cicd:sha-97d0324
+
+
+3. Levantar el contenedor
+-------------------------
+# El Puerto 8081 lo usa la API de docker compose (contract-api).
+# --platform linux/amd64: la imagen es amd64; en Mac con Apple Silicon corre emulada y tarda ~1 min.
+docker ps
+docker rm -f contract-api-prod 2>/dev/null
+docker run -d --platform linux/amd64 --name contract-api-prod -p 8082:8081 \
+  --env-file ~/contract-api-prod/prod.env \
+  ghcr.io/christophersanz/ai-cicd:latest
+
+docker run -d --platform linux/amd64 --name contract-api-prod-2 -p 8083:8081 \
+  --env-file ~/contract-api-prod/prod.env \
+  ghcr.io/christophersanz/ai-cicd:latest
+
+docker run -d --platform linux/amd64 --name contract-api-prod-cr -p 8084:8081 \
+  --env-file ~/contract-api-prod/prod.env \
+  christopherdocker/ai-cicd:sha-97d0324
+
+docker logs -f contract-api-prod        # espera "Started ContractApiApplication"; corta con Ctrl+C
+
+
+4. Probar la API (macOS / zsh)
+------------------------------
+API=http://localhost:8082
+BODY=$(jq -n '{username: "admin", password: "Admin-Prueba-2026"}')
+
+LOGIN=$(curl -fsS -X POST "$API/api/v1/auth/login" \
+  -H "Content-Type: application/json" -d "$BODY")
+H="Authorization: Bearer $(echo "$LOGIN" | jq -r '.accessToken')"
+
+curl -fsS "$API/api/v1/auth/me" -H "$H" | jq .
+curl -fsS "$API/actuator/health" -H "$H" | jq .
+curl -fsS "$API/api/v1/employees?page=0&size=20" -H "$H" | jq .
+
+unset BODY LOGIN H
+
+
+5. Detener y limpiar
+--------------------
+docker rm -f contract-api-prod
+# Borrar también los datos de prod (irreversible):
+# docker exec contract-api-postgres psql -U contract -d postgres -c "DROP DATABASE contracts_prod"
