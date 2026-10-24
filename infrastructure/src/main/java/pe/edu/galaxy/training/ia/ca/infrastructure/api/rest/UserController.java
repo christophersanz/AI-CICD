@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,13 +22,7 @@ import pe.edu.galaxy.training.ia.ca.infrastructure.api.dto.CreateUserRequest;
 import pe.edu.galaxy.training.ia.ca.infrastructure.api.dto.UserResponse;
 import pe.edu.galaxy.training.ia.ca.infrastructure.config.OpenApiConfig;
 
-/**
- * Gestión de usuarios. En la fase 1 el permiso {@code user:manage} lo exige una regla de URL temporal
- * en {@code SecurityFilterChainConfig} (decisión del paso 0) para evitar la escalada de privilegios.
- *
- * <p>TODO(fase 2, paso 2.1 del diseño 003; BR-CTR-011): {@code @PreAuthorize("hasAuthority('user:manage')")}
- * con {@code @EnableMethodSecurity} y retirar la regla de URL temporal.
- */
+/** Gestión de usuarios. Exige el permiso {@code user:manage}, que solo tiene {@code ADMIN} (business-rules §4.1). */
 @RestController
 @RequestMapping("/api/v1/users")
 @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
@@ -65,6 +60,7 @@ public class UserController {
             description = "Contraseña débil (AUTH-008) o username/rol con formato inválido (VAL-001)",
             content = @Content(mediaType = "application/problem+json",
                     schema = @Schema(implementation = ProblemDetail.class)))
+    @PreAuthorize("hasAuthority('user:manage')")
     public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) {
         UserResult result = createUserUseCase.create(mapper.toCommand(request));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()

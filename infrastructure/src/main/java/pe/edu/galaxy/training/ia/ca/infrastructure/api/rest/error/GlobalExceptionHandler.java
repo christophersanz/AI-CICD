@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -57,6 +58,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     ResponseEntity<ProblemDetail> handleConflict(ConflictException ex) {
         return problem(HttpStatus.CONFLICT, ex, ex.code());
+    }
+
+    /**
+     * {@code AUTH-001}: la lanza {@code @PreAuthorize} dentro del controller. Se relanza para que no la capture
+     * {@link #handleUnexpected} como 500 y la traduzca el {@code AccessDeniedHandler} de los filtros de
+     * seguridad, que es el único que escribe el cuerpo del 403.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    void rethrowAccessDenied(AccessDeniedException ex) {
+        throw ex;
     }
 
     @ExceptionHandler(Exception.class)

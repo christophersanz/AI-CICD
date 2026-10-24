@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -94,7 +95,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturnForbiddenWhenTokenLacksUserManagePermission() throws Exception {
-        // Regla de URL temporal de la fase 1 (decisión del paso 0)
+        // @PreAuthorize("hasAuthority('user:manage')"): sin escalada de privilegios desde HR
         mockMvc.perform(create(VALID_BODY).with(jwt().authorities(new SimpleGrantedAuthority("employee:create"))))
                 .andExpect(status().isForbidden())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
@@ -149,5 +150,27 @@ class UserControllerTest {
         mockMvc.perform(create(VALID_BODY).with(manager()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("VAL-001"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "user:manage")
+    void shouldReturnCreatedWhenMockUserHasUserManagePermission() throws Exception {
+        // Given
+        when(createUserUseCase.create(any()))
+                .thenReturn(new UserResult(UUID.randomUUID(), "ana.perez", Set.of("HR"), true));
+
+        // When / Then
+        mockMvc.perform(create(VALID_BODY))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.password").doesNotExist());
+    }
+
+    @Test
+    @WithMockUser(authorities = {"employee:create", "employee:update", "employee:read"})
+    void shouldReturnForbiddenWhenMockUserIsHr() throws Exception {
+        mockMvc.perform(create(VALID_BODY))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("AUTH-001"));
+        verifyNoInteractions(createUserUseCase);
     }
 }

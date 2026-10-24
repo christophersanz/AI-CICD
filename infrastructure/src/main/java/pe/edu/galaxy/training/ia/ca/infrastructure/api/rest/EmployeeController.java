@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,12 +34,8 @@ import pe.edu.galaxy.training.ia.ca.infrastructure.api.dto.UpdateEmployeeRequest
 import pe.edu.galaxy.training.ia.ca.infrastructure.config.OpenApiConfig;
 
 /**
- * Registro, actualización, consulta y listado de empleados. En la fase 1 basta con estar autenticado.
- *
- * <p>TODO(fase 2, paso 2.1 del diseño 003; BR-CTR-011): {@code @PreAuthorize("hasAuthority('employee:create')")}
- * en {@code register}, {@code hasAuthority('employee:update')} en {@code update} y
- * {@code hasAuthority('employee:read')} en {@code get} y {@code list} (requiere migrar el seed de
- * {@code employee:read}, business-rules §4.1), con {@code @EnableMethodSecurity}.
+ * Registro, actualización, consulta y listado de empleados. Cada operación exige su permiso
+ * ({@code employee:create}, {@code employee:update}, {@code employee:read}; business-rules §4.1).
  */
 @RestController
 @RequestMapping("/api/v1/employees")
@@ -71,6 +68,13 @@ public class EmployeeController {
     @ApiResponse(responseCode = "404", description = "Empleado no encontrado (EMP-404)",
             content = @Content(mediaType = "application/problem+json",
                     schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "401", description = "Access token ausente, inválido o expirado (AUTH-003, AUTH-004)",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "403", description = "Sin el permiso employee:read (AUTH-001)",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @PreAuthorize("hasAuthority('employee:read')")
     public EmployeeResponse get(@PathVariable UUID id) {
         return mapper.toResponse(getEmployeeUseCase.get(mapper.toQuery(id)));
     }
@@ -83,6 +87,13 @@ public class EmployeeController {
     @ApiResponse(responseCode = "400", description = "Parámetros inválidos",
             content = @Content(mediaType = "application/problem+json",
                     schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "401", description = "Access token ausente, inválido o expirado (AUTH-003, AUTH-004)",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "403", description = "Sin el permiso employee:read (AUTH-001)",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @PreAuthorize("hasAuthority('employee:read')")
     public PageResponse<EmployeeResponse> list(@Valid @ParameterObject EmployeeSearchRequest request) {
         return mapper.toResponse(listEmployeesUseCase.list(mapper.toQuery(request)));
     }
@@ -99,6 +110,13 @@ public class EmployeeController {
     @ApiResponse(responseCode = "422", description = "Documento o datos inválidos (EMP-002, VAL-001)",
             content = @Content(mediaType = "application/problem+json",
                     schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "401", description = "Access token ausente, inválido o expirado (AUTH-003, AUTH-004)",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "403", description = "Sin el permiso employee:create (AUTH-001)",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @PreAuthorize("hasAuthority('employee:create')")
     public ResponseEntity<EmployeeResponse> register(@Valid @RequestBody EmployeeRequest request) {
         EmployeeResult result = registerEmployeeUseCase.register(mapper.toCommand(request));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -121,6 +139,13 @@ public class EmployeeController {
     @ApiResponse(responseCode = "422", description = "Datos inválidos (VAL-001)",
             content = @Content(mediaType = "application/problem+json",
                     schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "401", description = "Access token ausente, inválido o expirado (AUTH-003, AUTH-004)",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "403", description = "Sin el permiso employee:update (AUTH-001)",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @PreAuthorize("hasAuthority('employee:update')")
     public ResponseEntity<EmployeeResponse> update(@PathVariable UUID id,
                                                    @Valid @RequestBody UpdateEmployeeRequest request) {
         EmployeeResult result = updateEmployeeUseCase.update(mapper.toCommand(id, request));

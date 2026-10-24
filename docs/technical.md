@@ -25,7 +25,7 @@ Si este documento y el código no coinciden, manda el código; actualiza este do
 
 ## 2. API REST
 
-URL base local: `http://localhost:8081`. Documentación interactiva (solo fuera de `prod`): `/swagger-ui.html`; especificación OpenAPI: `/v3/api-docs`.
+URL base local: `http://localhost:8081`. Documentación interactiva (solo fuera de `prod`): `/swagger-ui.html`; especificación OpenAPI: `/v3/api-docs` (JSON) y `/v3/api-docs.yaml`; copia versionada en [api/openapi.yaml](api/openapi.yaml).
 
 ### 2.1 Endpoints
 
@@ -36,10 +36,10 @@ URL base local: `http://localhost:8081`. Documentación interactiva (solo fuera 
 | `POST /api/v1/auth/logout` | `LogoutUseCase` | Autenticado | `204`, `400`, `401` |
 | `GET /api/v1/auth/me` | `GetCurrentUserUseCase` | Autenticado | `200`, `401`, `404` (AUTH-404) |
 | `POST /api/v1/users` | `CreateUserUseCase` | `user:manage` | `201` + `Location`, `400`, `401`, `403`, `404` (AUTH-009), `409` (AUTH-007), `422` (AUTH-008, VAL-001) |
-| `POST /api/v1/employees` | `RegisterEmployeeUseCase` | Autenticado | `201` + `Location`, `400`, `409` (EMP-001), `422` (EMP-002, VAL-001) |
-| `GET /api/v1/employees/{id}` | `GetEmployeeUseCase` | Autenticado | `200`, `400`, `404` (EMP-404) |
-| `PUT /api/v1/employees/{id}` | `UpdateEmployeeUseCase` | Autenticado | `200`, `400`, `404` (EMP-404), `422` (VAL-001) |
-| `GET /api/v1/employees` | `ListEmployeesUseCase` | Autenticado | `200`, `400` |
+| `POST /api/v1/employees` | `RegisterEmployeeUseCase` | `employee:create` | `201` + `Location`, `400`, `403`, `409` (EMP-001), `422` (EMP-002, VAL-001) |
+| `GET /api/v1/employees/{id}` | `GetEmployeeUseCase` | `employee:read` | `200`, `400`, `403`, `404` (EMP-404) |
+| `PUT /api/v1/employees/{id}` | `UpdateEmployeeUseCase` | `employee:update` | `200`, `400`, `403`, `404` (EMP-404), `422` (VAL-001) |
+| `GET /api/v1/employees` | `ListEmployeesUseCase` | `employee:read` | `200`, `400`, `403` |
 | `GET /actuator/health` | — | Público | `200` / `503` |
 | `GET /actuator/info`, `/actuator/metrics` | — | `system:monitor` | `200`, `401`, `403` |
 
@@ -125,8 +125,10 @@ Diseño completo en [design/003-security-design.md](design/003-security-design.m
 
 `SecurityFilterChainConfig` define dos cadenas, ambas stateless, sin CSRF (el token viaja en la cabecera `Authorization`), sin sesión, sin login de formulario ni HTTP Basic:
 
-1. **Pública** (`@Order(1)`): login, refresh, `/v3/api-docs/**`, `/swagger-ui/**`, `/actuator/health/**`.
-2. **Privada** (`@Order(2)`): `/api/v1/users/**` exige `user:manage`; el resto de `/api/v1/**` exige estar autenticado; `/actuator/**` exige `system:monitor`; todo lo demás se deniega.
+1. **Pública** (`@Order(1)`): login, refresh, `/v3/api-docs/**`, `/v3/api-docs.yaml`, `/swagger-ui/**`, `/actuator/health/**`.
+2. **Privada** (`@Order(2)`): `/api/v1/**` exige estar autenticado; `/actuator/**` exige `system:monitor`; todo lo demás se deniega.
+
+El permiso de cada operación lo exige `@PreAuthorize` en el controller (`@EnableMethodSecurity`): `employee:create`, `employee:update` y `employee:read` en `EmployeeController`, `user:manage` en `UserController` (BR-CTR-011). El `AccessDeniedException` que lanza `@PreAuthorize` lo relanza `GlobalExceptionHandler` (para que no acabe en su handler genérico de `500`) y lo traduce a `403` `AUTH-001` el mismo `ProblemDetailsAccessDeniedHandler` de los filtros, así que solo hay un sitio que escribe ese cuerpo.
 
 Los errores `401` y `403` de los filtros se escriben como Problem Details (`ProblemDetailsAuthenticationEntryPoint`, `ProblemDetailsAccessDeniedHandler`).
 
@@ -143,10 +145,8 @@ Claims del access token: `sub` (id del usuario), `iss`, `aud`, `iat`, `exp`, `jt
 
 Contraseñas: hash BCrypt de coste 12 con prefijo de algoritmo (`{bcrypt}...`). Si el algoritmo o el coste configurados cambian, el hash se regenera en el siguiente login correcto.
 
-### 3.3 Pendiente (fases 2–4 del diseño 003)
+### 3.3 Pendiente (resto de las fases 2–4 del diseño 003)
 
-- Autorización por método con `@PreAuthorize` y `@EnableMethodSecurity`, en lugar de la regla de URL temporal de `/api/v1/users` (BR-CTR-011).
-- El permiso `employee:read` figura en business-rules §4.1 pero aún no está en el seed `V3`; hace falta una migración nueva antes de exigirlo.
 - Auditoría de eventos de seguridad y endurecimiento.
 
 ## 4. Configuración
@@ -211,6 +211,7 @@ PostgreSQL 16, esquema gestionado por Flyway (`infrastructure/src/main/resources
 | `V2__create_identity.sql` | `roles`, `permissions`, `role_permissions`, `users`, `user_roles` |
 | `V3__seed_roles_permissions.sql` | Roles `ADMIN`, `HR`, `EMPLOYEE`, permisos y su relación (sin usuarios) |
 | `V4__create_refresh_tokens.sql` | `refresh_tokens` |
+| `V5__seed_employee_read_permission.sql` | Permiso `employee:read` para `ADMIN` y `HR` |
 
 ```mermaid
 erDiagram

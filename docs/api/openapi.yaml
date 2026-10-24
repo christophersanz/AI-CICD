@@ -1,0 +1,692 @@
+openapi: 3.1.0
+info:
+  title: contract-api
+  version: 0.1.0
+  description: API REST de gestión de contratos laborales. Contrato generado con springdoc-openapi desde el código (ver docs/api/README.md).
+servers:
+- url: http://localhost:8081
+  description: Local (docker compose / spring-boot:run)
+tags:
+- name: Users
+  description: Gestión de usuarios
+- name: Employees
+  description: Registro, actualización, consulta y listado de empleados
+- name: Authentication
+  description: Emisión, rotación y revocación de tokens
+paths:
+  "/api/v1/employees/{id}":
+    get:
+      tags:
+      - Employees
+      summary: Consultar un empleado
+      operationId: get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Empleado encontrado
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/EmployeeResponse"
+        '400':
+          description: Identificador con formato inválido
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '404':
+          description: Empleado no encontrado (EMP-404)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '401':
+          description: Access token ausente, inválido o expirado (AUTH-003, AUTH-004)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '403':
+          description: Sin el permiso employee:read (AUTH-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+    put:
+      tags:
+      - Employees
+      summary: Actualizar un empleado
+      description: Reemplaza nombres y correo. El documento de identidad no se modifica (BR-EMP-003).
+      operationId: update
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/UpdateEmployeeRequest"
+        required: true
+      responses:
+        '200':
+          description: Empleado actualizado
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/EmployeeResponse"
+        '400':
+          description: Formato de entrada inválido
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '404':
+          description: Empleado no encontrado (EMP-404)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '422':
+          description: Datos inválidos (VAL-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '401':
+          description: Access token ausente, inválido o expirado (AUTH-003, AUTH-004)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '403':
+          description: Sin el permiso employee:update (AUTH-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  "/api/v1/users":
+    post:
+      tags:
+      - Users
+      summary: Crear un usuario
+      description: Aplica BR-USR-001, BR-USR-002 y BR-USR-003. Requiere el permiso user:manage.
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreateUserRequest"
+        required: true
+      responses:
+        '201':
+          description: Usuario creado
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/UserResponse"
+        '400':
+          description: Formato de entrada inválido
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '401':
+          description: Access token ausente, inválido o expirado (AUTH-003, AUTH-004)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '403':
+          description: Sin el permiso user:manage (AUTH-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '404':
+          description: Rol inexistente (AUTH-009)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '409':
+          description: Username ya registrado (AUTH-007)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '422':
+          description: Contraseña débil (AUTH-008) o username/rol con formato inválido (VAL-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  "/api/v1/employees":
+    get:
+      tags:
+      - Employees
+      summary: Listar empleados
+      description: 'Paginado. Filtros opcionales: documento exacto (tipo + número) y nombre parcial sin distinguir mayúsculas ni tildes (BR-EMP-004).'
+      operationId: list
+      parameters:
+      - name: documentType
+        in: query
+        description: Tipo de documento; se envía junto con documentNumber y no se combina con name
+        required: false
+        schema:
+          type: string
+          enum:
+          - DNI
+          - FOREIGNER_CARD
+          pattern: DNI|FOREIGNER_CARD
+      - name: documentNumber
+        in: query
+        description: Número de documento exacto; se envía junto con documentType y no se combina con name
+        required: false
+        schema:
+          type: string
+          maxLength: 20
+          minLength: 0
+        example: 12345678
+      - name: name
+        in: query
+        description: Texto parcial en nombres y apellidos, sin distinguir mayúsculas ni tildes; no se combina con el filtro por documento
+        required: false
+        schema:
+          type: string
+          maxLength: 100
+          minLength: 0
+        example: perez
+      - name: page
+        in: query
+        description: Página, desde 0
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+        example: 0
+      - name: size
+        in: query
+        description: Tamaño de página (1–100)
+        required: false
+        schema:
+          type: integer
+          format: int32
+          maximum: 100
+          minimum: 1
+        example: 20
+      - name: sort
+        in: query
+        description: 'Campo y dirección: lastNames, firstNames, documentNumber o email; asc o desc'
+        required: false
+        schema:
+          type: string
+          pattern: "(lastNames|firstNames|documentNumber|email)(,(asc|desc))?"
+        example: lastNames,asc
+      responses:
+        '200':
+          description: Página de empleados
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/PageResponseEmployeeResponse"
+        '400':
+          description: Parámetros inválidos
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '401':
+          description: Access token ausente, inválido o expirado (AUTH-003, AUTH-004)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '403':
+          description: Sin el permiso employee:read (AUTH-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Employees
+      summary: Registrar un empleado
+      description: Aplica BR-EMP-001 y BR-EMP-002.
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/EmployeeRequest"
+        required: true
+      responses:
+        '201':
+          description: Empleado registrado
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/EmployeeResponse"
+        '400':
+          description: Formato de entrada inválido
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '409':
+          description: Documento ya registrado (EMP-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '422':
+          description: Documento o datos inválidos (EMP-002, VAL-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '401':
+          description: Access token ausente, inválido o expirado (AUTH-003, AUTH-004)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '403':
+          description: Sin el permiso employee:create (AUTH-001)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  "/api/v1/auth/refresh":
+    post:
+      tags:
+      - Authentication
+      summary: Renovar tokens
+      description: Rota el refresh token (un solo uso). Reutilizar uno ya usado revoca toda su familia (BR-USR-006).
+      operationId: refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RefreshTokenRequest"
+        required: true
+      responses:
+        '200':
+          description: Nuevo par de tokens
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/TokenResponse"
+        '400':
+          description: Formato de entrada inválido
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '401':
+          description: Refresh token inexistente, expirado, revocado o reutilizado (AUTH-005)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+  "/api/v1/auth/logout":
+    post:
+      tags:
+      - Authentication
+      summary: Cerrar sesión
+      description: Revoca la familia del refresh token si pertenece al usuario autenticado. Idempotente.
+      operationId: logout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RefreshTokenRequest"
+        required: true
+      responses:
+        '204':
+          description: Sesión cerrada
+        '400':
+          description: Formato de entrada inválido
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '401':
+          description: Access token ausente, inválido o expirado (AUTH-003, AUTH-004)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  "/api/v1/auth/login":
+    post:
+      tags:
+      - Authentication
+      summary: Iniciar sesión
+      description: Emite un access token y un refresh token de una familia nueva (BR-USR-004).
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        '200':
+          description: Credenciales válidas
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/TokenResponse"
+        '400':
+          description: Formato de entrada inválido
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '401':
+          description: Credenciales inválidas o usuario deshabilitado (AUTH-002)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+  "/api/v1/auth/me":
+    get:
+      tags:
+      - Authentication
+      summary: Usuario actual
+      description: Roles y permisos efectivos vigentes del usuario del token.
+      operationId: me
+      responses:
+        '200':
+          description: Usuario autenticado
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/CurrentUserResponse"
+        '401':
+          description: Access token ausente, inválido o expirado (AUTH-003, AUTH-004)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+        '404':
+          description: El usuario del token ya no existe (AUTH-404)
+          content:
+            application/problem+json:
+              schema:
+                "$ref": "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    UpdateEmployeeRequest:
+      type: object
+      description: Datos para actualizar un empleado
+      properties:
+        firstNames:
+          type: string
+          example: Ana María
+          maxLength: 150
+          minLength: 0
+        lastNames:
+          type: string
+          example: Pérez Gómez
+          maxLength: 150
+          minLength: 0
+        email:
+          type: string
+          format: email
+          example: ana.perez@example.com
+          maxLength: 254
+          minLength: 0
+      required:
+      - email
+      - firstNames
+      - lastNames
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        code:
+          type: string
+          description: Código de error de negocio (business-rules.md §8)
+          example: AUTH-001
+        errors:
+          type: array
+          description: Campos inválidos; solo en 400 invalid-request
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    EmployeeResponse:
+      type: object
+      description: Empleado registrado
+      properties:
+        id:
+          type: string
+          format: uuid
+        documentType:
+          type: string
+        documentNumber:
+          type: string
+        firstNames:
+          type: string
+        lastNames:
+          type: string
+        email:
+          type: string
+    CreateUserRequest:
+      type: object
+      description: Datos para crear un usuario
+      properties:
+        username:
+          type: string
+          example: ana.perez
+          maxLength: 100
+          minLength: 0
+        password:
+          type: string
+          format: password
+          example: una-contraseña-larga
+          maxLength: 256
+          minLength: 0
+        roles:
+          type: array
+          example:
+          - HR
+          items:
+            type: string
+            maxLength: 30
+            minLength: 0
+          uniqueItems: true
+      required:
+      - password
+      - roles
+      - username
+    UserResponse:
+      type: object
+      description: Usuario creado
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        enabled:
+          type: boolean
+    EmployeeRequest:
+      type: object
+      description: Datos para registrar un empleado
+      properties:
+        documentType:
+          type: string
+          enum:
+          - DNI
+          - FOREIGNER_CARD
+          example: DNI
+          minLength: 1
+          pattern: DNI|FOREIGNER_CARD
+        documentNumber:
+          type: string
+          example: 12345678
+          maxLength: 20
+          minLength: 0
+        firstNames:
+          type: string
+          example: Ana María
+          maxLength: 150
+          minLength: 0
+        lastNames:
+          type: string
+          example: Pérez Gómez
+          maxLength: 150
+          minLength: 0
+        email:
+          type: string
+          format: email
+          example: ana.perez@example.com
+          maxLength: 254
+          minLength: 0
+      required:
+      - documentNumber
+      - documentType
+      - email
+      - firstNames
+      - lastNames
+    RefreshTokenRequest:
+      type: object
+      description: Refresh token emitido por login o refresh
+      properties:
+        refreshToken:
+          type: string
+          maxLength: 128
+          minLength: 0
+      required:
+      - refreshToken
+    TokenResponse:
+      type: object
+      description: Par de tokens emitido
+      properties:
+        accessToken:
+          type: string
+          description: 'JWT para la cabecera Authorization: Bearer'
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          format: int64
+          description: Segundos hasta que expira el access token
+          example: 900
+        refreshToken:
+          type: string
+          description: Token opaco de un solo uso para /auth/refresh
+        refreshExpiresIn:
+          type: integer
+          format: int64
+          description: Segundos hasta que expira el refresh token
+          example: 604800
+    LoginRequest:
+      type: object
+      description: Credenciales de inicio de sesión
+      properties:
+        username:
+          type: string
+          example: admin
+          maxLength: 100
+          minLength: 0
+        password:
+          type: string
+          format: password
+          example: una-contraseña-larga
+          maxLength: 256
+          minLength: 0
+      required:
+      - password
+      - username
+    PageResponseEmployeeResponse:
+      type: object
+      description: Página de resultados
+      properties:
+        content:
+          type: array
+          items:
+            "$ref": "#/components/schemas/EmployeeResponse"
+        page:
+          type: integer
+          format: int32
+          description: Página actual, desde 0
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+    CurrentUserResponse:
+      type: object
+      description: Usuario autenticado con sus roles y permisos efectivos
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        permissions:
+          type: array
+          items:
+            type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: Access token obtenido en POST /api/v1/auth/login
+      scheme: bearer
+      bearerFormat: JWT

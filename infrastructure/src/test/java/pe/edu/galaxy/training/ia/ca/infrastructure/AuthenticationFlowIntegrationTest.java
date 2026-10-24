@@ -246,4 +246,22 @@ class AuthenticationFlowIntegrationTest {
         assertThat(docs.at("/paths/~1api~1v1~1auth~1login/post/security").isMissingNode()).isTrue();
         assertThat(docs.at("/paths/~1api~1v1~1auth~1refresh/post/security").isMissingNode()).isTrue();
     }
+
+    @Test
+    void shouldDescribeProblemDetailCodeAtTopLevelWhenOpenApiIsRequested() throws Exception {
+        // When
+        JsonNode docs = body(mockMvc.perform(get("/v3/api-docs")).andExpect(status().isOk()));
+
+        // Then
+        JsonNode properties = docs.at("/components/schemas/ProblemDetail/properties");
+        assertThat(properties.has("code")).isTrue();
+        assertThat(properties.has("errors")).isTrue();
+        assertThat(properties.has("properties")).isFalse();
+    }
+
+    @Test
+    void shouldPublishOpenApiYamlWithoutTokenWhenRequested() throws Exception {
+        mockMvc.perform(get("/v3/api-docs.yaml"))
+                .andExpect(status().isOk());
+    }
 }

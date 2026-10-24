@@ -322,7 +322,7 @@ Los agregados se referencian entre sí **solo por identificador** (`Contract` gu
 | Invariante de un agregado | Método del agregado | Solo se modifica un contrato en `DRAFT` (`Contract.update`, BR-CTR-006) |
 | Regla que necesita otros datos | Caso de uso | Documento único (`RegisterEmployeeService`, BR-EMP-001) |
 | Formato de la petición HTTP | Bean Validation en el `Request` | `email` obligatorio y ≤ 254 caracteres |
-| Permisos | Seguridad (`infrastructure`) | `/api/v1/users` exige `user:manage` |
+| Permisos | `@PreAuthorize` en el controller (`infrastructure`) | `POST /api/v1/users` exige `user:manage` |
 
 ## 7. Recorrido de una petición
 
@@ -393,8 +393,10 @@ flowchart TB
     V -->|no / ausente| E401[401 AUTH-003]
     V -->|expirado| E401B[401 AUTH-004]
     V -->|sí| AUTHZ{Regla de URL}
-    AUTHZ -->|/api/v1/users/** sin user:manage<br/>/actuator/** sin system:monitor| E403[403 AUTH-001]
-    AUTHZ -->|ok| CTRL
+    AUTHZ -->|/actuator/** sin system:monitor| E403[403 AUTH-001]
+    AUTHZ -->|ok| PRE{@PreAuthorize}
+    PRE -->|sin el permiso| E403
+    PRE -->|ok| CTRL
     AUTHZ -->|ruta no declarada| E403
 ```
 

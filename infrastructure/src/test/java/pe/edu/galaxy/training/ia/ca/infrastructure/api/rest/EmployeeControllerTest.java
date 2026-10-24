@@ -22,6 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import pe.edu.galaxy.training.ia.ca.application.dto.EmployeeResult;
@@ -81,6 +84,17 @@ class EmployeeControllerTest {
     @MockitoBean
     private ListEmployeesUseCase listEmployeesUseCase;
 
+    /** Token con los permisos de empleados del rol HR (business-rules §4.1). */
+    private static JwtRequestPostProcessor hr() {
+        return jwt().authorities(new SimpleGrantedAuthority("employee:create"),
+                new SimpleGrantedAuthority("employee:update"), new SimpleGrantedAuthority("employee:read"));
+    }
+
+    /** Token con solo el permiso del rol EMPLOYEE. */
+    private static JwtRequestPostProcessor employee() {
+        return jwt().authorities(new SimpleGrantedAuthority("contract:read:own"));
+    }
+
     @Test
     void shouldReturnCreatedWithLocationWhenRequestIsValid() throws Exception {
         // Given
@@ -89,7 +103,7 @@ class EmployeeControllerTest {
                 new EmployeeResult(id, DocumentType.DNI, "12345678", "Ana", "Pérez", "ana@example.com"));
 
         // When / Then
-        mockMvc.perform(post(URL).with(jwt()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+        mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "http://localhost/api/v1/employees/" + id))
                 .andExpect(jsonPath("$.id").value(id.toString()))
@@ -101,7 +115,7 @@ class EmployeeControllerTest {
     @Test
     void shouldReturnBadRequestWithFieldErrorsWhenRequiredFieldsAreMissing() throws Exception {
         // When / Then
-        mockMvc.perform(post(URL).with(jwt()).contentType(MediaType.APPLICATION_JSON).content("{}"))
+        mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.type").value("urn:contract-api:errors:invalid-request"))
@@ -115,14 +129,14 @@ class EmployeeControllerTest {
         String body = VALID_BODY.replace("\"DNI\"", "\"PASSPORT\"");
 
         // When / Then
-        mockMvc.perform(post(URL).with(jwt()).contentType(MediaType.APPLICATION_JSON).content(body))
+        mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0].field").value("documentType"));
     }
 
     @Test
     void shouldReturnBadRequestWhenBodyIsMalformed() throws Exception {
-        mockMvc.perform(post(URL).with(jwt()).contentType(MediaType.APPLICATION_JSON).content("{not-json"))
+        mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content("{not-json"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
     }
@@ -134,7 +148,7 @@ class EmployeeControllerTest {
                 new DuplicateEmployeeDocumentException(new DocumentNumber(DocumentType.DNI, "12345678")));
 
         // When / Then
-        mockMvc.perform(post(URL).with(jwt()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+        mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                 .andExpect(status().isConflict())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.type").value("urn:contract-api:errors:duplicate-employee-document"))
@@ -149,7 +163,7 @@ class EmployeeControllerTest {
                 .thenThrow(new InvalidDocumentNumberException("DNI must have exactly 8 digits."));
 
         // When / Then
-        mockMvc.perform(post(URL).with(jwt()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+        mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("EMP-002"))
                 .andExpect(jsonPath("$.detail").value("DNI must have exactly 8 digits."));
@@ -161,7 +175,7 @@ class EmployeeControllerTest {
         when(registerEmployeeUseCase.register(any())).thenThrow(new IllegalStateException("db password=secret"));
 
         // When / Then
-        mockMvc.perform(post(URL).with(jwt()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+        mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.detail").value("An unexpected error occurred."));
     }
@@ -174,7 +188,7 @@ class EmployeeControllerTest {
                 id, DocumentType.DNI, "12345678", "Ana María", "Pérez Gómez", "ana.perez@example.com"));
 
         // When / Then
-        mockMvc.perform(put(URL + "/" + id).with(jwt()).contentType(MediaType.APPLICATION_JSON).content(VALID_UPDATE_BODY))
+        mockMvc.perform(put(URL + "/" + id).with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_UPDATE_BODY))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.documentNumber").value("12345678"))
@@ -189,7 +203,7 @@ class EmployeeControllerTest {
     @Test
     void shouldReturnBadRequestWhenUpdateRequiredFieldsAreMissing() throws Exception {
         // When / Then
-        mockMvc.perform(put(URL + "/" + UUID.randomUUID()).with(jwt()).contentType(MediaType.APPLICATION_JSON).content("{}"))
+        mockMvc.perform(put(URL + "/" + UUID.randomUUID()).with(hr()).contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.errors.length()").value(3));
@@ -199,7 +213,7 @@ class EmployeeControllerTest {
     @Test
     void shouldReturnBadRequestWhenEmployeeIdIsNotUuid() throws Exception {
         // When / Then
-        mockMvc.perform(put(URL + "/not-a-uuid").with(jwt()).contentType(MediaType.APPLICATION_JSON).content(VALID_UPDATE_BODY))
+        mockMvc.perform(put(URL + "/not-a-uuid").with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_UPDATE_BODY))
                 .andExpect(status().isBadRequest());
         verifyNoInteractions(updateEmployeeUseCase);
     }
@@ -211,7 +225,7 @@ class EmployeeControllerTest {
         when(updateEmployeeUseCase.update(any())).thenThrow(new EmployeeNotFoundException(new EmployeeId(id)));
 
         // When / Then
-        mockMvc.perform(put(URL + "/" + id).with(jwt()).contentType(MediaType.APPLICATION_JSON).content(VALID_UPDATE_BODY))
+        mockMvc.perform(put(URL + "/" + id).with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_UPDATE_BODY))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.type").value("urn:contract-api:errors:employee-not-found"))
@@ -224,7 +238,7 @@ class EmployeeControllerTest {
         when(updateEmployeeUseCase.update(any())).thenThrow(new InvalidValueException("Email format is invalid."));
 
         // When / Then
-        mockMvc.perform(put(URL + "/" + UUID.randomUUID()).with(jwt()).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(put(URL + "/" + UUID.randomUUID()).with(hr()).contentType(MediaType.APPLICATION_JSON)
                         .content(VALID_UPDATE_BODY))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("VAL-001"));
@@ -240,7 +254,7 @@ class EmployeeControllerTest {
                 new EmployeeResult(id, DocumentType.DNI, "12345678", "Ana", "Pérez", "ana@example.com"));
 
         // When / Then
-        mockMvc.perform(get(URL + "/" + id).with(jwt()))
+        mockMvc.perform(get(URL + "/" + id).with(hr()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.lastNames").value("Pérez"));
@@ -253,7 +267,7 @@ class EmployeeControllerTest {
         when(getEmployeeUseCase.get(any())).thenThrow(new EmployeeNotFoundException(new EmployeeId(id)));
 
         // When / Then
-        mockMvc.perform(get(URL + "/" + id).with(jwt()))
+        mockMvc.perform(get(URL + "/" + id).with(hr()))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.code").value("EMP-404"));
@@ -261,7 +275,7 @@ class EmployeeControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenEmployeeIdToGetIsNotUuid() throws Exception {
-        mockMvc.perform(get(URL + "/not-a-uuid").with(jwt()))
+        mockMvc.perform(get(URL + "/not-a-uuid").with(hr()))
                 .andExpect(status().isBadRequest());
         verifyNoInteractions(getEmployeeUseCase);
     }
@@ -284,7 +298,7 @@ class EmployeeControllerTest {
                 new EmployeeResult(id, DocumentType.DNI, "12345678", "Ana", "Pérez", "ana@example.com")), 0, 20, 41));
 
         // When / Then
-        mockMvc.perform(get(URL).with(jwt()))
+        mockMvc.perform(get(URL).with(hr()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(id.toString()))
                 .andExpect(jsonPath("$.page").value(0))
@@ -301,7 +315,7 @@ class EmployeeControllerTest {
         when(listEmployeesUseCase.list(any())).thenReturn(new PageResult<>(List.of(), 2, 5, 0));
 
         // When / Then
-        mockMvc.perform(get(URL).with(jwt())
+        mockMvc.perform(get(URL).with(hr())
                         .param("name", "pérez").param("page", "2").param("size", "5")
                         .param("sort", "documentNumber,desc"))
                 .andExpect(status().isOk())
@@ -316,7 +330,7 @@ class EmployeeControllerTest {
         when(listEmployeesUseCase.list(any())).thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
         // When / Then
-        mockMvc.perform(get(URL).with(jwt()).param("documentType", "DNI").param("documentNumber", "12345678"))
+        mockMvc.perform(get(URL).with(hr()).param("documentType", "DNI").param("documentNumber", "12345678"))
                 .andExpect(status().isOk());
         verify(listEmployeesUseCase).list(new EmployeeSearchQuery(DocumentType.DNI, "12345678", null, 0, 20,
                 EmployeeSortField.LAST_NAMES, SortDirection.ASC));
@@ -324,7 +338,7 @@ class EmployeeControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenDocumentAndNameFiltersAreCombined() throws Exception {
-        mockMvc.perform(get(URL).with(jwt()).param("documentType", "DNI").param("documentNumber", "12345678")
+        mockMvc.perform(get(URL).with(hr()).param("documentType", "DNI").param("documentNumber", "12345678")
                         .param("name", "perez"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0].field").value("documentFilterExclusive"));
@@ -333,7 +347,7 @@ class EmployeeControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenPageSizeExceedsMaximum() throws Exception {
-        mockMvc.perform(get(URL).with(jwt()).param("size", "101"))
+        mockMvc.perform(get(URL).with(hr()).param("size", "101"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.errors[0].field").value("size"));
@@ -342,7 +356,7 @@ class EmployeeControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenSortFieldIsNotAllowed() throws Exception {
-        mockMvc.perform(get(URL).with(jwt()).param("sort", "id,asc"))
+        mockMvc.perform(get(URL).with(hr()).param("sort", "id,asc"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0].field").value("sort"));
         verifyNoInteractions(listEmployeesUseCase);
@@ -350,7 +364,7 @@ class EmployeeControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenDocumentNumberIsSentWithoutType() throws Exception {
-        mockMvc.perform(get(URL).with(jwt()).param("documentNumber", "12345678"))
+        mockMvc.perform(get(URL).with(hr()).param("documentNumber", "12345678"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0].field").value("documentFilterComplete"));
         verifyNoInteractions(listEmployeesUseCase);
@@ -358,9 +372,69 @@ class EmployeeControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenPageIsNotNumeric() throws Exception {
-        mockMvc.perform(get(URL).with(jwt()).param("page", "first"))
+        mockMvc.perform(get(URL).with(hr()).param("page", "first"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
         verifyNoInteractions(listEmployeesUseCase);
+    }
+
+    // --- autorización por método (@PreAuthorize, BR-CTR-011) ---
+
+    @Test
+    void shouldReturnForbiddenWhenRegisteringWithoutCreatePermission() throws Exception {
+        mockMvc.perform(post(URL).with(employee()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.type").value("urn:contract-api:errors:access-denied"))
+                .andExpect(jsonPath("$.code").value("AUTH-001"));
+        verifyNoInteractions(registerEmployeeUseCase);
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenUpdatingWithoutUpdatePermission() throws Exception {
+        mockMvc.perform(put(URL + "/" + UUID.randomUUID())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("employee:read")))
+                        .contentType(MediaType.APPLICATION_JSON).content(VALID_UPDATE_BODY))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("AUTH-001"));
+        verifyNoInteractions(updateEmployeeUseCase);
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenGettingWithoutReadPermission() throws Exception {
+        mockMvc.perform(get(URL + "/" + UUID.randomUUID()).with(employee()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("AUTH-001"));
+        verifyNoInteractions(getEmployeeUseCase);
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenListingWithoutReadPermission() throws Exception {
+        mockMvc.perform(get(URL).with(employee()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("AUTH-001"));
+        verifyNoInteractions(listEmployeesUseCase);
+    }
+
+    @Test
+    @WithMockUser(authorities = "employee:create")
+    void shouldReturnCreatedWhenMockUserHasCreatePermission() throws Exception {
+        // Given
+        UUID id = UUID.randomUUID();
+        when(registerEmployeeUseCase.register(any())).thenReturn(
+                new EmployeeResult(id, DocumentType.DNI, "12345999", "Ana", "Pérez", "ana@example.com"));
+
+        // When / Then
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(authorities = "contract:read:own")
+    void shouldReturnForbiddenWhenMockUserOnlyHasEmployeePermissions() throws Exception {
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("AUTH-001"));
+        verifyNoInteractions(registerEmployeeUseCase);
     }
 }

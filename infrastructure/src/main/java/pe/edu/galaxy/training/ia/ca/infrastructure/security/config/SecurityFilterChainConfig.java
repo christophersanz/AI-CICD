@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,25 +20,25 @@ import pe.edu.galaxy.training.ia.ca.infrastructure.security.jwt.JwtConfig;
 
 /**
  * Dos cadenas: la pública (login, refresh, OpenAPI y health) y la privada (todo lo demás, con JWT).
- * Lo que no se declara se deniega.
+ * Lo que no se declara se deniega. La cadena privada exige autenticación en {@code /api/v1/**}; el permiso
+ * de cada operación lo exige {@code @PreAuthorize} en el controller ({@code @EnableMethodSecurity}).
  *
  * <p>CSRF desactivado: la API es stateless y el token viaja en la cabecera {@code Authorization},
  * que el navegador no envía por su cuenta; no hay cookie de sesión que un sitio ajeno pueda aprovechar.
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @Import(JwtConfig.class)
 public class SecurityFilterChainConfig {
 
     static final String[] PUBLIC_PATHS = {
             "/api/v1/auth/login",
             "/api/v1/auth/refresh",
-            "/v3/api-docs", "/v3/api-docs/**",
+            "/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml",
             "/swagger-ui.html", "/swagger-ui/**",
             "/actuator/health", "/actuator/health/**"
     };
-
-    static final String[] USER_MANAGEMENT_PATHS = {"/api/v1/users", "/api/v1/users/**"};
 
     @Bean
     SecurityProblemWriter securityProblemWriter(ObjectMapper objectMapper) {
@@ -71,9 +72,6 @@ public class SecurityFilterChainConfig {
         return stateless(http)
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        // Temporal en la fase 1 (decisión del paso 0): sin ella cualquier usuario autenticado
-                        // podría crearse un ADMIN. TODO(fase 2, paso 2.1): sustituir por @PreAuthorize.
-                        .requestMatchers(USER_MANAGEMENT_PATHS).hasAuthority("user:manage")
                         .requestMatchers("/api/v1/**").authenticated()
                         .requestMatchers("/actuator/**").hasAuthority("system:monitor")
                         .anyRequest().denyAll())

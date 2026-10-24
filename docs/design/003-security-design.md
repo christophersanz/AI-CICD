@@ -1,6 +1,6 @@
 # Diseño de seguridad (3A) — contract-api
 
-- **Estado:** Aprobado; fase 1 completada (2026-10-16, ver §5 "Estado de la fase 1"); fase 2 pendiente
+- **Estado:** Aprobado; fase 1 completada (2026-10-16, ver §5 "Estado de la fase 1"); fase 2: paso 2.1 completado (2026-10-24)
 - **Fecha:** 2026-10-03
 - **Origen:** `docs/prompts/003-security-01.md`
 - **Decisiones previas:** C1 = se reemplaza ADR-0001 (se incorpora seguridad). C2 = se mantiene ADR-0003 (sin ArchUnit). Implementación por fases.
@@ -356,8 +356,8 @@ Pasos 1.0–1.8 ✅ completados (1.6–1.8 en `docs/prompts/005-security-02.md`)
 
 | # | Pendiente | Referencia |
 |---|---|---|
-| T1 | `@EnableMethodSecurity` y `@PreAuthorize` en `EmployeeController` (`employee:create`/`employee:update`) y `UserController` (`user:manage`); retirar la regla de URL temporal D3 | Paso 2.1, BR-CTR-011, TODO en `EmployeeController`, `UserController` y `SecurityFilterChainConfig` |
-| T2 | `GlobalExceptionHandler` captura `Exception` y respondería **500** a un `AccessDeniedException` lanzado por `@PreAuthorize`: añadir un handler que lo traduzca a 403 `AUTH-001` (o dejar que lo gestione `ExceptionTranslationFilter`) | Paso 2.1 |
+| T1 ✅ | `@EnableMethodSecurity` y `@PreAuthorize` en `EmployeeController` (`employee:create`/`employee:update`) y `UserController` (`user:manage`); retirar la regla de URL temporal D3 | Paso 2.1, BR-CTR-011, TODO en `EmployeeController`, `UserController` y `SecurityFilterChainConfig` |
+| T2 ✅ | `GlobalExceptionHandler` captura `Exception` y respondería **500** a un `AccessDeniedException` lanzado por `@PreAuthorize`: añadir un handler que lo traduzca a 403 `AUTH-001` (o dejar que lo gestione `ExceptionTranslationFilter`). Resuelto con la segunda opción: `GlobalExceptionHandler` lo relanza y lo escribe `ProblemDetailsAccessDeniedHandler` | Paso 2.1 |
 | T3 | Casos de uso de gestión de usuarios (activar/desactivar, roles, cambio de contraseña propia) con revocación de refresh tokens | Paso 2.2, BR-USR-005 (hoy sin cobertura) |
 | T4 | Record `Actor` en `application/dto`, construido desde el `Jwt` en `api`; usarlo en `logout`, `me` y las consultas de contratos | Paso 2.3, BR-CTR-012, P1 |
 | T5 | CORS por propiedades y perfil, con fallo al arrancar si hay `*` con `allowCredentials=true`; exponer `Location` y `X-Trace-Id` | Paso 2.4 |
@@ -367,7 +367,7 @@ Pasos 1.0–1.8 ✅ completados (1.6–1.8 en `docs/prompts/005-security-02.md`)
 
 | Paso | Contenido | Pruebas |
 |---|---|---|
-| 2.1 | `@EnableMethodSecurity`; `@PreAuthorize` en `EmployeeController` y `UserController`. | `@WebMvcTest`: 403 sin authority, 2xx con authority |
+| 2.1 ✅ | `@EnableMethodSecurity`; `@PreAuthorize` en `EmployeeController` y `UserController`; `V5` con `employee:read`; regla de URL temporal D3 retirada. | `@WebMvcTest`: 403 sin authority, 2xx con authority |
 | 2.2 | Gestión de usuarios: activar/desactivar, asignar/retirar rol, cambiar contraseña propia; revocación de refresh tokens. | Unitarias + slice |
 | 2.3 | `Actor` en `application/dto` y su construcción desde el `Jwt` en `api`. Aplicación de BR-CTR-012 cuando existan los casos de uso de consulta de contratos. | Unitarias |
 | 2.4 | CORS por propiedades y perfil; falla al arrancar si hay `*` con `allowCredentials=true`. Cabeceras expuestas: `Location`, `X-Trace-Id`. | `@WebMvcTest`: preflight permitido y rechazado |
