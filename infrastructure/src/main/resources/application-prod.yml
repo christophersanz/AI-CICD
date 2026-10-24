@@ -1,0 +1,8 @@
+# Perfil prod (lo activa la imagen Docker). Sin valores por defecto: la base de datos y las claves JWT
+# llegan por variables de entorno y la aplicación no arranca si faltan (RsaKeys falla sin claves).
+# Swagger/OpenAPI se desactiva en producción (docs/design/003-security-design.md §1.2).
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

@@ -1,0 +1,27 @@
+# Jenkins local de práctica (ADR-0010). Uso: docker compose -f docker/jenkins/docker-compose.yml up -d --build
+# Usa el Docker del host a través del socket: los contenedores de Testcontainers y de docker build
+# se crean junto a este, no dentro.
+name: contract-api-jenkins
+
+services:
+  jenkins:
+    build: .
+    container_name: contract-api-jenkins
+    user: root                                # solo en local: acceso directo al socket de Docker
+    ports:
+      - "127.0.0.1:8080:8080"                 # solo accesible desde esta máquina (la API usa 8081)
+    environment:
+      JENKINS_ADMIN_USER: ${JENKINS_ADMIN_USER:-admin}
+      JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD:-admin}
+      REPO_URL: ${REPO_URL:-https://github.com/GalaxyTraining/CURS-000617-CICD.git}
+      REPO_BRANCH: ${REPO_BRANCH:-main}
+      TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - jenkins-home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  jenkins-home:

@@ -1,0 +1,17 @@
+**/target/
+.git
+.github
+.idea
+.vscode
+*.iml
+.env
+docs
+docker
+docker-compose.yml
+CLAUDE.md
+README.md
+
+# Secretos: no deben entrar en el contexto de la imagen
+*.pem
+*.key
+*.env

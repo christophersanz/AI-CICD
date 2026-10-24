@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "CURS-000617-AI-Assisted-Java",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "contracts",
+      "Username": "contract",
+      "SSLMode": "prefer"
+    }
+  }
+}

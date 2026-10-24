@@ -1,0 +1,10 @@
+target/
+.idea/
+*.iml
+.vscode/
+.env
+
+# Secretos: claves JWT y archivos de variables (nunca se versionan)
+*.pem
+*.key
+*.env

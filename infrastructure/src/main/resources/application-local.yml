@@ -1,0 +1,10 @@
+# Perfil local: apunta al PostgreSQL de docker-compose.yml.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/contracts}
+    username: ${DB_USERNAME:contract}
+    password: ${DB_PASSWORD:contract}
+# Sin claves configuradas, genera un par RSA efímero (los tokens dejan de valer al reiniciar).
+security:
+  jwt:
+    generate-ephemeral-key: true

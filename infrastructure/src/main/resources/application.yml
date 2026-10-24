@@ -1,0 +1,55 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: contract-api
+  profiles:
+    default: local
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+logging:
+  structured:
+    format:
+      console: ecs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  tracing:
+    sampling:
+      probability: 1.0
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# Seguridad (ADR-0005). Las claves PEM llegan por variables de entorno; nunca se versionan.
+security:
+  jwt:
+    issuer: ${SECURITY_JWT_ISSUER:contract-api}
+    audience: ${SECURITY_JWT_AUDIENCE:contract-api}
+    access-token-ttl: 15m
+    refresh-token-ttl: 7d
+    key-id: ${SECURITY_JWT_KEY_ID:contract-api-1}
+    public-key: ${SECURITY_JWT_PUBLIC_KEY:}
+    private-key: ${SECURITY_JWT_PRIVATE_KEY:}
+    generate-ephemeral-key: false
+  password:
+    default-algorithm: bcrypt
+    bcrypt-strength: 12

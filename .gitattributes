@@ -1,0 +1,5 @@
+# Fin de línea normalizado en el repositorio; los scripts conservan el formato que exige su sistema.
+* text=auto
+mvnw text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf

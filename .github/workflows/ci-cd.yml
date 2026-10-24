@@ -1,0 +1,125 @@
+# CI/CD de contract-api (ADR-0009).
+# - Pull Request a main: build, pruebas (Testcontainers), cobertura y build de la imagen sin publicarla.
+# - Push a main: lo anterior y publicación de la imagen en GHCR (latest + sha) y, si está configurado,
+#   en Docker Hub (variable DOCKERHUB_USERNAME y secreto DOCKERHUB_TOKEN).
+# - Tag vX.Y.Z: publicación con las etiquetas de versión.
+name: CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build, pruebas y cobertura
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # Incluye pruebas de integración con Testcontainers (Docker disponible en ubuntu-latest)
+      # y el umbral de cobertura de JaCoCo en domain y application.
+      - name: Compilar y verificar
+        run: ./mvnw -B -ntp clean verify
+
+      - name: Resumen de cobertura
+        if: always()
+        run: |
+          {
+            echo "### Cobertura (JaCoCo)"
+            echo "| Módulo | Líneas | Ramas | Umbral |"
+            echo "|---|---|---|---|"
+            for module in domain application infrastructure; do
+              csv="$module/target/site/jacoco/jacoco.csv"
+              [ -f "$csv" ] || continue
+              threshold="80 % líneas"; [ "$module" = infrastructure ] && threshold="—"
+              awk -F, -v m="$module" -v t="$threshold" 'NR > 1 { lm += $8; lc += $9; bm += $6; bc += $7 }
+                END { printf "| %s | %.1f %% | %.1f %% | %s |\n", m, 100 * lc / (lm + lc), (bm + bc) ? 100 * bc / (bm + bc) : 0, t }' "$csv"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publicar informes
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports
+          path: |
+            **/target/surefire-reports/
+            **/target/site/jacoco/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  image:
+    name: Imagen Docker
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login en GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Opcional: sin la variable DOCKERHUB_USERNAME (p. ej. en un fork) solo se publica en GHCR.
+      - name: Login en Docker Hub
+        if: github.event_name != 'pull_request' && vars.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # El nombre de la imagen se normaliza a minúsculas (ghcr.io/galaxytraining/curs-000617-cicd).
+      - name: Etiquetas
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+            name=docker.io/${{ vars.DOCKERHUB_USERNAME }}/curs-000617-cicd,enable=${{ vars.DOCKERHUB_USERNAME != '' }}
+          tags: |
+            type=ref,event=pr
+            type=sha,format=short
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build y publicación
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

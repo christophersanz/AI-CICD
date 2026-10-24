@@ -1,0 +1,35 @@
+# Configuración de Jenkins como código (JCasC). Los valores ${...} llegan desde docker-compose.yml.
+jenkins:
+  systemMessage: "Jenkins local de práctica para contract-api (ADR-0010). El CI oficial es GitHub Actions."
+  numExecutors: 2
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_ADMIN_USER}"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+unclassified:
+  location:
+    url: "http://localhost:8080/"
+
+jobs:
+  - script: >
+      pipelineJob('contract-api') {
+        description('Build, pruebas, cobertura e imagen Docker de contract-api (Jenkinsfile del repositorio).')
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('${REPO_URL}') }
+                branch('*/${REPO_BRANCH}')
+              }
+            }
+            scriptPath('Jenkinsfile')
+            lightweight(true)
+          }
+        }
+      }

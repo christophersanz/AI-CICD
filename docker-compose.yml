@@ -1,0 +1,41 @@
+name: curs-000617-ai-assisted-java
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: contract-api-postgres
+    environment:
+      POSTGRES_DB: contracts
+      POSTGRES_USER: contract
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-contract}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U contract -d contracts"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:9
+    container_name: contract-api-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+    name: api-contratos-ca-v3_postgres-data   # keeps your existing data
+  pgadmin-data:
