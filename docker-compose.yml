@@ -35,6 +35,28 @@ services:
       postgres:
         condition: service_healthy
 
+  # API construida con el Dockerfile. Perfil local: Swagger activo y, si no se pasan claves JWT,
+  # un par RSA efímero (los tokens dejan de valer al reiniciar). Variables en .env (ver .env.example).
+  api:
+    build: .
+    image: ai-cicd:local
+    container_name: contract-api
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      DB_URL: jdbc:postgresql://postgres:5432/contracts
+      DB_USERNAME: contract
+      DB_PASSWORD: ${DB_PASSWORD:-contract}
+      SECURITY_JWT_PUBLIC_KEY: ${SECURITY_JWT_PUBLIC_KEY:-}
+      SECURITY_JWT_PRIVATE_KEY: ${SECURITY_JWT_PRIVATE_KEY:-}
+      SECURITY_BOOTSTRAP_ADMIN_USERNAME: ${SECURITY_BOOTSTRAP_ADMIN_USERNAME:-admin}
+      SECURITY_BOOTSTRAP_ADMIN_PASSWORD: ${SECURITY_BOOTSTRAP_ADMIN_PASSWORD:?Define SECURITY_BOOTSTRAP_ADMIN_PASSWORD en .env (12-64 caracteres)}
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres-data:
     name: api-contratos-ca-v3_postgres-data   # keeps your existing data

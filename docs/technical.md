@@ -296,6 +296,8 @@ docker compose up -d                       # PostgreSQL (5432) y pgAdmin (http:/
 ./mvnw spring-boot:run -pl infrastructure  # http://localhost:8081, perfil local
 ```
 
+`docker compose up -d --build` levanta además la API (servicio `api`, perfil `local` por defecto) con las variables de `.env`; la plantilla con todas las variables es `.env.example`.
+
 pgAdmin arranca sin pedir contraseña maestra y con el servidor ya registrado (`docker/pgadmin/servers.json`). Las credenciales por defecto de PostgreSQL son `contract` / `contract`; se pueden cambiar con `DB_PASSWORD`.
 
 ## 9. Imagen Docker y CI/CD
@@ -313,11 +315,12 @@ El `Dockerfile` tiene dos etapas:
 
 | Evento | `build` | `image` |
 |---|---|---|
-| Pull Request a `main` | `clean verify`, resumen de cobertura e informes | Construye la imagen sin publicarla |
+| Pull Request a `main` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Construye la imagen sin publicarla |
 | Push a `main` | Igual | Publica `latest` y `sha-<corto>` |
 | Tag `vX.Y.Z` | Igual | Publica `X.Y.Z` y `X.Y` |
 
-- Registros: `ghcr.io/galaxytraining/curs-000617-cicd` siempre; Docker Hub solo si el repositorio define la variable `DOCKERHUB_USERNAME` y el secreto `DOCKERHUB_TOKEN`.
+- SonarCloud ([ADR-0011](adr/0011-analisis-estatico-sonarcloud.md)): se ejecuta solo si existe el secreto `SONAR_TOKEN`; el job falla si no se cumple el Quality Gate.
+- Registros: `ghcr.io/christophersanz/ai-cicd` siempre; Docker Hub solo si el repositorio define la variable `DOCKERHUB_USERNAME` y el secreto `DOCKERHUB_TOKEN`.
 - Los informes de Surefire y JaCoCo se guardan como artefacto `reports` durante 14 días.
 - En los PR, un push nuevo cancela la ejecución anterior.
 
