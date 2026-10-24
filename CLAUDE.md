@@ -35,7 +35,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | Documentación API | springdoc-openapi (OpenAPI 3) |
 | Observabilidad | Micrometer + OpenTelemetry, logs estructurados en JSON |
 | Pruebas | JUnit 5, AssertJ, Mockito, Testcontainers, spring-security-test; cobertura con JaCoCo (≥ 80 % de líneas en `domain` y `application`) |
-| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), imagen Docker en GHCR y Docker Hub (opcional), GitHub Flow (ADR-0009); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
+| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional), GitHub Flow (ADR-0009); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
 
 ## 3. Comandos habituales
 
@@ -45,7 +45,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 ./mvnw spring-boot:run -pl infrastructure  # Levantar la API
 docker compose up -d                  # Levantar dependencias locales (PostgreSQL y pgAdmin)
 docker build -t contract-api .        # Construir la imagen (perfil prod)
-docker compose -f docker/jenkins/docker-compose.yml up -d --build  # Jenkins local de práctica (ADR-0010)
+docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d --build  # Jenkins local de práctica (ADR-0010)
 ```
 
 ## 3.1 Flujo de Git (GitHub Flow, ADR-0009)

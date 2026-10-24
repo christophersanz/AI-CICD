@@ -8,3 +8,6 @@ target/
 *.pem
 *.key
 *.env
+
+# macOS
+.DS_Store

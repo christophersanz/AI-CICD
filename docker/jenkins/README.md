@@ -13,12 +13,12 @@ Jenkins en Docker, ya configurado para ejecutar el `Jenkinsfile` de este reposit
 Desde la raíz del repositorio:
 
 ```bash
-docker compose -f docker/jenkins/docker-compose.yml up -d --build
+docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d --build
 ```
 
 La primera vez tarda unos minutos (construye la imagen e instala los plugins). Cuando `docker logs contract-api-jenkins` muestre `Jenkins is fully up and running`:
 
-1. Abre http://localhost:8080 e inicia sesión con `admin` / `admin`.
+1. Abre http://localhost:8080 e inicia sesión con `admin` / la contraseña de `JENKINS_ADMIN_PASSWORD` en `.env`.
 2. Entra al job **contract-api** y pulsa **Build Now** (o **Construir ahora**).
 3. Revisa el avance en **Console Output** y, al terminar, los resultados de las pruebas y el informe de cobertura en los artefactos del build.
 
@@ -38,8 +38,8 @@ Variables de entorno opcionales (en la terminal o en un archivo `.env` junto a e
 Ejemplo en PowerShell para construir tu fork:
 
 ```powershell
-$env:REPO_URL = "https://github.com/<tu-usuario>/CURS-000617-CICD.git"
-docker compose -f docker/jenkins/docker-compose.yml up -d
+$env:REPO_URL = "https://github.com/<tu-usuario>/AI-CICD.git"
+docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d
 ```
 
 ## Cómo funciona

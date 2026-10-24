@@ -13,7 +13,7 @@ services:
     environment:
       JENKINS_ADMIN_USER: ${JENKINS_ADMIN_USER:-admin}
       JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD:-admin}
-      REPO_URL: ${REPO_URL:-https://github.com/GalaxyTraining/CURS-000617-CICD.git}
+      REPO_URL: ${REPO_URL:-https://github.com/christophersanz/AI-CICD.git}
       REPO_BRANCH: ${REPO_BRANCH:-main}
       TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
     extra_hosts:

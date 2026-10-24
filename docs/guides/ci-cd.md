@@ -109,7 +109,7 @@ Si cambias el JSON, hay que volver a importarlo a mano en GitHub: el archivo es 
 
 ## 5. El pipeline de GitHub Actions
 
-Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). Tiene dos jobs; el segundo solo empieza si el primero termina bien.
+Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). Tiene dos jobs; el segundo solo empieza si el primero termina bien. El análisis de SonarCloud es un paso del primero ([ADR-0011](../adr/0011-analisis-estatico-sonarcloud.md)).
 
 ### 5.1 Job `Build, pruebas y cobertura`
 
@@ -119,6 +119,7 @@ Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). 
 - Al terminar, aunque falle:
   - escribe una tabla de cobertura por módulo en el **resumen** de la ejecución (*Actions → ejecución → Summary*);
   - publica el artefacto **reports** (informes de Surefire y JaCoCo, 14 días). Descárgalo desde la ejecución y abre `*/target/site/jacoco/index.html`.
+- Si el repositorio tiene el secreto `SONAR_TOKEN`, ejecuta el **análisis de SonarCloud** con la cobertura de JaCoCo y espera el **Quality Gate**: si no se cumple, el job falla (sección 5.4). Sin el secreto, el paso se omite.
 
 ### 5.2 Job `Imagen Docker`
 
@@ -129,6 +130,15 @@ Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). 
 ### 5.3 Ejecutar el pipeline a mano
 
 *Actions → CI/CD → Run workflow* y elige la rama. Útil, por ejemplo, después de configurar un secreto sin tener que hacer un commit.
+
+### 5.4 Configurar SonarCloud (una sola vez)
+
+1. Entra a <https://sonarcloud.io> con tu cuenta de GitHub → **+ → Analyze new project** → elige el repositorio (gratis para repositorios públicos).
+2. En el proyecto: *Administration → Analysis Method* → desactiva **Automatic Analysis** (si está activo, el análisis desde el CI falla).
+3. *My Account → Security* → genera un token.
+4. En GitHub: *Settings → Secrets and variables → Actions → Secrets* → `SONAR_TOKEN` = el token.
+5. Solo si tu organización o clave de proyecto en SonarCloud son distintas de las de GitHub, crea en la pestaña **Variables** `SONAR_ORGANIZATION` y/o `SONAR_PROJECT_KEY`. Por defecto se usan `<dueño>` y `<dueño>_<repositorio>` (p. ej. `christophersanz` y `christophersanz_AI-CICD`), que son los que crea SonarCloud al importar.
+6. *Run workflow* sobre `main` y revisa el resultado en el panel del proyecto en SonarCloud. Ese panel es la evidencia de **"Análisis estático sin issues críticos"**.
 
 ## 6. Publicar una versión
 
@@ -151,16 +161,16 @@ La misma imagen y las mismas etiquetas se publican en dos registros:
 
 | | GHCR | Docker Hub |
 |---|---|---|
-| Imagen | `ghcr.io/galaxytraining/curs-000617-cicd` | `docker.io/anovoa1975/curs-000617-cicd` |
-| Visibilidad | Privada (la organización no permite paquetes públicos) | Pública |
+| Imagen | `ghcr.io/christophersanz/ai-cicd` | `docker.io/<usuario-dockerhub>/ai-cicd` |
+| Visibilidad | Privada por defecto (se puede hacer pública en *Packages → Package settings*) | Pública |
 | Para descargar | `docker login ghcr.io` con un token | Sin login |
 | Credenciales en el pipeline | `GITHUB_TOKEN`, automático | Variable `DOCKERHUB_USERNAME` y secreto `DOCKERHUB_TOKEN` |
 
 ### 7.1 Descargar desde Docker Hub (recomendado)
 
 ```bash
-docker pull anovoa1975/curs-000617-cicd:latest
-docker pull anovoa1975/curs-000617-cicd:0.1.0
+docker pull <usuario-dockerhub>/ai-cicd:latest
+docker pull <usuario-dockerhub>/ai-cicd:0.1.0
 ```
 
 Docker Hub limita las descargas anónimas por IP. Si un aula entera comparte IP y alcanza el límite, inicia sesión con `docker login` (cuenta gratuita) para tener un límite mayor.
@@ -168,7 +178,7 @@ Docker Hub limita las descargas anónimas por IP. Si un aula entera comparte IP 
 ### 7.2 Descargar desde GHCR
 
 1. Crea un token **classic** (empieza por `ghp_`) con solo el permiso `read:packages`: <https://github.com/settings/tokens/new?scopes=read:packages&description=ghcr-read>. Los tokens *fine-grained* no sirven para GHCR.
-2. Si aparece **Configure SSO** junto al token, autorízalo para `GalaxyTraining`.
+2. (Solo si el repositorio pertenece a una organización con SSO) autoriza el token con **Configure SSO**.
 3. Inicia sesión **sin escribir el token en el comando** (PowerShell):
 
 ```powershell
@@ -177,13 +187,13 @@ $t | docker login ghcr.io -u <tu-usuario-github> --password-stdin
 Remove-Variable t
 ```
 
-4. `docker pull ghcr.io/galaxytraining/curs-000617-cicd:latest`
+4. `docker pull ghcr.io/christophersanz/ai-cicd:latest`
 
 ### 7.3 Configurar Docker Hub en tu propio repositorio o fork
 
 Sin esta configuración el pipeline publica solo en GHCR y no falla.
 
-1. En Docker Hub: crea el repositorio `curs-000617-cicd` como **Public** y un token en *Account settings → Personal access tokens* con permiso **Read & Write**.
+1. En Docker Hub: crea el repositorio `ai-cicd` como **Public** y un token en *Account settings → Personal access tokens* con permiso **Read & Write**.
 2. En GitHub: *Settings → Secrets and variables → Actions*:
    - pestaña **Variables** → *New repository variable*: `DOCKERHUB_USERNAME` = tu usuario de Docker Hub;
    - pestaña **Secrets** → *New repository secret*: `DOCKERHUB_TOKEN` = el token.
@@ -239,7 +249,7 @@ Git Bash:
 ```bash
 docker run -d --name contract-api-prod -p 8081:8081 \
   --env-file ~/contract-api-prod/prod.env \
-  anovoa1975/curs-000617-cicd:latest
+  <usuario-dockerhub>/ai-cicd:latest
 
 docker logs -f contract-api-prod      # espera "Started ContractApiApplication"; sal con Ctrl+C
 ```
@@ -249,7 +259,7 @@ PowerShell (la continuación de línea es el acento grave y `~` no se expande pa
 ```powershell
 docker run -d --name contract-api-prod -p 8081:8081 `
   --env-file "$HOME\contract-api-prod\prod.env" `
-  anovoa1975/curs-000617-cicd:latest
+  <usuario-dockerhub>/ai-cicd:latest
 ```
 
 Si el puerto 8081 está ocupado (por ejemplo, por la API en `spring-boot:run`), usa `-p 8082:8081` y llama al 8082.
@@ -294,7 +304,7 @@ docker rm -f contract-api-prod
 # ~/contract-api-prod/docker-compose.yml
 services:
   api:
-    image: anovoa1975/curs-000617-cicd:latest
+    image: <usuario-dockerhub>/ai-cicd:latest
     ports: ["8081:8081"]
     environment:
       SPRING_CONFIG_IMPORT: "optional:configtree:/run/secrets/"
@@ -324,7 +334,7 @@ secrets:
 Para practicar con Jenkins hay un entorno listo en [`docker/jenkins/`](../../docker/jenkins/README.md) que ejecuta el [`Jenkinsfile`](../../Jenkinsfile) del repositorio: mismas etapas que el CI (`./mvnw clean verify` e imagen Docker), sin publicar.
 
 ```bash
-docker compose -f docker/jenkins/docker-compose.yml up -d --build
+docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d --build
 ```
 
 Abre <http://localhost:8080>, entra con `admin` / `admin` y ejecuta el job **contract-api** con **Build Now**. La primera ejecución tarda unos minutos porque descarga dependencias e imágenes. Los detalles (variables, fork, limpieza) están en su [README](../../docker/jenkins/README.md).
@@ -335,6 +345,12 @@ Jenkins es solo de práctica: el check que protege `main` es el de GitHub Action
 
 | Síntoma | Causa | Solución |
 |---|---|---|
+| El workflow no se ejecuta nunca | La rama por defecto se llama `master` y el workflow escucha `main` | Renombrar la rama a `main` (*Settings → General → Default branch*) |
+| `./mvnw: Permission denied` | `mvnw` versionado sin permiso de ejecución | `git update-index --chmod=+x mvnw` y commit |
+| `cannot open ./.mvn/wrapper/maven-wrapper.properties` | Falta la carpeta `.mvn/` en el repositorio | Versionar `.mvn/wrapper/maven-wrapper.properties` |
+| `Análisis SonarCloud` aparece *skipped* | Falta el secreto `SONAR_TOKEN` | Sección 5.4 |
+| SonarCloud: *You are running CI analysis while Automatic Analysis is enabled* | Análisis automático activo | Desactivarlo (sección 5.4, paso 2) |
+| El job falla en *Quality Gate* | El código nuevo no cumple el Quality Gate (issues, cobertura) | Revisar el panel de SonarCloud y corregir |
 | El ruleset aparece con ícono amarillo | Repositorio privado con plan Free | Hacer público el repositorio o usar un plan Pro/Team (sección 4) |
 | *This branch is out-of-date with the base branch* | `main` avanzó después de abrir el PR | **Update branch** y esperar el CI |
 | *Squash and merge* deshabilitado | Checks pendientes o en rojo, o rama desactualizada | Revisar el job fallido en *Checks*; actualizar la rama |

@@ -1,5 +1,6 @@
-# CI/CD de contract-api (ADR-0009).
-# - Pull Request a main: build, pruebas (Testcontainers), cobertura y build de la imagen sin publicarla.
+# CI/CD de contract-api (ADR-0009, ADR-0011).
+# - Pull Request a main: build, pruebas (Testcontainers), cobertura, análisis SonarCloud (si hay SONAR_TOKEN)
+#   y build de la imagen sin publicarla.
 # - Push a main: lo anterior y publicación de la imagen en GHCR (latest + sha) y, si está configurado,
 #   en Docker Hub (variable DOCKERHUB_USERNAME y secreto DOCKERHUB_TOKEN).
 # - Tag vX.Y.Z: publicación con las etiquetas de versión.
@@ -20,14 +21,21 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  # Nombre de la imagen en Docker Hub (en GHCR se usa el nombre del repositorio).
+  IMAGE_NAME: ai-cicd
+
 jobs:
   build:
     name: Build, pruebas y cobertura
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      # Historial completo: SonarCloud lo usa para distinguir el código nuevo y asignar autores.
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: JDK 21
         uses: actions/setup-java@v6
@@ -40,6 +48,27 @@ jobs:
       # y el umbral de cobertura de JaCoCo en domain y application.
       - name: Compilar y verificar
         run: ./mvnw -B -ntp clean verify
+
+      # El análisis solo se ejecuta si el repositorio tiene el secreto SONAR_TOKEN (en un fork se omite).
+      - name: ¿SonarCloud configurado?
+        id: sonar
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [ -n "$SONAR_TOKEN" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; fi
+
+      # Reutiliza las clases compiladas y los informes jacoco.xml del paso anterior. Con qualitygate.wait
+      # el job falla si no se cumple el Quality Gate (p. ej. issues críticos en el código nuevo).
+      - name: Análisis SonarCloud
+        if: steps.sonar.outputs.enabled == 'true'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          ./mvnw -B -ntp org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.organization=${{ vars.SONAR_ORGANIZATION || github.repository_owner }}
+          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY || format('{0}_{1}', github.repository_owner, github.event.repository.name) }}
+          -Dsonar.qualitygate.wait=true
 
       - name: Resumen de cobertura
         if: always()
@@ -99,14 +128,14 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # El nombre de la imagen se normaliza a minúsculas (ghcr.io/galaxytraining/curs-000617-cicd).
+      # El nombre de la imagen se normaliza a minúsculas (ghcr.io/christophersanz/ai-cicd).
       - name: Etiquetas
         id: meta
         uses: docker/metadata-action@v6
         with:
           images: |
             ghcr.io/${{ github.repository }}
-            name=docker.io/${{ vars.DOCKERHUB_USERNAME }}/curs-000617-cicd,enable=${{ vars.DOCKERHUB_USERNAME != '' }}
+            name=docker.io/${{ vars.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }},enable=${{ vars.DOCKERHUB_USERNAME != '' }}
           tags: |
             type=ref,event=pr
             type=sha,format=short
