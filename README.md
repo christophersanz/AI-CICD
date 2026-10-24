@@ -57,4 +57,4 @@ La imagen usa el perfil `prod`: no tiene valores por defecto ni clave efímera, 
 
 ## Flujo de trabajo
 
-GitHub Flow ([ADR-0009](docs/adr/0009-ci-cd-github-actions.md)): rama `feature/*` desde `main` → Pull Request → CI en verde → merge. El pipeline compila, ejecuta las pruebas (incluidas las de Testcontainers), exige una cobertura ≥ 80 % en `domain` y `application`, analiza el código en SonarCloud (si está configurado) y construye la imagen; al integrar en `main`, la publica en GHCR y, si está configurado, en Docker Hub.
+GitHub Flow ([ADR-0009](docs/adr/0009-ci-cd-github-actions.md)): rama `feature/*` desde `master` → Pull Request → CI en verde → merge. El pipeline compila, ejecuta las pruebas (incluidas las de Testcontainers), exige una cobertura ≥ 80 % en `domain` y `application`, analiza el código en SonarCloud (si está configurado) y construye la imagen; al integrar en `master`, la publica en GHCR y, si está configurado, en Docker Hub.

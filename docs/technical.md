@@ -315,8 +315,8 @@ El `Dockerfile` tiene dos etapas:
 
 | Evento | `build` | `image` |
 |---|---|---|
-| Pull Request a `main` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Construye la imagen sin publicarla |
-| Push a `main` | Igual | Publica `latest` y `sha-<corto>` |
+| Pull Request a `master` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Construye la imagen sin publicarla |
+| Push a `master` | Igual | Publica `latest` y `sha-<corto>` |
 | Tag `vX.Y.Z` | Igual | Publica `X.Y.Z` y `X.Y` |
 
 - SonarCloud ([ADR-0011](adr/0011-analisis-estatico-sonarcloud.md)): se ejecuta solo si existe el secreto `SONAR_TOKEN`; el job falla si no se cumple el Quality Gate.
@@ -330,4 +330,4 @@ El `Dockerfile` tiene dos etapas:
 
 ### 9.4 Flujo de ramas
 
-GitHub Flow: `main` protegida (`.github/ruleset/main-protegida.json`), ramas `feature/*`, `fix/*` o `docs/*`, Pull Request con el CI en verde y versión publicada con un tag `vX.Y.Z` sobre `main`.
+GitHub Flow: `master` protegida (`.github/ruleset/main-protegida.json`), ramas `feature/*`, `fix/*` o `docs/*`, Pull Request con el CI en verde y versión publicada con un tag `vX.Y.Z` sobre `master`.

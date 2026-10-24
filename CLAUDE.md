@@ -50,10 +50,10 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 ## 3.1 Flujo de Git (GitHub Flow, ADR-0009)
 
-- `main` está protegida y siempre es desplegable: **nunca se hace commit ni push directo a `main`**.
-- Cada cambio va en una rama desde `main`: `feature/<tema>`, `fix/<tema>` o `docs/<tema>`, y entra por Pull Request con el CI en verde.
+- `master` está protegida y siempre es desplegable: **nunca se hace commit ni push directo a `master`**.
+- Cada cambio va en una rama desde `master`: `feature/<tema>`, `fix/<tema>` o `docs/<tema>`, y entra por Pull Request con el CI en verde.
 - Los mensajes de commit van en español, en imperativo y describen el porqué.
-- Una versión se publica con un tag `vX.Y.Z` sobre `main`; el pipeline publica la imagen con esa etiqueta.
+- Una versión se publica con un tag `vX.Y.Z` sobre `master`; el pipeline publica la imagen con esa etiqueta.
 
 ## 4. Cómo debe trabajar Claude en este repo
 

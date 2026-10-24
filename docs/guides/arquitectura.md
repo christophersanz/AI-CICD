@@ -69,7 +69,7 @@ flowchart LR
 flowchart LR
     DEV[Rama feature/*] --> PR[Pull Request]
     PR --> CI{GitHub Actions<br/>clean verify + imagen}
-    CI -->|merge| MAIN[main]
+    CI -->|merge| MAIN[master]
     MAIN --> GHCR[(GHCR)]
     MAIN -.->|si está configurado| DH[(Docker Hub)]
     GHCR --> RUN[docker run<br/>con variables DB_* y SECURITY_JWT_*]

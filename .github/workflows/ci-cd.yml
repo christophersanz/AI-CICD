@@ -1,16 +1,16 @@
 # CI/CD de contract-api (ADR-0009, ADR-0011).
-# - Pull Request a main: build, pruebas (Testcontainers), cobertura, análisis SonarCloud (si hay SONAR_TOKEN)
+# - Pull Request a master: build, pruebas (Testcontainers), cobertura, análisis SonarCloud (si hay SONAR_TOKEN)
 #   y build de la imagen sin publicarla.
-# - Push a main: lo anterior y publicación de la imagen en GHCR (latest + sha) y, si está configurado,
+# - Push a master: lo anterior y publicación de la imagen en GHCR (latest + sha) y, si está configurado,
 #   en Docker Hub (variable DOCKERHUB_USERNAME y secreto DOCKERHUB_TOKEN).
 # - Tag vX.Y.Z: publicación con las etiquetas de versión.
 name: CI/CD
 
 on:
   pull_request:
-    branches: [main]
+    branches: [master]
   push:
-    branches: [main]
+    branches: [master]
     tags: ['v*.*.*']
   workflow_dispatch:
 

@@ -34,7 +34,7 @@ Variables en `docker/jenkins/.env`, creado a partir de la plantilla `docker/jenk
 | `JENKINS_ADMIN_USER` | `admin` | Usuario administrador |
 | `JENKINS_ADMIN_PASSWORD` | `admin` | Contraseña del administrador |
 | `REPO_URL` | `https://github.com/christophersanz/AI-CICD.git` | Cambiarla si trabajas sobre tu propio fork |
-| `REPO_BRANCH` | `main` | Rama que construye el job |
+| `REPO_BRANCH` | `master` | Rama que construye el job |
 
 Ejemplo en PowerShell para construir tu fork:
 

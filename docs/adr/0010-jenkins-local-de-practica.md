@@ -5,14 +5,14 @@
 
 ## Contexto
 
-El CI/CD oficial es GitHub Actions (ADR-0009), que descartó Jenkins como plataforma. Para el curso se quiere practicar también con Jenkins, ejecutado en local con Docker, sin cambiar el pipeline oficial ni la protección de `main`.
+El CI/CD oficial es GitHub Actions (ADR-0009), que descartó Jenkins como plataforma. Para el curso se quiere practicar también con Jenkins, ejecutado en local con Docker, sin cambiar el pipeline oficial ni la protección de `master`.
 
 ## Decisión
 
 - Se versiona un `Jenkinsfile` declarativo en la raíz con las mismas etapas que el job de CI: `./mvnw clean verify` (pruebas, Testcontainers y umbral de cobertura) y `docker build` de la imagen. No publica en GHCR.
 - Jenkins se entrega al alumno en `docker/jenkins/` (`docker-compose.yml`, `Dockerfile`, `plugins.txt`, `casc.yaml`): imagen `jenkins/jenkins:lts-jdk21` con el cliente de Docker y `buildx`, plugins preinstalados y *Configuration as Code* (JCasC) que crea el usuario administrador y el job `contract-api` sin asistente inicial. El repositorio y la rama del job son configurables por variables de entorno.
 - Jenkins usa el Docker del host montando `docker.sock`; por eso Testcontainers necesita `TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal`. Solo escucha en `127.0.0.1`.
-- GitHub Actions sigue siendo el único check requerido para integrar en `main`.
+- GitHub Actions sigue siendo el único check requerido para integrar en `master`.
 
 ## Alternativas consideradas
 

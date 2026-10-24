@@ -1,13 +1,13 @@
 # Guía de CI/CD de contract-api
 
-Guía práctica para trabajar con el flujo de integración y entrega continua del proyecto: cómo se integra un cambio en `main`, qué valida el pipeline, dónde se publica la imagen Docker y cómo ejecutarla. Las decisiones y sus motivos están en [ADR-0009](../adr/0009-ci-cd-github-actions.md) (GitHub Actions) y [ADR-0010](../adr/0010-jenkins-local-de-practica.md) (Jenkins local).
+Guía práctica para trabajar con el flujo de integración y entrega continua del proyecto: cómo se integra un cambio en `master`, qué valida el pipeline, dónde se publica la imagen Docker y cómo ejecutarla. Las decisiones y sus motivos están en [ADR-0009](../adr/0009-ci-cd-github-actions.md) (GitHub Actions) y [ADR-0010](../adr/0010-jenkins-local-de-practica.md) (Jenkins local).
 
 ## Índice
 
 1. [Visión general](#1-visión-general)
 2. [Requisitos](#2-requisitos)
 3. [Flujo de trabajo con GitHub Flow](#3-flujo-de-trabajo-con-github-flow)
-4. [Protección de `main` (ruleset)](#4-protección-de-main-ruleset)
+4. [Protección de `master` (ruleset)](#4-protección-de-master-ruleset)
 5. [El pipeline de GitHub Actions](#5-el-pipeline-de-github-actions)
 6. [Publicar una versión](#6-publicar-una-versión)
 7. [Registros de imágenes: GHCR y Docker Hub](#7-registros-de-imágenes-ghcr-y-docker-hub)
@@ -23,8 +23,8 @@ flowchart LR
     A[Rama feature/*] -->|push| B[Pull Request]
     B --> C{CI<br/>build + pruebas<br/>+ cobertura + imagen}
     C -->|rojo| A
-    C -->|verde| D[Squash and merge<br/>a main]
-    D --> E[CI en main]
+    C -->|verde| D[Squash and merge<br/>a master]
+    D --> E[CI en master]
     E --> F[(GHCR<br/>latest, sha)]
     E --> G[(Docker Hub<br/>latest, sha)]
     D -.->|tag vX.Y.Z| H[CI del tag]
@@ -33,8 +33,8 @@ flowchart LR
 
 | Evento | Build y pruebas | Imagen | Publicación |
 |---|:-:|:-:|---|
-| Pull Request a `main` | ✅ | se construye | ninguna |
-| Push a `main` (merge) | ✅ | se construye | `latest` y sha corto |
+| Pull Request a `master` | ✅ | se construye | ninguna |
+| Push a `master` (merge) | ✅ | se construye | `latest` y sha corto |
 | Tag `vX.Y.Z` | ✅ | se construye | `X.Y.Z` y `X.Y` |
 | Manual (*Run workflow*) | ✅ | se construye | según la rama elegida |
 
@@ -47,12 +47,12 @@ flowchart LR
 
 ## 3. Flujo de trabajo con GitHub Flow
 
-`main` siempre es desplegable y **nunca recibe commits directos**. Todo cambio entra por Pull Request.
+`master` siempre es desplegable y **nunca recibe commits directos**. Todo cambio entra por Pull Request.
 
 ### 3.1 Crear la rama
 
 ```bash
-git checkout main
+git checkout master
 git pull
 git checkout -b feature/mi-cambio        # o fix/<tema>, docs/<tema>
 ```
@@ -80,26 +80,26 @@ git push -u origin feature/mi-cambio
 ### 3.4 Integrar
 
 - Si GitHub indica **This branch is out-of-date with the base branch**, pulsa **Update branch** y espera de nuevo el CI.
-- Con los checks en verde: **Squash and merge** → **Confirm**. Es el único método permitido: cada PR queda como un solo commit en `main`.
+- Con los checks en verde: **Squash and merge** → **Confirm**. Es el único método permitido: cada PR queda como un solo commit en `master`.
 - Borra la rama (botón **Delete branch**) y actualiza tu copia local:
 
 ```bash
-git checkout main
+git checkout master
 git pull
 git branch -D feature/mi-cambio      # -D porque con squash git no reconoce la rama como integrada
 ```
 
-## 4. Protección de `main` (ruleset)
+## 4. Protección de `master` (ruleset)
 
 La regla `main-protegida` está versionada en [`.github/ruleset/main-protegida.json`](../../.github/ruleset/main-protegida.json):
 
 | Regla | Efecto |
 |---|---|
-| Pull Request obligatorio | No se puede hacer push directo a `main`. Sin aprobaciones mínimas (un único desarrollador no puede aprobar su propio PR). |
-| Solo *squash* | Un commit por PR en `main`. |
+| Pull Request obligatorio | No se puede hacer push directo a `master`. Sin aprobaciones mínimas (un único desarrollador no puede aprobar su propio PR). |
+| Solo *squash* | Un commit por PR en `master`. |
 | Checks requeridos | `Build, pruebas y cobertura` e `Imagen Docker` deben estar en verde. |
-| Rama al día | La rama debe incluir los últimos cambios de `main` antes de integrarse. |
-| Sin force push ni borrado | Protege el historial de `main`. |
+| Rama al día | La rama debe incluir los últimos cambios de `master` antes de integrarse. |
+| Sin force push ni borrado | Protege el historial de `master`. |
 
 **Configurarla en un repositorio nuevo o en tu fork:** *Settings → Rules → Rulesets → New ruleset → Import a ruleset* y selecciona el JSON. Los checks requeridos solo aparecen en el buscador después de que el workflow se haya ejecutado una vez.
 
@@ -124,7 +124,7 @@ Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). 
 ### 5.2 Job `Imagen Docker`
 
 - Construye la imagen con el [`Dockerfile`](../../Dockerfile) multi-stage: compila con el Maven Wrapper (sin pruebas, ya se ejecutaron), extrae las capas de Spring Boot y genera una imagen con JRE 21, usuario sin privilegios y perfil `prod`.
-- En un PR solo la construye (comprueba que el `Dockerfile` funciona). En `main` y en tags, además la publica (sección 7).
+- En un PR solo la construye (comprueba que el `Dockerfile` funciona). En `master` y en tags, además la publica (sección 7).
 - Usa la caché de GitHub Actions para las capas, así que las ejecuciones siguientes son más rápidas.
 
 ### 5.3 Ejecutar el pipeline a mano
@@ -138,20 +138,20 @@ Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). 
 3. *My Account → Security* → genera un token.
 4. En GitHub: *Settings → Secrets and variables → Actions → Secrets* → `SONAR_TOKEN` = el token.
 5. Solo si tu organización o clave de proyecto en SonarCloud son distintas de las de GitHub, crea en la pestaña **Variables** `SONAR_ORGANIZATION` y/o `SONAR_PROJECT_KEY`. Por defecto se usan `<dueño>` y `<dueño>_<repositorio>` (p. ej. `christophersanz` y `christophersanz_AI-CICD`), que son los que crea SonarCloud al importar.
-6. *Run workflow* sobre `main` y revisa el resultado en el panel del proyecto en SonarCloud. Ese panel es la evidencia de **"Análisis estático sin issues críticos"**.
+6. *Run workflow* sobre `master` y revisa el resultado en el panel del proyecto en SonarCloud. Ese panel es la evidencia de **"Análisis estático sin issues críticos"**.
 
 ## 6. Publicar una versión
 
-Las versiones siguen [SemVer](https://semver.org/lang/es/) y se crean con un tag sobre `main`:
+Las versiones siguen [SemVer](https://semver.org/lang/es/) y se crean con un tag sobre `master`:
 
 ```bash
-git checkout main
+git checkout master
 git pull
 git tag v0.2.0
 git push origin v0.2.0
 ```
 
-El pipeline publica la imagen con las etiquetas `0.2.0` y `0.2`. `latest` no cambia con un tag: solo avanza con los merges a `main`.
+El pipeline publica la imagen con las etiquetas `0.2.0` y `0.2`. `latest` no cambia con un tag: solo avanza con los merges a `master`.
 
 Opcional: *Releases → Draft a new release*, elige el tag, pulsa **Generate release notes** y **Publish release**.
 
@@ -197,7 +197,7 @@ Sin esta configuración el pipeline publica solo en GHCR y no falla.
 2. En GitHub: *Settings → Secrets and variables → Actions*:
    - pestaña **Variables** → *New repository variable*: `DOCKERHUB_USERNAME` = tu usuario de Docker Hub;
    - pestaña **Secrets** → *New repository secret*: `DOCKERHUB_TOKEN` = el token.
-3. Ejecuta el pipeline (*Run workflow* sobre `main`) y comprueba que el paso **Login en Docker Hub** está en verde, no *skipped*.
+3. Ejecuta el pipeline (*Run workflow* sobre `master`) y comprueba que el paso **Login en Docker Hub** está en verde, no *skipped*.
 
 > El usuario va como **variable** y no como secreto a propósito: forma parte del nombre de la imagen, y los secretos se enmascaran como `***` en los logs.
 
@@ -339,20 +339,20 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 Abre <http://localhost:8080>, entra con `admin` / `admin` y ejecuta el job **contract-api** con **Build Now**. La primera ejecución tarda unos minutos porque descarga dependencias e imágenes. Los detalles (variables, fork, limpieza) están en su [README](../../docker/jenkins/README.md).
 
-Jenkins es solo de práctica: el check que protege `main` es el de GitHub Actions ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)).
+Jenkins es solo de práctica: el check que protege `master` es el de GitHub Actions ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)).
 
 ## 11. Problemas frecuentes
 
 | Síntoma | Causa | Solución |
 |---|---|---|
-| El workflow no se ejecuta nunca | La rama por defecto se llama `master` y el workflow escucha `main` | Renombrar la rama a `main` (*Settings → General → Default branch*) |
+| El workflow no se ejecuta nunca | El workflow escucha `master` y el push se hizo a otra rama, o la rama por defecto no es `master` | Trabajar sobre `master` y dejarla como rama por defecto (*Settings → General → Default branch*) |
 | `./mvnw: Permission denied` | `mvnw` versionado sin permiso de ejecución | `git update-index --chmod=+x mvnw` y commit |
 | `cannot open ./.mvn/wrapper/maven-wrapper.properties` | Falta la carpeta `.mvn/` en el repositorio | Versionar `.mvn/wrapper/maven-wrapper.properties` |
 | `Análisis SonarCloud` aparece *skipped* | Falta el secreto `SONAR_TOKEN` | Sección 5.4 |
 | SonarCloud: *You are running CI analysis while Automatic Analysis is enabled* | Análisis automático activo | Desactivarlo (sección 5.4, paso 2) |
 | El job falla en *Quality Gate* | El código nuevo no cumple el Quality Gate (issues, cobertura) | Revisar el panel de SonarCloud y corregir |
 | El ruleset aparece con ícono amarillo | Repositorio privado con plan Free | Hacer público el repositorio o usar un plan Pro/Team (sección 4) |
-| *This branch is out-of-date with the base branch* | `main` avanzó después de abrir el PR | **Update branch** y esperar el CI |
+| *This branch is out-of-date with the base branch* | `master` avanzó después de abrir el PR | **Update branch** y esperar el CI |
 | *Squash and merge* deshabilitado | Checks pendientes o en rojo, o rama desactualizada | Revisar el job fallido en *Checks*; actualizar la rama |
 | El build falla por cobertura | `domain` o `application` por debajo del 80 % de líneas | Añadir pruebas; ver el informe en el artefacto **reports** |
 | `Login en Docker Hub` aparece *skipped* | El workflow no ve la variable `DOCKERHUB_USERNAME` (se creó como secreto o en un *Environment*) | Crearla en la pestaña **Variables** del repositorio y ejecutar *Run workflow* |
