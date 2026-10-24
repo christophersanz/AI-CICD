@@ -13,6 +13,7 @@ Jenkins en Docker, ya configurado para ejecutar el `Jenkinsfile` de este reposit
 Desde la raíz del repositorio:
 
 ```bash
+cp -n docker/jenkins/.env.example docker/jenkins/.env   # solo la primera vez (no se versiona)
 docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d --build
 ```
 
@@ -26,13 +27,13 @@ No hay asistente inicial: los plugins, el usuario y el job se crean al arrancar 
 
 ## Configuración
 
-Variables de entorno opcionales (en la terminal o en un archivo `.env` junto a este `docker-compose.yml`):
+Variables en `docker/jenkins/.env`, creado a partir de la plantilla `docker/jenkins/.env.example` (también se pueden definir en la terminal). Es un archivo distinto del `.env` de la raíz, que usa el `docker-compose.yml` de la API:
 
 | Variable | Por defecto | Uso |
 |---|---|---|
 | `JENKINS_ADMIN_USER` | `admin` | Usuario administrador |
 | `JENKINS_ADMIN_PASSWORD` | `admin` | Contraseña del administrador |
-| `REPO_URL` | repositorio del curso | Cambiarla si trabajas sobre tu propio fork |
+| `REPO_URL` | `https://github.com/christophersanz/AI-CICD.git` | Cambiarla si trabajas sobre tu propio fork |
 | `REPO_BRANCH` | `main` | Rama que construye el job |
 
 Ejemplo en PowerShell para construir tu fork:
