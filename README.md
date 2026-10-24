@@ -16,6 +16,9 @@ API REST para la gestión de contratos laborales. Java 21, Spring Boot 3, Clean 
 | [docs/guides/arquitectura.md](docs/guides/arquitectura.md) | Guía visual de la arquitectura: contexto, módulos, puertos y adaptadores, dominio, flujos de petición, tokens y errores |
 | [docs/guides/ci-cd.md](docs/guides/ci-cd.md) | Guía de CI/CD: flujo de trabajo en `master`, pipeline, versiones, imágenes en GHCR y Docker Hub, ejecución y Jenkins local |
 | [docs/design/003-security-local-testing.md](docs/design/003-security-local-testing.md) | Probar la API en local con PowerShell y Postman |
+| [postman/](postman/) | Colección Postman (login y endpoints, con aserciones de códigos HTTP) y entorno local |
+| [docs/prompts/](docs/prompts/) | Prompts versionados usados con Claude Code |
+| [docs/ai-log.md](docs/ai-log.md) | Bitácora de IA: tareas, lo aceptado, lo corregido, tiempos y métricas |
 
 ## Levantar todo con Docker (recomendado)
 
