@@ -28,6 +28,9 @@ Diseña la arquitectura de una API REST para el siguiente contexto:
 - Casos de uso principales: [lista]
 - Requisitos no funcionales: [p. ej. 500 req/s, auditoría, alta disponibilidad]
 - Restricciones tecnológicas: [p. ej. PostgreSQL, Kafka, Kubernetes]
+- Repositorio y CI/CD: [p. ej. GitHub con una sola rama `master` protegida por ruleset; GitHub Actions
+  como CI oficial (build, pruebas, cobertura, SonarCloud e imagen Docker en GHCR y Docker Hub);
+  Jenkins local de práctica con `Jenkinsfile`]
 - Equipo: [tamaño y nivel]
 
 Respeta las reglas de docs/architecture.md. Entrega:
@@ -40,8 +43,11 @@ Respeta las reglas de docs/architecture.md. Entrega:
 7. Diseño de endpoints REST y formato de errores (RFC 9457).
 8. Transversales: seguridad, transacciones, observabilidad, configuración.
 9. Estrategia de pruebas.
-10. 3-5 ADRs con alternativas descartadas.
-11. Riesgos y trade-offs.
+10. Repositorio y CI/CD: flujo de ramas y protección en GitHub, pipeline de GitHub Actions (etapas,
+    quality gates, publicación y etiquetado de la imagen), su equivalente en Jenkins (`Jenkinsfile`)
+    y manejo de secretos, con diagrama en Mermaid.
+11. 3-5 ADRs con alternativas descartadas.
+12. Riesgos y trade-offs.
 
 Si falta información crítica, haz primero un máximo de 5 preguntas concretas.
 Evita la sobreingeniería: adapta la complejidad al problema y al equipo.

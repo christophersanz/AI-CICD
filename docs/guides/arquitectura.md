@@ -65,14 +65,44 @@ flowchart LR
     JVM -->|logs JSON ECS| OUT[[stdout]]
 ```
 
+### 2.1 Integración y entrega continua
+
+El código vive en **GitHub** (`christophersanz/AI-CICD`), en una sola rama `master` con push directo y protegida por el ruleset `master-protegida` (sin force push ni borrado). Cada push a `master` o tag `vX.Y.Z` dispara **GitHub Actions**, el CI oficial. **Jenkins** ejecuta las mismas etapas con el `Jenkinsfile`, pero solo en local, para practicar y sin publicar nada (ADR-0010).
+
 ```mermaid
 flowchart LR
-    DEV[Commit en master<br/>en local] -->|push| MAIN[master]
-    MAIN --> CI{GitHub Actions<br/>clean verify + imagen}
-    CI -->|verde| GHCR[(GHCR)]
-    CI -.->|si está configurado| DH[(Docker Hub)]
-    GHCR --> RUN[docker run<br/>con variables DB_* y SECURITY_JWT_*]
+    DEV[Commit en master<br/>en local<br/>./mvnw clean verify] -->|git push| GH
+
+    subgraph GH[GitHub · christophersanz/AI-CICD]
+        MAIN[master<br/>ruleset master-protegida]
+    end
+
+    subgraph GHA[GitHub Actions · .github/workflows/ci-cd.yml]
+        B[Job 1: Build, pruebas y cobertura<br/>clean verify · JaCoCo ≥ 80 %]
+        IMG[Job 2: Imagen Docker<br/>Buildx · etiquetas latest, sha, X.Y.Z, X.Y]
+        B -->|verde| IMG
+    end
+
+    MAIN -->|push / tag vX.Y.Z| B
+    B -.->|si existe SONAR_TOKEN| SONAR[(SonarCloud<br/>Quality Gate)]
+    IMG --> GHCR[(GHCR<br/>ghcr.io/christophersanz/ai-cicd)]
+    IMG -.->|si existe DOCKERHUB_USERNAME| DH[(Docker Hub<br/>christopherdocker/ai-cicd)]
+    GHCR --> RUN[docker run · perfil prod<br/>variables DB_* y SECURITY_JWT_*]
+    DH --> RUN
+
+    subgraph JK[Jenkins local de práctica · docker/jenkins · :8080]
+        JF[Jenkinsfile<br/>Build, pruebas y cobertura → Imagen Docker<br/>sin publicar]
+    end
+    MAIN -.->|clona master| JF
 ```
+
+| Pieza | Dónde está | Papel |
+|---|---|---|
+| GitHub | `christophersanz/AI-CICD`, rama `master` | Repositorio único; el ruleset impide reescribir el historial ([ADR-0009](../adr/0009-ci-cd-github-actions.md)) |
+| GitHub Actions | `.github/workflows/ci-cd.yml` | CI/CD oficial: valida cada push y publica la imagen |
+| SonarCloud | Paso opcional del job 1 | Análisis estático y Quality Gate, solo si existe el secreto `SONAR_TOKEN` ([ADR-0011](../adr/0011-analisis-estatico-sonarcloud.md)) |
+| GHCR / Docker Hub | `ghcr.io/christophersanz/ai-cicd`, `christopherdocker/ai-cicd` | Registros de la imagen; Docker Hub solo si existen `DOCKERHUB_USERNAME` y `DOCKERHUB_TOKEN` |
+| Jenkins | `Jenkinsfile` + `docker/jenkins/` | Mismas etapas en local para practicar; no publica ni sustituye al CI ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)) |
 
 El detalle del pipeline está en la [guía de CI/CD](ci-cd.md); las variables de entorno, en [technical.md §4](../technical.md#4-configuración).
 
