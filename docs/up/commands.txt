@@ -98,3 +98,23 @@ unset BODY LOGIN H
 docker rm -f contract-api-prod
 # Borrar también los datos de prod (irreversible):
 # docker exec contract-api-postgres psql -U contract -d postgres -c "DROP DATABASE contracts_prod"
+
+
+6. Recursos
+---------
+repositorio gitHub:
+https://github.com/christophersanz/AI-CICD
+
+GitHub actions:
+https://github.com/christophersanz/AI-CICD/actions/runs/40072321916
+
+registry:
+https://github.com/christophersanz/AI-CICD/pkgs/container/ai-cicd
+https://hub.docker.com/r/christopherdocker/ai-cicd/tags
+
+Jenkins:
+http://localhost:8080/login  -> admin|admin
+
+Bd:
+http://localhost:5050/browser
+
