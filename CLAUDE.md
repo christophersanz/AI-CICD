@@ -11,7 +11,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | docs/technical.md | Estado implementado: endpoints, seguridad, variables de entorno, esquema de BD, build y CI/CD | Al cambiar endpoints, configuración, migraciones o el pipeline (actualizarlo en el mismo cambio) |
 | docs/api/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
 | docs/guides/arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
-| docs/guides/ci-cd.md | Guía práctica de CI/CD: flujo de trabajo en `master`, pipeline, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
+| docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
 | @docs/prompts/prompts.md | Prompts reutilizables para tareas frecuentes | Al iniciar una tarea recurrente (nuevo caso de uso, revisión, ADR, etc.) |
 
 ## 1. Descripción del proyecto
@@ -36,7 +36,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | Documentación API | springdoc-openapi (OpenAPI 3) |
 | Observabilidad | Micrometer + OpenTelemetry, logs estructurados en JSON |
 | Pruebas | JUnit 5, AssertJ, Mockito, Testcontainers, spring-security-test; cobertura con JaCoCo (≥ 80 % de líneas en `domain` y `application`) |
-| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional), una sola rama `master` con push directo (ADR-0009); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
+| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional) (ADR-0009); GitHub Flow con checks obligatorios y despliegue con aprobación en el environment `production` (ADR-0012); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
 
 ## 3. Comandos habituales
 
@@ -49,10 +49,11 @@ docker build -t contract-api .        # Construir la imagen (perfil prod)
 docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d --build  # Jenkins local de práctica (ADR-0010)
 ```
 
-## 3.1 Flujo de Git (una sola rama, ADR-0009)
+## 3.1 Flujo de Git (GitHub Flow, ADR-0012)
 
-- `master` es la **única rama**: se trabaja en local sobre ella y se hace push directo. Antes de cada push, `./mvnw clean verify` en verde; el CI se ejecuta después del push.
-- `master` no admite force push ni borrado (ruleset `master-protegida`): nunca se reescribe el historial ya subido; un fallo se corrige con un commit nuevo.
+- Nunca se hace push directo a `master`: todo cambio va en una rama corta (`feature/*`, `fix/*`, `docs/*`) y entra por Pull Request. Antes de cada push, `./mvnw clean verify` en verde.
+- El ruleset `master-protegida` exige los checks **Build, pruebas y cobertura** e **Imagen Docker** en verde, la rama al día con `master` e integración solo con **squash**; sin force push ni borrado. Claude no integra PRs: el *Squash and merge* lo decide el desarrollador.
+- Tras el merge, el job **Despliegue (production)** espera la aprobación del environment `production` y verifica la imagen publicada en un entorno efímero.
 - Los mensajes de commit van en español, en imperativo y describen el porqué.
 - Una versión se publica con un tag `vX.Y.Z` sobre `master`; el pipeline publica la imagen con esa etiqueta.
 
@@ -68,4 +69,4 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 - Evita la sobreingeniería: no introduzcas CQRS, event sourcing ni nuevos módulos sin una necesidad justificada.
 - No añadas dependencias nuevas al `pom.xml` sin indicarlo y justificarlo.
 - Ejecuta `./mvnw clean verify` antes de dar una tarea por terminada: es lo mismo que ejecuta el CI, incluido el umbral de cobertura.
-- Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009 o registra uno nuevo.
+- Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009/ADR-0012 o registra uno nuevo.

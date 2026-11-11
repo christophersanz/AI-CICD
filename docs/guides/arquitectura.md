@@ -67,21 +67,24 @@ flowchart LR
 
 ### 2.1 Integración y entrega continua
 
-El código vive en **GitHub** (`christophersanz/AI-CICD`), en una sola rama `master` con push directo y protegida por el ruleset `master-protegida` (sin force push ni borrado). Cada push a `master` o tag `vX.Y.Z` dispara **GitHub Actions**, el CI oficial. **Jenkins** ejecuta las mismas etapas con el `Jenkinsfile`, pero solo en local, para practicar y sin publicar nada (ADR-0010).
+El código vive en **GitHub** (`christophersanz/AI-CICD`), con GitHub Flow: cada cambio entra a `master` por Pull Request y el ruleset `master-protegida` exige los checks en verde, *squash* y la rama al día (ADR-0012). Cada PR, merge a `master` o tag `vX.Y.Z` dispara **GitHub Actions**, el CI oficial; tras el merge, el despliegue espera la aprobación del environment `production`. **Jenkins** ejecuta las mismas etapas con el `Jenkinsfile`, pero solo en local, para practicar y sin publicar nada (ADR-0010).
 
 ```mermaid
 flowchart LR
-    DEV[Commit en master<br/>en local<br/>./mvnw clean verify] -->|git push| GH
+    DEV[Rama feature/*<br/>./mvnw clean verify] -->|Pull Request| PR
 
     subgraph GH[GitHub · christophersanz/AI-CICD]
-        MAIN[master<br/>ruleset master-protegida]
+        PR[Pull Request<br/>checks obligatorios] -->|Squash and merge| MAIN[master<br/>ruleset master-protegida]
     end
 
     subgraph GHA[GitHub Actions · .github/workflows/ci-cd.yml]
         B[Job 1: Build, pruebas y cobertura<br/>clean verify · JaCoCo ≥ 80 %]
         IMG[Job 2: Imagen Docker<br/>Buildx · etiquetas latest, sha, X.Y.Z, X.Y]
         B -->|verde| IMG
+        IMG -->|aprobación de production| DEP[Job 3: Despliegue<br/>entorno efímero · prueba de humo]
     end
+
+    PR -->|checks| B
 
     MAIN -->|push / tag vX.Y.Z| B
     B -.->|si existe SONAR_TOKEN| SONAR[(SonarCloud<br/>Quality Gate)]
@@ -98,8 +101,9 @@ flowchart LR
 
 | Pieza | Dónde está | Papel |
 |---|---|---|
-| GitHub | `christophersanz/AI-CICD`, rama `master` | Repositorio único; el ruleset impide reescribir el historial ([ADR-0009](../adr/0009-ci-cd-github-actions.md)) |
-| GitHub Actions | `.github/workflows/ci-cd.yml` | CI/CD oficial: valida cada push y publica la imagen |
+| GitHub | `christophersanz/AI-CICD`, rama `master` | Repositorio único; el ruleset exige PR con checks en verde y solo *squash*, e impide reescribir el historial ([ADR-0012](../adr/0012-github-flow-y-despliegue-con-aprobacion.md)) |
+| Environment `production` | *Settings → Environments* | Pide la aprobación de un revisor antes del job de despliegue ([ADR-0012](../adr/0012-github-flow-y-despliegue-con-aprobacion.md)) |
+| GitHub Actions | `.github/workflows/ci-cd.yml` | CI/CD oficial: valida cada PR y merge, publica la imagen y la verifica tras la aprobación |
 | SonarCloud | Paso opcional del job 1 | Análisis estático y Quality Gate, solo si existe el secreto `SONAR_TOKEN` ([ADR-0011](../adr/0011-analisis-estatico-sonarcloud.md)) |
 | GHCR / Docker Hub | `ghcr.io/christophersanz/ai-cicd`, `christopherdocker/ai-cicd` | Registros de la imagen; Docker Hub solo si existen `DOCKERHUB_USERNAME` y `DOCKERHUB_TOKEN` |
 | Jenkins | `Jenkinsfile` + `docker/jenkins/` | Mismas etapas en local para practicar; no publica ni sustituye al CI ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)) |

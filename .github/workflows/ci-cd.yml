@@ -1,8 +1,9 @@
-# CI/CD de contract-api (ADR-0009, ADR-0011).
+# CI/CD de contract-api (ADR-0009, ADR-0011, ADR-0012).
 # - Pull Request a master: build, pruebas (Testcontainers), cobertura, análisis SonarCloud (si hay SONAR_TOKEN)
-#   y build de la imagen sin publicarla.
-# - Push a master: lo anterior y publicación de la imagen en GHCR (latest + sha) y, si está configurado,
-#   en Docker Hub (variable DOCKERHUB_USERNAME y secreto DOCKERHUB_TOKEN).
+#   y build de la imagen sin publicarla. Sus dos checks son obligatorios para integrar (ruleset master-protegida).
+# - Push a master (merge del PR): lo anterior y publicación de la imagen en GHCR (latest + sha) y, si está
+#   configurado, en Docker Hub (variable DOCKERHUB_USERNAME y secreto DOCKERHUB_TOKEN). Después, el despliegue
+#   espera la aprobación del environment "production" y verifica la imagen publicada en un entorno efímero.
 # - Tag vX.Y.Z: publicación con las etiquetas de versión.
 name: CI/CD
 
@@ -152,3 +153,119 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # CD con aprobación humana (ADR-0012). Solo tras un push a master: el job espera a que un revisor del
+  # environment "production" lo apruebe (Settings → Environments). No hay un servidor persistente: despliega la
+  # imagen recién publicada (por su sha, no "latest") en un entorno efímero del runner con PostgreSQL y claves
+  # JWT temporales, y la da por buena solo si pasa la prueba de humo. Al terminar el entorno se descarta.
+  deploy:
+    name: Despliegue (production)
+    needs: image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+    permissions:
+      contents: read
+      packages: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: contracts
+          POSTGRES_USER: contract
+          POSTGRES_PASSWORD: contract
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U contract -d contracts"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      API_URL: http://localhost:8081
+    steps:
+      - name: Login en GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Claves JWT y contraseña del administrador generadas en el momento: no hay secretos que guardar y no
+      # sobreviven al job. Los PEM van en una sola línea con \n literales, como espera el perfil prod.
+      - name: Configuración efímera
+        run: |
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private.pem 2>/dev/null
+          openssl pkey -in private.pem -pubout -out public.pem
+          admin_password="Deploy-$(openssl rand -hex 12)"
+          echo "::add-mask::$admin_password"
+          echo "ADMIN_PASSWORD=$admin_password" >> "$GITHUB_ENV"
+          {
+            echo "DB_URL=jdbc:postgresql://localhost:5432/contracts"
+            echo "DB_USERNAME=contract"
+            echo "DB_PASSWORD=contract"
+            echo "SECURITY_JWT_PUBLIC_KEY=$(awk '{printf "%s\\n", $0}' public.pem)"
+            echo "SECURITY_JWT_PRIVATE_KEY=$(awk '{printf "%s\\n", $0}' private.pem)"
+            echo "SECURITY_BOOTSTRAP_ADMIN_USERNAME=admin"
+            echo "SECURITY_BOOTSTRAP_ADMIN_PASSWORD=$admin_password"
+          } > prod.env
+          rm private.pem public.pem
+
+      - name: Desplegar la imagen publicada
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}:sha-${GITHUB_SHA::7}"
+          echo "IMAGE=$image" >> "$GITHUB_ENV"
+          docker run -d --name contract-api --network host --env-file prod.env "$image"
+
+      - name: Esperar a que la API esté lista
+        run: |
+          for _ in $(seq 1 60); do
+            if curl -fsS "$API_URL/actuator/health" | grep -q '"status":"UP"'; then
+              echo "API lista"; exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::La API no respondió UP en /actuator/health en 120 s"
+          exit 1
+
+      # Prueba de humo: el contenedor responde, Flyway migró la base, el administrador inicial se creó
+      # (BR-USR-007) y la autenticación JWT y la autorización por permisos funcionan de extremo a extremo.
+      - name: Prueba de humo
+        run: |
+          token=$(curl -fsS -X POST "$API_URL/api/v1/auth/login" \
+            -H 'Content-Type: application/json' \
+            -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PASSWORD\"}" | jq -r '.accessToken')
+          [ -n "$token" ] && [ "$token" != "null" ] || { echo "::error::El login no devolvió un access token"; exit 1; }
+          echo "::add-mask::$token"
+
+          me=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $token" "$API_URL/api/v1/auth/me")
+          employees=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $token" "$API_URL/api/v1/employees")
+          anonymous=$(curl -s -o /dev/null -w '%{http_code}' "$API_URL/api/v1/employees")
+
+          {
+            echo "### Despliegue verificado"
+            echo "Imagen: \`$IMAGE\`"
+            echo ""
+            echo "| Comprobación | Esperado | Obtenido |"
+            echo "|---|:-:|:-:|"
+            echo "| \`GET /actuator/health\` | UP | UP |"
+            echo "| \`POST /api/v1/auth/login\` (admin) | token | token |"
+            echo "| \`GET /api/v1/auth/me\` | 200 | $me |"
+            echo "| \`GET /api/v1/employees\` con token | 200 | $employees |"
+            echo "| \`GET /api/v1/employees\` sin token | 401 | $anonymous |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          [ "$me" = 200 ] && [ "$employees" = 200 ] && [ "$anonymous" = 401 ] \
+            || { echo "::error::La prueba de humo falló (me=$me, employees=$employees, sin token=$anonymous)"; exit 1; }
+
+      - name: Logs del contenedor
+        if: always()
+        run: docker logs contract-api 2>&1 | tail -n 200 || true
+
+      - name: Retirar el entorno efímero
+        if: always()
+        run: |
+          docker rm -f contract-api || true
+          rm -f prod.env
