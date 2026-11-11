@@ -1,12 +1,12 @@
 # Guía de CI/CD de contract-api
 
-Guía práctica para trabajar con el flujo de integración y entrega continua del proyecto: cómo se integra un cambio en `master`, qué valida el pipeline, dónde se publica la imagen Docker y cómo ejecutarla. Las decisiones y sus motivos están en [ADR-0009](../adr/0009-ci-cd-github-actions.md) (GitHub Actions) y [ADR-0010](../adr/0010-jenkins-local-de-practica.md) (Jenkins local).
+Guía práctica para trabajar con el flujo de integración y entrega continua del proyecto: cómo se integra un cambio en `master`, qué valida el pipeline, dónde se publica la imagen Docker y cómo ejecutarla. Las decisiones y sus motivos están en [ADR-0009](../adr/0009-ci-cd-github-actions.md) (GitHub Actions), [ADR-0012](../adr/0012-github-flow-y-despliegue-con-aprobacion.md) (GitHub Flow y despliegue con aprobación) y [ADR-0010](../adr/0010-jenkins-local-de-practica.md) (Jenkins local).
 
 ## Índice
 
 1. [Visión general](#1-visión-general)
 2. [Requisitos](#2-requisitos)
-3. [Flujo de trabajo en una sola rama](#3-flujo-de-trabajo-en-una-sola-rama)
+3. [Flujo de trabajo con GitHub Flow](#3-flujo-de-trabajo-con-github-flow)
 4. [Protección de `master` (ruleset)](#4-protección-de-master-ruleset)
 5. [El pipeline de GitHub Actions](#5-el-pipeline-de-github-actions)
 6. [Publicar una versión](#6-publicar-una-versión)
@@ -20,20 +20,25 @@ Guía práctica para trabajar con el flujo de integración y entrega continua de
 
 ```mermaid
 flowchart LR
-    A[Commit en master<br/>en local] -->|push| E{CI en master<br/>build + pruebas<br/>+ cobertura + imagen}
-    E -->|rojo| A
-    E -->|verde| F[(GHCR<br/>latest, sha)]
-    E -->|verde| G[(Docker Hub<br/>latest, sha)]
-    A -.->|tag vX.Y.Z| H[CI del tag]
+    A[Rama feature/*] -->|push| B[Pull Request]
+    B --> C{CI<br/>build + pruebas<br/>+ cobertura + imagen}
+    C -->|rojo| A
+    C -->|verde| D[Squash and merge<br/>a master]
+    D --> E[CI en master]
+    E --> F[(GHCR<br/>latest, sha)]
+    E --> G[(Docker Hub<br/>latest, sha)]
+    F --> W{Aprobación<br/>environment production}
+    W -->|aprobado| X[Despliegue efímero<br/>+ prueba de humo]
+    D -.->|tag vX.Y.Z| H[CI del tag]
     H --> I[(GHCR y Docker Hub<br/>X.Y.Z, X.Y)]
 ```
 
-| Evento | Build y pruebas | Imagen | Publicación |
-|---|:-:|:-:|---|
-| Push a `master` | ✅ | se construye | `latest` y sha corto |
-| Tag `vX.Y.Z` | ✅ | se construye | `X.Y.Z` y `X.Y` |
-| Pull Request a `master` (opcional) | ✅ | se construye | ninguna |
-| Manual (*Run workflow*) | ✅ | se construye | según la rama elegida |
+| Evento | Build y pruebas | Imagen | Publicación | Despliegue |
+|---|:-:|:-:|---|---|
+| Pull Request a `master` | ✅ | se construye | ninguna | — |
+| Push a `master` (merge) | ✅ | se construye | `latest` y sha corto | tras aprobar `production` |
+| Tag `vX.Y.Z` | ✅ | se construye | `X.Y.Z` y `X.Y` | — |
+| Manual (*Run workflow*) | ✅ | se construye | según la rama elegida | — |
 
 ## 2. Requisitos
 
@@ -42,15 +47,16 @@ flowchart LR
 - JDK 21 solo si compilas en local (`./mvnw` descarga Maven).
 - Git Bash o PowerShell. Los comandos indican en cuál se ejecutan cuando la sintaxis difiere.
 
-## 3. Flujo de trabajo en una sola rama
+## 3. Flujo de trabajo con GitHub Flow
 
-`master` es la única rama de larga vida: se trabaja en local sobre ella y se hace push directo. Como el CI se ejecuta **después** del push, verifica en local antes de subir.
+`master` siempre es desplegable y **nunca recibe commits directos** ([ADR-0012](../adr/0012-github-flow-y-despliegue-con-aprobacion.md)). Todo cambio entra por Pull Request.
 
-### 3.1 Actualizar la copia local
+### 3.1 Crear la rama
 
 ```bash
 git checkout master
 git pull
+git checkout -b feature/mi-cambio        # o fix/<tema>, docs/<tema>
 ```
 
 ### 3.2 Trabajar y verificar en local
@@ -64,18 +70,36 @@ Los mensajes de commit van en español, en imperativo y explican el porqué:
 ```bash
 git add <archivos>
 git commit -m "Validar el formato del correo al registrar empleados"
+git push -u origin feature/mi-cambio
 ```
 
-### 3.3 Subir y revisar el CI
+### 3.3 Abrir el Pull Request
+
+1. GitHub muestra **Compare & pull request** tras el push; también puedes usar `gh pr create`.
+2. Completa la plantilla: en **Qué cambia** describe el cambio y su motivo, y marca la checklist.
+3. Espera los dos checks: **Build, pruebas y cobertura** e **Imagen Docker**.
+
+### 3.4 Integrar
+
+- Si GitHub indica **This branch is out-of-date with the base branch**, pulsa **Update branch** y espera de nuevo el CI.
+- Con los checks en verde, revisa el diff y pulsa **Squash and merge** → **Confirm**. Es el único método permitido: cada PR queda como un solo commit en `master`.
+- Borra la rama (**Delete branch**) y actualiza tu copia local:
 
 ```bash
-git pull --rebase        # si alguien más subió cambios (no se permite force push)
-git push
+git checkout master
+git pull
+git branch -D feature/mi-cambio      # -D porque con squash git no reconoce la rama como integrada
 ```
 
-Revisa la ejecución en *Actions → CI/CD*. Si queda en rojo, corrígelo con un **commit nuevo** en `master`: no se reescribe el historial ya subido.
+### 3.5 Aprobar el despliegue
 
-Para un cambio grande o que quieras revisar antes, puedes abrir una rama corta y un Pull Request a `master`: el CI se ejecuta igual sobre el PR, pero no es obligatorio.
+El merge dispara el CI en `master`. Cuando se publica la imagen, el job **Despliegue (production)** queda en *Waiting*:
+
+1. Abre la ejecución en *Actions → CI/CD* y pulsa **Review deployments**.
+2. Marca `production`, añade un comentario si quieres y pulsa **Approve and deploy**. Con **Reject** el despliegue no se ejecuta y la imagen queda publicada sin verificar.
+3. Revisa el **Summary**: la tabla *Despliegue verificado* muestra la imagen (`sha-<corto>`) y el resultado de cada comprobación (sección 5.3).
+
+El historial de aprobaciones, con quién aprobó y cuándo, queda en *Code → Deployments*.
 
 ## 4. Protección de `master` (ruleset)
 
@@ -83,20 +107,31 @@ La regla `master-protegida` está versionada en [`.github/ruleset/master-protegi
 
 | Regla | Efecto |
 |---|---|
-| Sin force push | No se puede reescribir el historial de `master` (`git push --force` se rechaza). |
-| Sin borrado | `master` no se puede eliminar. |
+| Pull Request obligatorio | No se puede hacer push directo a `master`. Sin aprobaciones mínimas: GitHub no permite que un único desarrollador apruebe su propio PR. |
+| Solo *squash* | Un commit por PR en `master`. |
+| Checks requeridos | `Build, pruebas y cobertura` e `Imagen Docker` deben estar en verde. |
+| Rama al día | La rama debe incluir los últimos cambios de `master` antes de integrarse. |
+| Sin force push ni borrado | Protege el historial de `master`. |
 
-El push directo está permitido: no se exige Pull Request ni checks previos.
-
-**Configurarla en un repositorio nuevo o en tu fork:** *Settings → Rules → Rulesets → New ruleset → Import a ruleset* y selecciona el JSON.
+**Configurarla en un repositorio nuevo o en tu fork:** *Settings → Rules → Rulesets → New ruleset → Import a ruleset* y selecciona el JSON. Los checks requeridos solo aparecen en el buscador después de que el workflow se haya ejecutado una vez.
 
 > En un repositorio **privado** con plan Free, GitHub permite crear la regla pero **no la aplica** (aparece con un ícono amarillo). Hace falta que el repositorio sea público o un plan Pro/Team. Con la regla activa el ícono es verde.
 
 Si cambias el JSON, hay que volver a importarlo a mano en GitHub: el archivo es la referencia, no se aplica solo.
 
+### 4.1 Environment `production`
+
+El job de despliegue usa el environment `production` (*Settings → Environments*):
+
+1. **New environment** → nombre `production`.
+2. Marca **Required reviewers** y añade tu usuario. Con un único desarrollador, deja desmarcado *Prevent self-review*.
+3. En **Deployment branches and tags** elige *Selected branches and tags* y añade `master`.
+
+Si el environment no existe, GitHub lo crea al primer despliegue **sin revisores**, y el job se ejecuta sin esperar aprobación.
+
 ## 5. El pipeline de GitHub Actions
 
-Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). Tiene dos jobs; el segundo solo empieza si el primero termina bien. El análisis de SonarCloud es un paso del primero ([ADR-0011](../adr/0011-analisis-estatico-sonarcloud.md)).
+Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). Tiene tres jobs encadenados: cada uno solo empieza si el anterior termina bien, y el tercero solo se ejecuta en `master` tras la aprobación. El análisis de SonarCloud es un paso del primero ([ADR-0011](../adr/0011-analisis-estatico-sonarcloud.md)).
 
 ### 5.1 Job `Build, pruebas y cobertura`
 
@@ -106,19 +141,35 @@ Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). 
 - Al terminar, aunque falle:
   - escribe una tabla de cobertura por módulo en el **resumen** de la ejecución (*Actions → ejecución → Summary*);
   - publica el artefacto **reports** (informes de Surefire y JaCoCo, 14 días). Descárgalo desde la ejecución y abre `*/target/site/jacoco/index.html`.
-- Si el repositorio tiene el secreto `SONAR_TOKEN`, ejecuta el **análisis de SonarCloud** con la cobertura de JaCoCo y espera el **Quality Gate**: si no se cumple, el job falla (sección 5.4). Sin el secreto, el paso se omite.
+- Si el repositorio tiene el secreto `SONAR_TOKEN`, ejecuta el **análisis de SonarCloud** con la cobertura de JaCoCo y espera el **Quality Gate**: si no se cumple, el job falla (sección 5.5). Sin el secreto, el paso se omite.
 
 ### 5.2 Job `Imagen Docker`
 
 - Construye la imagen con el [`Dockerfile`](../../Dockerfile) multi-stage: compila con el Maven Wrapper (sin pruebas, ya se ejecutaron), extrae las capas de Spring Boot y genera una imagen con JRE 21, usuario sin privilegios y perfil `prod`.
-- En un push a `master` y en tags la construye y la publica (sección 7). En un PR opcional solo la construye.
+- En un push a `master` y en tags la construye y la publica (sección 7). En un PR solo la construye.
 - Usa la caché de GitHub Actions para las capas, así que las ejecuciones siguientes son más rápidas.
 
-### 5.3 Ejecutar el pipeline a mano
+### 5.3 Job `Despliegue (production)`
+
+Solo tras un push a `master` y con la aprobación del environment `production` (secciones 3.5 y 4.1). No hay un servidor persistente, así que despliega en un **entorno efímero** del runner:
+
+- Levanta PostgreSQL 16 como servicio del job.
+- Genera en el momento las claves JWT y la contraseña del administrador inicial. No hay secretos que configurar y no sobreviven al job.
+- Descarga de GHCR la imagen **recién publicada por su sha** (`sha-<corto>`, no `latest`) y la arranca con el perfil `prod`.
+- Espera hasta 120 s a que `/actuator/health` responda `UP`, lo que demuestra que Flyway migró la base y la aplicación arrancó.
+- **Prueba de humo:**
+  - login del administrador inicial (BR-USR-007);
+  - `GET /api/v1/auth/me` y `GET /api/v1/employees` con el token deben dar `200`;
+  - `GET /api/v1/employees` sin token debe dar `401`.
+- Escribe la tabla *Despliegue verificado* en el resumen, muestra los logs del contenedor y retira el entorno, aunque algo falle.
+
+Para desplegar en un servidor real, este job es el punto de cambio: se sustituyen los pasos del entorno efímero por el despliegue en ese host, y la aprobación y la prueba de humo se mantienen.
+
+### 5.4 Ejecutar el pipeline a mano
 
 *Actions → CI/CD → Run workflow* y elige la rama. Útil, por ejemplo, después de configurar un secreto sin tener que hacer un commit.
 
-### 5.4 Configurar SonarCloud (una sola vez)
+### 5.5 Configurar SonarCloud (una sola vez)
 
 1. Entra a <https://sonarcloud.io> con tu cuenta de GitHub → **+ → Analyze new project** → elige el repositorio (gratis para repositorios públicos).
 2. En el proyecto: *Administration → Analysis Method* → desactiva **Automatic Analysis** (si está activo, el análisis desde el CI falla).
@@ -338,8 +389,13 @@ Jenkins es solo de práctica: el CI oficial que valida cada push a `master` es G
 | El workflow no se ejecuta nunca | El workflow escucha `master` y el push se hizo a otra rama, o la rama por defecto no es `master` | Trabajar sobre `master` y dejarla como rama por defecto (*Settings → General → Default branch*) |
 | `./mvnw: Permission denied` | `mvnw` versionado sin permiso de ejecución | `git update-index --chmod=+x mvnw` y commit |
 | `cannot open ./.mvn/wrapper/maven-wrapper.properties` | Falta la carpeta `.mvn/` en el repositorio | Versionar `.mvn/wrapper/maven-wrapper.properties` |
-| `Análisis SonarCloud` aparece *skipped* | Falta el secreto `SONAR_TOKEN` | Sección 5.4 |
-| SonarCloud: *You are running CI analysis while Automatic Analysis is enabled* | Análisis automático activo | Desactivarlo (sección 5.4, paso 2) |
+| *Squash and merge* deshabilitado | Checks pendientes o en rojo, o rama desactualizada | Revisar el job fallido en *Checks*; **Update branch** |
+| `git push` a `master` rechazado (*Changes must be made through a pull request*) | Push directo bloqueado por el ruleset | Crear una rama y abrir un PR (sección 3) |
+| `Despliegue (production)` se ejecuta sin pedir aprobación | El environment `production` no existe o no tiene revisores | Configurarlo (sección 4.1) |
+| `Despliegue (production)` falla en *Desplegar la imagen* con `manifest unknown` | La imagen `sha-<corto>` no se publicó (job `Imagen Docker` sin publicar) | Revisar el job `Imagen Docker` de la misma ejecución |
+| La prueba de humo falla | La imagen no arranca o un endpoint cambió | Revisar el paso *Logs del contenedor* y la tabla del *Summary* |
+| `Análisis SonarCloud` aparece *skipped* | Falta el secreto `SONAR_TOKEN` | Sección 5.5 |
+| SonarCloud: *You are running CI analysis while Automatic Analysis is enabled* | Análisis automático activo | Desactivarlo (sección 5.5, paso 2) |
 | El job falla en *Quality Gate* | El código nuevo no cumple el Quality Gate (issues, cobertura) | Revisar el panel de SonarCloud y corregir |
 | El ruleset aparece con ícono amarillo | Repositorio privado con plan Free | Hacer público el repositorio o usar un plan Pro/Team (sección 4) |
 | `git push` rechazado: *Cannot force-push to this branch* | El ruleset `master-protegida` impide reescribir el historial | No usar `--force`: `git pull --rebase` y luego `git push`; corregir errores con un commit nuevo |

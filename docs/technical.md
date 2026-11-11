@@ -314,16 +314,17 @@ El `Dockerfile` tiene dos etapas:
 
 `.github/workflows/ci-cd.yml`, según [ADR-0009](adr/0009-ci-cd-github-actions.md). Uso paso a paso en la [guía de CI/CD](guides/ci-cd.md).
 
-| Evento | `build` | `image` |
-|---|---|---|
-| Push a `master` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Publica `latest` y `sha-<corto>` |
-| Pull Request a `master` (opcional) | Igual | Construye la imagen sin publicarla |
-| Tag `vX.Y.Z` | Igual | Publica `X.Y.Z` y `X.Y` |
+| Evento | `build` | `image` | `deploy` |
+|---|---|---|---|
+| Pull Request a `master` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Construye la imagen sin publicarla | — |
+| Push a `master` (merge del PR) | Igual | Publica `latest` y `sha-<corto>` | Espera aprobación de `production` y verifica `sha-<corto>` en un entorno efímero |
+| Tag `vX.Y.Z` | Igual | Publica `X.Y.Z` y `X.Y` | — |
 
 - SonarCloud ([ADR-0011](adr/0011-analisis-estatico-sonarcloud.md)): se ejecuta solo si existe el secreto `SONAR_TOKEN`; el job falla si no se cumple el Quality Gate.
 - Registros: `ghcr.io/christophersanz/ai-cicd` siempre; Docker Hub solo si el repositorio define la variable `DOCKERHUB_USERNAME` y el secreto `DOCKERHUB_TOKEN`.
 - Los informes de Surefire y JaCoCo se guardan como artefacto `reports` durante 14 días.
 - En los PR, un push nuevo cancela la ejecución anterior.
+- `deploy` ([ADR-0012](adr/0012-github-flow-y-despliegue-con-aprobacion.md)): environment `production` con revisor obligatorio. Levanta la imagen con PostgreSQL (servicio del job), claves JWT y contraseña de administrador generadas en el momento, y comprueba `health` UP, login, `GET /auth/me` y `GET /employees` (200 con token, 401 sin token). El resultado queda en el resumen de la ejecución.
 
 ### 9.3 Jenkins local
 
@@ -331,4 +332,4 @@ El `Dockerfile` tiene dos etapas:
 
 ### 9.4 Flujo de ramas
 
-Una sola rama, `master`: commits en local y push directo; ruleset `.github/ruleset/master-protegida.json` (sin force push ni borrado) y versión publicada con un tag `vX.Y.Z` sobre `master`.
+GitHub Flow ([ADR-0012](adr/0012-github-flow-y-despliegue-con-aprobacion.md)): ramas cortas y Pull Request a `master`. Ruleset `.github/ruleset/master-protegida.json`: PR obligatorio, solo *squash*, checks `Build, pruebas y cobertura` e `Imagen Docker` en verde, rama al día, sin force push ni borrado. Versión publicada con un tag `vX.Y.Z` sobre `master`.
