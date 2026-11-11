@@ -36,7 +36,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | Documentación API | springdoc-openapi (OpenAPI 3) |
 | Observabilidad | Micrometer + OpenTelemetry, logs estructurados en JSON |
 | Pruebas | JUnit 5, AssertJ, Mockito, Testcontainers, spring-security-test; cobertura con JaCoCo (≥ 80 % de líneas en `domain` y `application`) |
-| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional) (ADR-0009); GitHub Flow con checks obligatorios y despliegue con aprobación en el environment `production` (ADR-0012); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
+| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional) (ADR-0009); GitHub Flow con checks obligatorios y despliegue con aprobación en el environment `production` (ADR-0012) a Render (`render.yaml`, ADR-0013); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
 
 ## 3. Comandos habituales
 
@@ -53,7 +53,7 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 - Nunca se hace push directo a `master`: todo cambio va en una rama corta (`feature/*`, `fix/*`, `docs/*`) y entra por Pull Request. Antes de cada push, `./mvnw clean verify` en verde.
 - El ruleset `master-protegida` exige los checks **Build, pruebas y cobertura** e **Imagen Docker** en verde, la rama al día con `master` e integración solo con **squash**; sin force push ni borrado. Claude no integra PRs: el *Squash and merge* lo decide el desarrollador.
-- Tras el merge, el job **Despliegue (production)** espera la aprobación del environment `production` y verifica la imagen publicada en un entorno efímero.
+- Tras el merge, **Verificación de la imagen** prueba la imagen publicada en un entorno efímero y **Despliegue (production)** espera la aprobación del environment `production` para desplegarla en Render. Claude no aprueba despliegues.
 - Los mensajes de commit van en español, en imperativo y describen el porqué.
 - Una versión se publica con un tag `vX.Y.Z` sobre `master`; el pipeline publica la imagen con esa etiqueta.
 
@@ -69,4 +69,4 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 - Evita la sobreingeniería: no introduzcas CQRS, event sourcing ni nuevos módulos sin una necesidad justificada.
 - No añadas dependencias nuevas al `pom.xml` sin indicarlo y justificarlo.
 - Ejecuta `./mvnw clean verify` antes de dar una tarea por terminada: es lo mismo que ejecuta el CI, incluido el umbral de cobertura.
-- Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009/ADR-0012 o registra uno nuevo.
+- Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009/ADR-0012/ADR-0013 o registra uno nuevo.

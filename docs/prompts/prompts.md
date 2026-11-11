@@ -28,7 +28,7 @@ Diseña la arquitectura de una API REST para el siguiente contexto:
 - Casos de uso principales: [lista]
 - Requisitos no funcionales: [p. ej. 500 req/s, auditoría, alta disponibilidad]
 - Restricciones tecnológicas: [p. ej. PostgreSQL, Kafka, Kubernetes]
-- Repositorio y CI/CD: [p. ej. GitHub Flow con PR obligatorio y checks requeridos en el ruleset; despliegue con aprobación en un environment; GitHub Actions
+- Repositorio y CI/CD: [p. ej. GitHub Flow con PR obligatorio y checks requeridos en el ruleset; despliegue con aprobación en un environment a Render; GitHub Actions
   como CI oficial (build, pruebas, cobertura, SonarCloud e imagen Docker en GHCR y Docker Hub);
   Jenkins local de práctica con `Jenkinsfile`]
 - Equipo: [tamaño y nivel]

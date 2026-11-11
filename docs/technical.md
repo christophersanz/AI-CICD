@@ -314,17 +314,28 @@ El `Dockerfile` tiene dos etapas:
 
 `.github/workflows/ci-cd.yml`, según [ADR-0009](adr/0009-ci-cd-github-actions.md). Uso paso a paso en la [guía de CI/CD](guides/ci-cd.md).
 
-| Evento | `build` | `image` | `deploy` |
-|---|---|---|---|
-| Pull Request a `master` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Construye la imagen sin publicarla | — |
-| Push a `master` (merge del PR) | Igual | Publica `latest` y `sha-<corto>` | Espera aprobación de `production` y verifica `sha-<corto>` en un entorno efímero |
-| Tag `vX.Y.Z` | Igual | Publica `X.Y.Z` y `X.Y` | — |
+| Evento | `build` | `image` | `verify` | `deploy` |
+|---|---|---|---|---|
+| Pull Request a `master` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Construye la imagen sin publicarla | — | — |
+| Push a `master` (merge del PR) | Igual | Publica `latest` y `sha-<corto>` | Prueba `sha-<corto>` en un entorno efímero | Tras aprobar `production`, despliega `sha-<corto>` en Render y repite la prueba de humo |
+| Tag `vX.Y.Z` | Igual | Publica `X.Y.Z` y `X.Y` | — | — |
 
 - SonarCloud ([ADR-0011](adr/0011-analisis-estatico-sonarcloud.md)): se ejecuta solo si existe el secreto `SONAR_TOKEN`; el job falla si no se cumple el Quality Gate.
 - Registros: `ghcr.io/christophersanz/ai-cicd` siempre; Docker Hub solo si el repositorio define la variable `DOCKERHUB_USERNAME` y el secreto `DOCKERHUB_TOKEN`.
 - Los informes de Surefire y JaCoCo se guardan como artefacto `reports` durante 14 días.
 - En los PR, un push nuevo cancela la ejecución anterior.
-- `deploy` ([ADR-0012](adr/0012-github-flow-y-despliegue-con-aprobacion.md)): environment `production` con revisor obligatorio. Levanta la imagen con PostgreSQL (servicio del job), claves JWT y contraseña de administrador generadas en el momento, y comprueba `health` UP, login, `GET /auth/me` y `GET /employees` (200 con token, 401 sin token). El resultado queda en el resumen de la ejecución.
+- `verify` ([ADR-0012](adr/0012-github-flow-y-despliegue-con-aprobacion.md)): levanta la imagen de GHCR con PostgreSQL (servicio del job), claves JWT y contraseña de administrador generadas en el momento. Ejecuta `.github/scripts/smoke-test.sh`, que comprueba:
+  - `health` UP;
+  - login;
+  - `GET /auth/me` y `GET /employees`: 200 con token y 401 sin token.
+
+  El resultado queda en el resumen de la ejecución.
+- `deploy` ([ADR-0013](adr/0013-despliegue-en-render.md)): environment `production` con revisor obligatorio. `.github/scripts/render-deploy.sh` pide a la API de Render el despliegue de `docker.io/<usuario>/ai-cicd:sha-<corto>` y espera a `live`; después ejecuta la misma prueba de humo contra `RENDER_URL`. Requiere:
+  - las variables de repositorio `RENDER_SERVICE_ID`, `RENDER_URL` y `DOCKERHUB_USERNAME`;
+  - los secretos del environment `RENDER_API_KEY` y `SMOKE_ADMIN_PASSWORD`.
+
+  Sin `RENDER_SERVICE_ID` el job se omite.
+- Render (`render.yaml`): servicio web `contract-api` (plan free, `runtime: image`, `autoDeploy: false`, health check `/actuator/health`, `PORT=8081`) y base `contract-db` (PostgreSQL 16, sin acceso externo). `DB_URL`, las claves JWT y la contraseña del administrador se definen en el panel de Render.
 
 ### 9.3 Jenkins local
 
