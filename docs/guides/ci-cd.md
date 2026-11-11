@@ -1,6 +1,6 @@
 # Guía de CI/CD de contract-api
 
-Guía práctica para trabajar con el flujo de integración y entrega continua del proyecto: cómo se integra un cambio en `master`, qué valida el pipeline, dónde se publica la imagen Docker y cómo ejecutarla. Las decisiones y sus motivos están en [ADR-0009](../adr/0009-ci-cd-github-actions.md) (GitHub Actions), [ADR-0012](../adr/0012-github-flow-y-despliegue-con-aprobacion.md) (GitHub Flow y despliegue con aprobación) y [ADR-0010](../adr/0010-jenkins-local-de-practica.md) (Jenkins local).
+Guía práctica para trabajar con el flujo de integración y entrega continua del proyecto: cómo se integra un cambio en `master`, qué valida el pipeline, dónde se publica la imagen Docker y cómo ejecutarla. Las decisiones y sus motivos están en [ADR-0009](../adr/0009-ci-cd-github-actions.md) (GitHub Actions), [ADR-0012](../adr/0012-github-flow-y-despliegue-con-aprobacion.md) (GitHub Flow y despliegue con aprobación), [ADR-0013](../adr/0013-despliegue-en-render.md) (despliegue en Render) y [ADR-0010](../adr/0010-jenkins-local-de-practica.md) (Jenkins local).
 
 ## Índice
 
@@ -27,8 +27,10 @@ flowchart LR
     D --> E[CI en master]
     E --> F[(GHCR<br/>latest, sha)]
     E --> G[(Docker Hub<br/>latest, sha)]
-    F --> W{Aprobación<br/>environment production}
-    W -->|aprobado| X[Despliegue efímero<br/>+ prueba de humo]
+    F --> V[Verificación efímera<br/>+ prueba de humo]
+    V --> W{Aprobación<br/>environment production}
+    G -.->|imagen sha| R
+    W -->|aprobado| R[Render<br/>deploy + prueba de humo]
     D -.->|tag vX.Y.Z| H[CI del tag]
     H --> I[(GHCR y Docker Hub<br/>X.Y.Z, X.Y)]
 ```
@@ -36,7 +38,7 @@ flowchart LR
 | Evento | Build y pruebas | Imagen | Publicación | Despliegue |
 |---|:-:|:-:|---|---|
 | Pull Request a `master` | ✅ | se construye | ninguna | — |
-| Push a `master` (merge) | ✅ | se construye | `latest` y sha corto | tras aprobar `production` |
+| Push a `master` (merge) | ✅ | se construye | `latest` y sha corto | verificación efímera; Render tras aprobar `production` |
 | Tag `vX.Y.Z` | ✅ | se construye | `X.Y.Z` y `X.Y` | — |
 | Manual (*Run workflow*) | ✅ | se construye | según la rama elegida | — |
 
@@ -93,11 +95,11 @@ git branch -D feature/mi-cambio      # -D porque con squash git no reconoce la r
 
 ### 3.5 Aprobar el despliegue
 
-El merge dispara el CI en `master`. Cuando se publica la imagen, el job **Despliegue (production)** queda en *Waiting*:
+El merge dispara el CI en `master`. Cuando la imagen se publica y pasa la **Verificación de la imagen** (sección 5.3), el job **Despliegue (production)** queda en *Waiting*:
 
-1. Abre la ejecución en *Actions → CI/CD* y pulsa **Review deployments**.
-2. Marca `production`, añade un comentario si quieres y pulsa **Approve and deploy**. Con **Reject** el despliegue no se ejecuta y la imagen queda publicada sin verificar.
-3. Revisa el **Summary**: la tabla *Despliegue verificado* muestra la imagen (`sha-<corto>`) y el resultado de cada comprobación (sección 5.3).
+1. Abre la ejecución en *Actions → CI/CD* y revisa en el **Summary** la tabla *Imagen verificada (entorno efímero)*.
+2. Pulsa **Review deployments**, marca `production`, añade un comentario si quieres y pulsa **Approve and deploy**. El banner amarillo desaparece y el job pasa a *In progress*; si sigue en *Waiting*, la aprobación no se registró. Con **Reject** no se despliega y Render sigue con la versión anterior.
+3. Al terminar, la tabla *Despliegue verificado en Render (production)* muestra la URL, la imagen (`sha-<corto>`) y cada comprobación (sección 5.4). El enlace del environment en la ejecución abre la API.
 
 El historial de aprobaciones, con quién aprobó y cuándo, queda en *Code → Deployments*.
 
@@ -126,12 +128,13 @@ El job de despliegue usa el environment `production` (*Settings → Environments
 1. **New environment** → nombre `production`.
 2. Marca **Required reviewers** y añade tu usuario. Con un único desarrollador, deja desmarcado *Prevent self-review*.
 3. En **Deployment branches and tags** elige *Selected branches and tags* y añade `master`.
+4. En **Environment secrets** añade `RENDER_API_KEY` y `SMOKE_ADMIN_PASSWORD` (sección 5.4). Al ser secretos del environment, solo los lee el job aprobado.
 
 Si el environment no existe, GitHub lo crea al primer despliegue **sin revisores**, y el job se ejecuta sin esperar aprobación.
 
 ## 5. El pipeline de GitHub Actions
 
-Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). Tiene tres jobs encadenados: cada uno solo empieza si el anterior termina bien, y el tercero solo se ejecuta en `master` tras la aprobación. El análisis de SonarCloud es un paso del primero ([ADR-0011](../adr/0011-analisis-estatico-sonarcloud.md)).
+Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). Tiene cuatro jobs encadenados y cada uno solo empieza si el anterior termina bien. Los dos últimos solo se ejecutan tras un push a `master`, y el cuarto además necesita la aprobación. El análisis de SonarCloud es un paso del primero ([ADR-0011](../adr/0011-analisis-estatico-sonarcloud.md)).
 
 ### 5.1 Job `Build, pruebas y cobertura`
 
@@ -141,7 +144,7 @@ Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). 
 - Al terminar, aunque falle:
   - escribe una tabla de cobertura por módulo en el **resumen** de la ejecución (*Actions → ejecución → Summary*);
   - publica el artefacto **reports** (informes de Surefire y JaCoCo, 14 días). Descárgalo desde la ejecución y abre `*/target/site/jacoco/index.html`.
-- Si el repositorio tiene el secreto `SONAR_TOKEN`, ejecuta el **análisis de SonarCloud** con la cobertura de JaCoCo y espera el **Quality Gate**: si no se cumple, el job falla (sección 5.5). Sin el secreto, el paso se omite.
+- Si el repositorio tiene el secreto `SONAR_TOKEN`, ejecuta el **análisis de SonarCloud** con la cobertura de JaCoCo y espera el **Quality Gate**: si no se cumple, el job falla (sección 5.6). Sin el secreto, el paso se omite.
 
 ### 5.2 Job `Imagen Docker`
 
@@ -149,27 +152,65 @@ Definido en [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml). 
 - En un push a `master` y en tags la construye y la publica (sección 7). En un PR solo la construye.
 - Usa la caché de GitHub Actions para las capas, así que las ejecuciones siguientes son más rápidas.
 
-### 5.3 Job `Despliegue (production)`
+### 5.3 Job `Verificación de la imagen`
 
-Solo tras un push a `master` y con la aprobación del environment `production` (secciones 3.5 y 4.1). No hay un servidor persistente, así que despliega en un **entorno efímero** del runner:
+Automático tras un push a `master`, sin aprobación. Prueba la imagen recién publicada en un **entorno efímero** del runner, antes de pedir la aprobación:
 
 - Levanta PostgreSQL 16 como servicio del job.
 - Genera en el momento las claves JWT y la contraseña del administrador inicial. No hay secretos que configurar y no sobreviven al job.
-- Descarga de GHCR la imagen **recién publicada por su sha** (`sha-<corto>`, no `latest`) y la arranca con el perfil `prod`.
-- Espera hasta 120 s a que `/actuator/health` responda `UP`, lo que demuestra que Flyway migró la base y la aplicación arrancó.
-- **Prueba de humo:**
+- Descarga de GHCR la imagen **por su sha** (`sha-<corto>`, no `latest`) y la arranca con el perfil `prod`.
+- Ejecuta la **prueba de humo** ([`.github/scripts/smoke-test.sh`](../../.github/scripts/smoke-test.sh)):
+  - espera hasta 120 s a que `/actuator/health` responda `UP` (Flyway migró la base y la aplicación arrancó);
   - login del administrador inicial (BR-USR-007);
   - `GET /api/v1/auth/me` y `GET /api/v1/employees` con el token deben dar `200`;
   - `GET /api/v1/employees` sin token debe dar `401`.
-- Escribe la tabla *Despliegue verificado* en el resumen, muestra los logs del contenedor y retira el entorno, aunque algo falle.
+- Escribe la tabla *Imagen verificada* en el resumen, muestra los logs del contenedor y retira el entorno, aunque algo falle.
 
-Para desplegar en un servidor real, este job es el punto de cambio: se sustituyen los pasos del entorno efímero por el despliegue en ese host, y la aprobación y la prueba de humo se mantienen.
+### 5.4 Job `Despliegue (production)` en Render
 
-### 5.4 Ejecutar el pipeline a mano
+Solo tras la verificación y con la aprobación del environment `production` (secciones 3.5 y 4.1). Despliega en [Render](https://render.com) (plan gratuito) la imagen de **Docker Hub** con el mismo sha, que es pública y Render descarga sin credenciales ([ADR-0013](../adr/0013-despliegue-en-render.md)):
+
+1. [`.github/scripts/render-deploy.sh`](../../.github/scripts/render-deploy.sh) llama a la API de Render (`POST /v1/services/{id}/deploys` con `imageUrl`) y consulta el deploy cada 10 s hasta `live`. Falla si Render lo marca como fallido o cancelado, o si tarda más de 15 min.
+2. La misma prueba de humo se ejecuta contra la URL pública, con hasta 300 s para el health: el plan gratuito duerme el servicio tras 15 min sin tráfico.
+
+Si el repositorio no define la variable `RENDER_SERVICE_ID` (por ejemplo, en un fork), el job se omite.
+
+**Configurar Render (una sola vez):**
+
+1. Genera las claves JWT de production en Git Bash. Cada PEM debe quedar en una sola línea con `\n` literales (como en la sección 8.2):
+
+   ```bash
+   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private.pem
+   openssl pkey -in private.pem -pubout -out public.pem
+   awk '{printf "%s\\n", $0}' public.pem  > public.line    # valor de SECURITY_JWT_PUBLIC_KEY
+   awk '{printf "%s\\n", $0}' private.pem > private.line   # valor de SECURITY_JWT_PRIVATE_KEY
+   ```
+
+   Elige también la contraseña del administrador; debe cumplir BR-USR-003 o la aplicación no arranca. Al terminar, borra los archivos: el valor vive en Render.
+2. En Render, crea la cuenta y entra en **New → Blueprint**. Conecta el repositorio y Render lee [`render.yaml`](../../render.yaml). Crea el servicio `contract-api` y la base `contract-db`, y pide los valores marcados con `sync: false`:
+   - `SECURITY_JWT_PUBLIC_KEY` y `SECURITY_JWT_PRIVATE_KEY`: el contenido de `public.line` y `private.line`;
+   - `SECURITY_BOOTSTRAP_ADMIN_PASSWORD`: la contraseña del administrador;
+   - `DB_URL`: déjalo en blanco por ahora.
+3. Abre `contract-db` → **Connections**, copia el *Hostname* interno (`dpg-…-a`) y define en `contract-api` → **Environment** `DB_URL=jdbc:postgresql://<hostname>:5432/contracts`. Guarda y despliega: en **Logs** deben aparecer las migraciones de Flyway y `Started ContractApiApplication`.
+4. En Render, **Account Settings → API Keys → Create API Key**. Copia también el id del servicio (`srv-…`, visible en la URL del panel) y su URL pública (`https://contract-api-xxxx.onrender.com`).
+5. En GitHub (Git Bash o PowerShell, con `gh` autenticado), los secretos se piden por teclado y no quedan en el historial:
+
+   ```bash
+   gh secret set RENDER_API_KEY --env production
+   gh secret set SMOKE_ADMIN_PASSWORD --env production   # la misma contraseña del administrador
+   gh variable set RENDER_SERVICE_ID --body "srv-..."
+   gh variable set RENDER_URL --body "https://contract-api-xxxx.onrender.com"
+   ```
+
+6. El siguiente merge a `master` despliega en Render tras la aprobación. Para desplegar sin un commit nuevo, abre la última ejecución de `master` y pulsa **Re-run all jobs**.
+
+> El plan gratuito tiene límites: el servicio duerme tras 15 min sin tráfico (la primera petición tarda alrededor de un minuto), 512 MB de memoria y una base PostgreSQL que **caduca a los 30 días**. Render avisa antes de borrarla.
+
+### 5.5 Ejecutar el pipeline a mano
 
 *Actions → CI/CD → Run workflow* y elige la rama. Útil, por ejemplo, después de configurar un secreto sin tener que hacer un commit.
 
-### 5.5 Configurar SonarCloud (una sola vez)
+### 5.6 Configurar SonarCloud (una sola vez)
 
 1. Entra a <https://sonarcloud.io> con tu cuenta de GitHub → **+ → Analyze new project** → elige el repositorio (gratis para repositorios públicos).
 2. En el proyecto: *Administration → Analysis Method* → desactiva **Automatic Analysis** (si está activo, el análisis desde el CI falla).
@@ -392,10 +433,14 @@ Jenkins es solo de práctica: el CI oficial que valida cada push a `master` es G
 | *Squash and merge* deshabilitado | Checks pendientes o en rojo, o rama desactualizada | Revisar el job fallido en *Checks*; **Update branch** |
 | `git push` a `master` rechazado (*Changes must be made through a pull request*) | Push directo bloqueado por el ruleset | Crear una rama y abrir un PR (sección 3) |
 | `Despliegue (production)` se ejecuta sin pedir aprobación | El environment `production` no existe o no tiene revisores | Configurarlo (sección 4.1) |
-| `Despliegue (production)` falla en *Desplegar la imagen* con `manifest unknown` | La imagen `sha-<corto>` no se publicó (job `Imagen Docker` sin publicar) | Revisar el job `Imagen Docker` de la misma ejecución |
-| La prueba de humo falla | La imagen no arranca o un endpoint cambió | Revisar el paso *Logs del contenedor* y la tabla del *Summary* |
-| `Análisis SonarCloud` aparece *skipped* | Falta el secreto `SONAR_TOKEN` | Sección 5.5 |
-| SonarCloud: *You are running CI analysis while Automatic Analysis is enabled* | Análisis automático activo | Desactivarlo (sección 5.5, paso 2) |
+| `Verificación de la imagen` falla en *Levantar la imagen* con `manifest unknown` | La imagen `sha-<corto>` no se publicó (job `Imagen Docker` sin publicar) | Revisar el job `Imagen Docker` de la misma ejecución |
+| La prueba de humo falla en la verificación | La imagen no arranca o un endpoint cambió | Revisar el paso *Logs del contenedor* y la tabla del *Summary* |
+| `Despliegue (production)` aparece *skipped* | Faltan las variables `RENDER_SERVICE_ID` o `DOCKERHUB_USERNAME` | Sección 5.4, paso 5, y sección 7.3 |
+| *Desplegar en Render* falla con `401` | `RENDER_API_KEY` ausente o revocada en el environment `production` | Crear otra API key y volver a guardarla (sección 5.4, paso 5) |
+| El deploy de Render termina en `update_failed` | La app no arrancó en Render: `DB_URL` mal formada, claves JWT con saltos de línea reales o falta de memoria | Panel de Render → `contract-api` → **Logs**; revisar la sección 5.4, pasos 1 y 3 |
+| La prueba de humo en production falla en el login | `SMOKE_ADMIN_PASSWORD` distinta de `SECURITY_BOOTSTRAP_ADMIN_PASSWORD`, o se cambió la contraseña del administrador | Igualar ambos valores. El administrador inicial solo se crea si no existe ningún `ADMIN` (BR-USR-007) |
+| `Análisis SonarCloud` aparece *skipped* | Falta el secreto `SONAR_TOKEN` | Sección 5.6 |
+| SonarCloud: *You are running CI analysis while Automatic Analysis is enabled* | Análisis automático activo | Desactivarlo (sección 5.6, paso 2) |
 | El job falla en *Quality Gate* | El código nuevo no cumple el Quality Gate (issues, cobertura) | Revisar el panel de SonarCloud y corregir |
 | El ruleset aparece con ícono amarillo | Repositorio privado con plan Free | Hacer público el repositorio o usar un plan Pro/Team (sección 4) |
 | `git push` rechazado: *Cannot force-push to this branch* | El ruleset `master-protegida` impide reescribir el historial | No usar `--force`: `git pull --rebase` y luego `git push`; corregir errores con un commit nuevo |
