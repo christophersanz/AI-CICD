@@ -1,4 +1,4 @@
-> **Histórico.** Prompt tal como se ejecutó durante el curso; se conserva como evidencia (ver `docs/prompts/prompts.md` §5). Para trabajo nuevo usa `docs/design/003-security-design.md`, que es el diseño resultante, y `docs/prompts/14-revisar-seguridad-01.md` para revisarla. La seguridad ya está implementada (ADR-0005).
+> **Histórico — versión 01.** Nombre original en el curso: `003-security-01.md` (sesión 03). Se conserva tal como se ejecutó, como evidencia (ver `docs/prompts/README.md` §5). Para trabajo nuevo usa `docs/design/003-security-design.md` (el diseño resultante) y `docs/prompts/14-revisar-seguridad-01.md` para revisarla. Fase 1 de la seguridad ya implementada (ADR-0005); la versión 02 de este prompt continúa la implementación.
 
 Actúa como Arquitecto de Software Senior y especialista en seguridad de aplicaciones,
 experto en Java 21, Spring Boot 3, Spring Security 6 y Clean Architecture.

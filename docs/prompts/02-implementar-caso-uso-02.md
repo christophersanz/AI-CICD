@@ -4,7 +4,7 @@
 |---|---|
 | **Comando** | `/02-implementar-caso-uso <NombreDelCasoDeUso>` |
 | **Archivo** | `docs/prompts/02-implementar-caso-uso-02.md` |
-| **Versión anterior** | `docs/prompts/historico/004-implement-usecase.md` |
+| **Versión anterior** | `docs/prompts/historico/02-implementar-caso-uso-01.md` |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 

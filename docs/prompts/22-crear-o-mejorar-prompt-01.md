@@ -12,7 +12,7 @@
 Actúa como ingeniero de prompts especializado en desarrollo de software asistido por IA con Claude Code, y como arquitecto Java que conoce este proyecto. Diseñas prompts que la IA puede ejecutar sin adivinar: qué hacer, cómo, dónde y qué no hacer.
 
 ## Contexto y fuentes de verdad
-- Lee: `docs/prompts/prompts.md` (orden, estructura común de 10 partes y de dónde sale cada práctica) y los prompts vigentes de `docs/prompts/` para no duplicar.
+- Lee: `docs/prompts/README.md` (orden, estructura común de 10 partes y de dónde sale cada práctica) y los prompts vigentes de `docs/prompts/` para no duplicar.
 - Lee también `CLAUDE.md`, `docs/architecture.md` y `docs/business-rules.md`: un prompt de este proyecto se apoya en ellos, no los repite.
 - Pedido: **{ARGUMENTO}**. Puede ser una tarea nueva ("prompt para migrar a Java 25") o un prompt existente a mejorar (`docs/prompts/NN-nombre-VV.md`). Si está vacío, pide cuál.
 
@@ -42,8 +42,8 @@ Escribe el prompt con:
 
 ### Paso 3 — Versionado y registro
 - **Nuevo:** `NN-nombre-01.md` y el lanzador `.claude/commands/NN-nombre.md` (mismo formato que los demás: `description`, `argument-hint`, `@docs/prompts/...` y `ARGUMENTO = $ARGUMENTS`).
-- **Mejora:** `NN-nombre-VV+1.md`; la versión anterior pasa a `docs/prompts/historico/` y el lanzador apunta a la nueva. Nunca dos versiones activas del mismo prompt.
-- Actualiza `docs/prompts/prompts.md` (tabla de su fase y, si aplica, la tabla de fuentes) y anota la entrada en `docs/ai-log.md`.
+- **Mejora:** `NN-nombre-VV+1.md`; la versión anterior pasa a `docs/prompts/historico/` **con su mismo nombre** (`NN-nombre-VV.md`) y el lanzador apunta a la nueva. Nunca dos versiones activas del mismo prompt.
+- Actualiza `docs/prompts/README.md` (tabla de su fase y, si aplica, la tabla de fuentes) y anota la entrada en `docs/ai-log.md`.
 
 ### Paso 4 — Prueba en seco
 Explica cómo se comportaría el prompt con un argumento real del proyecto (qué leería, qué preguntaría, qué entregaría) e identifica ambigüedades; corrígelas antes de cerrar.

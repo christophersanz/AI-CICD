@@ -1,10 +1,10 @@
-# 06 · Refactorizar sin cambiar el comportamiento (v01)
+# 06 · Refactorizar sin cambiar el comportamiento (v02)
 
 | | |
 |---|---|
 | **Comando** | `/06-refactorizar <paquete, clase, módulo u objetivo de la refactorización>` |
-| **Archivo** | `docs/prompts/06-refactorizar-01.md` |
-| **Versión anterior** | `docs/prompts/historico/002.-refactoring-v1.md` (refactor del dominio por agregado, ya aplicado) |
+| **Archivo** | `docs/prompts/06-refactorizar-02.md` |
+| **Versión anterior** | `docs/prompts/historico/06-refactorizar-01.md` (nombre original `002.-refactoring-v1.md`: refactor del dominio por agregado, ya aplicado) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 

@@ -1,5 +1,11 @@
 # 09 · Reglas comunes de revisión (v01)
 
+| | |
+|---|---|
+| **Comando** | — (lo incluyen los comandos `/05-revisar-pr`, `/10` a `/16` y `/18-revision-final`) |
+| **Archivo** | `docs/prompts/09-reglas-revision-01.md` |
+| **Versión anterior** | — |
+
 Las aplican todos los prompts de revisión (`05-revisar-pr`, `10` a `16` y `18-revision-final`); sus comandos de Claude Code incluyen este archivo. Cambiarlas aquí cambia todas las revisiones.
 
 > **Una revisión no modifica código, pruebas, configuración ni documentación.** El único archivo que crea es su informe. Las correcciones se hacen con `/17-corregir-hallazgos`.
@@ -18,7 +24,7 @@ Las aplican todos los prompts de revisión (`05-revisar-pr`, `10` a `16` y `18-r
 | 8 | `/17-corregir-hallazgos` | Corrige los ERROR y WARNING confirmados (único que modifica código) | `NNN-17-correcciones.md` |
 | 9 | `/18-revision-final` | Verifica las correcciones y decide `READY` / `NOT READY` | `NNN-18-final.md` |
 
-`NNN` es el número de la **ronda** de revisión (001, 002…): todos los informes de una ronda comparten el mismo número. Se puede ejecutar solo una parte del ciclo (por ejemplo, 10 → 17 → 18 tras cambiar el dominio), pero siempre en este orden: de adentro hacia afuera (dominio → aplicación → infraestructura → API) y de lo particular a lo integral. Revisar por capa enfoca la revisión y consume menos contexto que revisar todo de una vez.
+`NNN` es el número de la **ronda** de revisión (001, 002…; la 001 fue `docs/reviews/001-16-arquitectura.md`, así que la siguiente es 002): todos los informes de una ronda comparten el mismo número. Se puede ejecutar solo una parte del ciclo (por ejemplo, 10 → 17 → 18 tras cambiar el dominio), pero siempre en este orden: de adentro hacia afuera (dominio → aplicación → infraestructura → API) y de lo particular a lo integral. Revisar por capa enfoca la revisión y consume menos contexto que revisar todo de una vez.
 
 ## Fuentes de verdad
 

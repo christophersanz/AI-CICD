@@ -4,7 +4,7 @@
 |---|---|
 | **Comando** | `/16-revisar-arquitectura [NNN de la ronda de revisión; vacío = siguiente]` |
 | **Archivo** | `docs/prompts/16-revisar-arquitectura-02.md` |
-| **Versión anterior** | `docs/prompts/historico/001-review-01.md` |
+| **Versión anterior** | `docs/prompts/historico/16-revisar-arquitectura-01.md` |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 

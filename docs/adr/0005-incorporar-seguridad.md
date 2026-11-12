@@ -6,7 +6,7 @@
 
 ## Contexto
 
-ADR-0001 difirió la seguridad en la versión 1, dejando BR-CTR-011, BR-CTR-012 y `AUTH-001` en pausa. La API no debía exponerse fuera de un entorno controlado. Ahora se requiere autenticar a los usuarios, autorizar por permisos y auditar los eventos de seguridad (`docs/prompts/historico/003-security-01.md`). El diseño completo está en `docs/design/003-security-design.md`.
+ADR-0001 difirió la seguridad en la versión 1, dejando BR-CTR-011, BR-CTR-012 y `AUTH-001` en pausa. La API no debía exponerse fuera de un entorno controlado. Ahora se requiere autenticar a los usuarios, autorizar por permisos y auditar los eventos de seguridad (`docs/prompts/historico/07-implementar-seguridad-01.md`). El diseño completo está en `docs/design/003-security-design.md`.
 
 ## Decisión
 

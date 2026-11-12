@@ -12,7 +12,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | docs/api/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
 | docs/guides/arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
 | docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
-| @docs/prompts/prompts.md | Índice de los prompts `docs/prompts/NN-nombre-VV.md` (orden y versión), sus comandos de Claude Code, la estructura común y las fuentes | Al iniciar una tarea recurrente (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión, pipeline) |
+| @docs/prompts/README.md | Índice de los prompts `docs/prompts/NN-nombre-VV.md` (orden y versión), sus comandos de Claude Code, la estructura común y las fuentes | Al iniciar una tarea recurrente (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión, pipeline) |
 
 ## 1. Descripción del proyecto
 
@@ -59,7 +59,7 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 ## 4. Cómo debe trabajar Claude en este repo
 
-- Para tareas recurrentes usa los prompts de `docs/prompts/` (`NN-nombre-VV.md`: `NN` = orden, `VV` = versión) mediante su comando `/NN-nombre` de `.claude/commands/`, que solo carga el prompt vigente. Orden: `00`–`06` desarrollo (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión de PR, refactorización), `10`–`18` ciclo de revisión (por capa → arquitectura → corrección → revisión final `READY`/`NOT READY`) y `20`–`22` calidad, operación y prompts; índice en `docs/prompts/prompts.md`. Todos presentan un plan y esperan aprobación antes de cambiar código, y guardan su progreso en `docs/sessions/`. Las revisiones no modifican código: solo `/17-corregir-hallazgos` corrige. Un prompt se mejora creando su siguiente versión (`/22-crear-o-mejorar-prompt`); la anterior pasa a `docs/prompts/historico/`.
+- Para tareas recurrentes usa los prompts de `docs/prompts/` (`NN-nombre-VV.md`: `NN` = orden, `VV` = versión) mediante su comando `/NN-nombre` de `.claude/commands/`, que solo carga el prompt vigente. Orden: `00`–`06` desarrollo (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión de PR, refactorización), `10`–`18` ciclo de revisión (por capa → arquitectura → corrección → revisión final `READY`/`NOT READY`) y `20`–`22` calidad, operación y prompts; índice en `docs/prompts/README.md`. Todos presentan un plan y esperan aprobación antes de cambiar código, y guardan su progreso en `docs/sessions/`. Las revisiones no modifican código: solo `/17-corregir-hallazgos` corrige. Un prompt se mejora creando su siguiente versión (`/22-crear-o-mejorar-prompt`); la anterior pasa a `docs/prompts/historico/`.
 - Antes de crear código, identifica **en qué capa** va y respeta la regla de dependencia (`docs/architecture.md`, sección 3).
 - Antes de tocar lógica de negocio, verifica las invariantes y reglas en `docs/business-rules.md`. **No inventes reglas de negocio:** si falta una, pregunta.
 - Para una funcionalidad nueva, sigue este orden: **dominio → puerto de entrada → caso de uso → puerto de salida → adaptador → controller → pruebas**.

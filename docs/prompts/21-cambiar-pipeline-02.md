@@ -4,7 +4,7 @@
 |---|---|
 | **Comando** | `/21-cambiar-pipeline <cambio a realizar en el pipeline o el despliegue>` |
 | **Archivo** | `docs/prompts/21-cambiar-pipeline-02.md` |
-| **Versión anterior** | `docs/prompts/historico/006-cicd.md` |
+| **Versión anterior** | `docs/prompts/historico/21-cambiar-pipeline-01.md` |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
