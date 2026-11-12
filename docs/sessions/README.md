@@ -2,9 +2,11 @@
 
 Cada comando de `.claude/commands/` guarda aquí su progreso. Así una tarea larga se puede retomar en otra sesión de Claude Code (o después de compactar el contexto) sin volver a explicar todo ni repetir trabajo: al empezar, Claude lee el archivo y continúa desde el último paso.
 
+Los comandos de revisión (`05`, `10`–`16` y `18`) no crean archivo de sesión: no modifican nada y su informe en `docs/reviews/` cumple esa función.
+
 ## Nombre
 
-`AAAA-MM-DD-<comando>-<tema>.md`, por ejemplo `2026-11-12-implement-usecase-DeactivateEmployeeUseCase.md`.
+`AAAA-MM-DD-<comando>-<tema>.md`, por ejemplo `2026-11-12-02-implementar-caso-uso-DeactivateEmployeeUseCase.md`.
 
 ## Contenido
 

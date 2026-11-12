@@ -24,7 +24,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 9 | 2026-10-24 | Presentación final | sesión Claude Code | [__ h] | [__ h] | 2 |
 | 10 | 2026-11-11 | GitHub Flow, despliegue con aprobación y Render (PR #1, #2) | sesión Claude Code | [__ h] | [__ h] | 1 |
 | 11 | 2026-11-12 | Jenkins por etapas, despliegue local y SonarQube (PR #3–#5) | sesión Claude Code | [__ h] | [__ h] | 3 |
-| 12 | 2026-11-12 | Prompts v2: comandos de Claude Code y archivos de sesión | sesión Claude Code | [__ h] | [__ h] | [__] |
+| 12 | 2026-11-12 | Prompts v2: comandos de Claude Code ordenados, ciclo de revisión y archivos de sesión | sesión Claude Code | [__ h] | [__ h] | 3 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -122,9 +122,12 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 
 ### #12 — Prompts v2
 
-- **Origen:** los prompts 001–005 eran copia de los del docente y estaban desfasados (ArchUnit, "seguridad no implementada", flujo de una sola rama); `006-cicd.md` tenía 911 líneas con un parche incrustado.
-- **Aceptado:** `docs/prompts/prompts.md` como índice corto con la estructura común (rol, fuentes de verdad, objetivo verificable, qué no hacer, plan con aprobación, pasos, verificación, informe final, archivo de sesión); siete comandos en `.claude/commands/` (`/business-rules`, `/implement-usecase`, `/tests`, `/review`, `/sonar-fix`, `/document`, `/pipeline`); archivos de sesión en `docs/sessions/`; prompts 001–006 conservados como histórico.
-- **Corregido:** [__]
+- **Origen:** los prompts 001–005 eran copia de los del docente y estaban desfasados (ArchUnit, "seguridad no implementada", flujo de una sola rama); `006-cicd.md` tenía 911 líneas con un parche incrustado. Se combinaron las prácticas del docente (sesiones 01–05), la serie de revisión de los modelos del curso (`use-case-ca-v1/prompts` 01–07), los prompts de F1 y las presentaciones de Juan José, Ángel y Jairo (tabla en `docs/prompts/prompts.md` §3).
+- **Aceptado:** `docs/prompts/prompts.md` como índice corto con la estructura común (rol, fuentes de verdad, objetivo verificable, qué no hacer, plan con aprobación, pasos, verificación, informe final, archivo de sesión); 17 comandos en `.claude/commands/` numerados por orden de uso: desarrollo (`00-refinar-requisitos` a `05-revisar-pr`), ciclo de revisión en 9 pasos (`10-revisar-dominio` a `16-revisar-arquitectura`, `17-corregir-hallazgos` como único que modifica código y `18-revision-final` con `FINAL STATUS: READY`/`NOT READY`, con reglas comunes en `docs/prompts/review-rules.md`) y calidad y operación (`20-corregir-sonar`, `21-cambiar-pipeline`); archivos de sesión en `docs/sessions/`; prompts 001–006 conservados como histórico.
+- **Corregido:**
+  - La primera versión no revisó los prompts de los modelos del curso ni los de F1; se detectó al pedirle a la IA que verificara sus fuentes y se incorporaron (revisión por capa, corrección separada, revisión final con veredicto).
+  - Un reemplazo masivo de nombres de comandos cambió también la ruta `docs/business-rules.md` en todos los comandos; se detectó al revisar el resultado y se revirtió.
+  - El endpoint de *hotspots* de SonarQube usa `project`, no `projectKey`; se comprobó contra el SonarQube local.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
 ## Métricas del proyecto

@@ -1,5 +1,5 @@
 ---
-description: Resuelve los hallazgos del Quality Gate de SonarQube local (corregir o justificar en el código)
+description: Calidad: resuelve los hallazgos del Quality Gate de SonarQube local (corregir o justificar en el código)
 argument-hint: [regla java:Sxxxx | archivo | vacío = todos]
 ---
 
@@ -22,7 +22,7 @@ El Quality Gate `contract-api` en verde en un build del Jenkins local, con cada 
 - Una justificación de seguridad (CSRF, enumeración, criptografía, inyección) siempre requiere mi aprobación explícita.
 
 # Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-sonar-fix-<alcance>.md` (docs/sessions/README.md).
+Crea o retoma `docs/sessions/AAAA-MM-DD-20-corregir-sonar-<alcance>.md` (docs/sessions/README.md).
 
 ## Paso 1 — Leer el estado (sin cambiar código)
 1. Estado del gate: `GET /api/qualitygates/project_status?projectKey=contract-api`.

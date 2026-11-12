@@ -1,5 +1,5 @@
 ---
-description: Cambia el CI/CD de contract-api (GitHub Actions, Jenkins, Docker, despliegues) y lo verifica de punta a punta
+description: Operación: cambia el CI/CD (GitHub Actions, Jenkins, Docker, despliegues) y lo verifica de punta a punta
 argument-hint: <cambio a realizar en el pipeline o el despliegue>
 ---
 
@@ -26,7 +26,7 @@ El cambio funciona en una ejecución real (no solo con la sintaxis validada): Gi
 - Mantén alineados GitHub Actions y el `Jenkinsfile` cuando el cambio aplique a ambos (por ejemplo, la prueba de humo compartida `.github/scripts/smoke-test.sh`).
 
 # Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-pipeline-<tema>.md` (docs/sessions/README.md).
+Crea o retoma `docs/sessions/AAAA-MM-DD-21-cambiar-pipeline-<tema>.md` (docs/sessions/README.md).
 
 ## Paso 1 — Análisis de impacto y plan (sin cambiar nada)
 1. Estado actual de lo que se va a tocar (confírmalo leyendo los archivos y, si aplica, `gh run list`, `gh api` o la API del Jenkins local).

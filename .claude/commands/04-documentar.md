@@ -1,5 +1,5 @@
 ---
-description: Genera o actualiza la documentación técnica de contract-api (JavaDoc, OpenAPI, diagramas, ADR, guías)
+description: Desarrollo 4: genera o actualiza la documentación técnica (JavaDoc, OpenAPI, diagramas, ADR, guías)
 argument-hint: <javadoc | openapi | diagramas | adr | guias | todo> [módulo o tema]
 ---
 
@@ -21,7 +21,7 @@ Que la documentación del alcance coincida con el código actual y responda, sin
 - Nada de secretos, contraseñas ni URLs internas en la documentación.
 
 # Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-document-<alcance>.md` (docs/sessions/README.md).
+Crea o retoma `docs/sessions/AAAA-MM-DD-04-documentar-<alcance>.md` (docs/sessions/README.md).
 
 ## Paso 1 — Inventario (sin escribir)
 Tabla `Elemento | Estado (falta / desfasado / correcto) | Evidencia` según el alcance:

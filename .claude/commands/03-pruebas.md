@@ -1,5 +1,5 @@
 ---
-description: Completa y mejora las pruebas de una clase o caso de uso de contract-api, con patrones de prueba explícitos
+description: Desarrollo 3: completa y mejora las pruebas de una clase o caso de uso, con patrones de prueba explícitos
 argument-hint: <Clase | NombreUseCase | módulo>
 ---
 
@@ -19,7 +19,7 @@ Cada regla y cada error que toca `$ARGUMENTS` tiene al menos una prueba que fall
 - No añadas librerías de pruebas sin justificarlo.
 
 # Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-tests-<objetivo>.md` (docs/sessions/README.md).
+Crea o retoma `docs/sessions/AAAA-MM-DD-03-pruebas-<objetivo>.md` (docs/sessions/README.md).
 
 ## Paso 1 — Diagnóstico (sin escribir pruebas)
 1. **Matriz de trazabilidad** de lo que existe hoy:

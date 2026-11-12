@@ -1,5 +1,5 @@
 ---
-description: Descubre y documenta reglas de negocio de contract-api preguntando al autor (no las inventa)
+description: Desarrollo 1: descubre y documenta reglas de negocio preguntando al autor (no las inventa)
 argument-hint: <tema, caso de uso o pregunta abierta>
 ---
 
@@ -21,11 +21,11 @@ Que el tema quede especificado sin ambigüedad en `business-rules.md`: cada regl
 # Restricciones
 - **No inventes reglas.** Puedes proponer opciones con sus pros y contras, pero la decisión es del autor.
 - Las reglas con base en normativa laboral peruana se marcan con ⚖️ y la nota de validar con RR.HH./asesoría legal; no cites artículos de ley que no puedas verificar.
-- No escribas código en este comando: el resultado es documentación. La implementación va después con `/implement-usecase`.
+- No escribas código en este comando: el resultado es documentación. La implementación va después con `/02-implementar-caso-uso`.
 - No borres reglas existentes: si una cambia, explica el impacto en el código y las pruebas que la cubren.
 
 # Forma de trabajo
-Crea o retoma el archivo de sesión `docs/sessions/AAAA-MM-DD-business-rules-<tema>.md` (docs/sessions/README.md) y actualízalo al terminar cada paso.
+Crea o retoma el archivo de sesión `docs/sessions/AAAA-MM-DD-01-reglas-negocio-<tema>.md` (docs/sessions/README.md) y actualízalo al terminar cada paso.
 
 ## Paso 1 — Diagnóstico (sin cambiar nada)
 1. Qué dicen hoy `business-rules.md` y el código sobre el tema (reglas, estados, errores, casos de uso afectados).
@@ -50,7 +50,7 @@ Con mis respuestas, presenta el diff propuesto de `business-rules.md`:
 
 ## Paso 4 — Aplicar y cerrar
 1. Aplica el diff aprobado en `business-rules.md`.
-2. Lista el impacto en el código: clases, pruebas y endpoints que habrá que cambiar, y el comando sugerido (`/implement-usecase <Nombre>` o `/tests <Clase>`).
+2. Lista el impacto en el código: clases, pruebas y endpoints que habrá que cambiar, y el comando sugerido (`/02-implementar-caso-uso <Nombre>` o `/03-pruebas <Clase>`).
 3. Si la decisión es arquitectónica (no solo de negocio), propón el ADR.
 
 # Informe final

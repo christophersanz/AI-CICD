@@ -117,7 +117,7 @@ infrastructure/
 8. **Las invariantes de negocio viven en el dominio**, no en controllers ni en validaciones de Bean Validation.
 9. **Aislamiento dentro de `infrastructure`:** `api` solo invoca puertos de entrada (`port.in`); nunca usa `persistence`, `client` ni `security` directamente. `persistence`, `client` y `security` no dependen de `api`.
 
-> Estas reglas se verifican en la revisión de código (comando `/review`, `.claude/commands/review.md`). No hay verificación automática con ArchUnit (ADR-0003).
+> Estas reglas se verifican en la revisión de código (ciclo de revisión `/10-revisar-dominio` … `/18-revision-final`, orden en `docs/prompts/review-rules.md`). No hay verificación automática con ArchUnit (ADR-0003).
 
 ## 4. Flujo de una petición
 

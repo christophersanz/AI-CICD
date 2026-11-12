@@ -17,7 +17,7 @@ API REST para la gestión de contratos laborales. Java 21, Spring Boot 3, Clean 
 | [docs/guides/ci-cd.md](docs/guides/ci-cd.md) | Guía de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones, imágenes en GHCR y Docker Hub, ejecución y Jenkins local |
 | [docs/design/003-security-local-testing.md](docs/design/003-security-local-testing.md) | Probar la API en local con PowerShell y Postman |
 | [postman/](postman/) | Colección Postman (login y endpoints, con aserciones de códigos HTTP) y entorno local |
-| [docs/prompts/](docs/prompts/prompts.md) | Índice de los comandos de Claude Code (`.claude/commands/`: `/business-rules`, `/implement-usecase`, `/tests`, `/review`, `/sonar-fix`, `/document`, `/pipeline`), estructura común de los prompts y prompts históricos del curso |
+| [docs/prompts/](docs/prompts/prompts.md) | Índice de los comandos de Claude Code (`.claude/commands/`, numerados por orden de uso: desarrollo `00`–`05`, ciclo de revisión `10`–`18` y calidad y operación `20`–`21`), estructura común de los prompts y prompts históricos del curso |
 | [docs/sessions/](docs/sessions/README.md) | Archivos de sesión: progreso de cada comando para retomarlo sin perder contexto |
 | [docs/ai-log.md](docs/ai-log.md) | Bitácora de IA: tareas, lo aceptado, lo corregido, tiempos y métricas |
 
