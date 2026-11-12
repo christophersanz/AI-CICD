@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Comprueba que un proyecto tiene lo que necesitan los prompts del kit (ver docs/prompts/README.md §6).
 #   Uso: docs/prompts/kit/verificar.sh [proyecto]   (por defecto, la raíz del repositorio actual)
-# Errores (exit 1): falta un documento, una clave DP que usa algún prompt, un comando o su prompt,
+# Errores (exit 1): falta un documento, una clave DP que usa algún prompt, un comando o su prompt, un prompt
+#                   cita un comando inexistente o nombra su archivo de sesión con otro número,
 #                   o hay dos archivos para el mismo prompt.
 # Avisos: valores DP sin completar ([...]) y secciones numeradas que citan los prompts y no existen.
 set -uo pipefail
@@ -53,6 +54,24 @@ for c in .claude/commands/[0-9][0-9]-*.md; do
   for ref in $(grep -o 'docs/prompts/[0-9a-z-]*\.md' "$c" | sort -u); do
     [ -f "$ref" ] || err "$c apunta a $ref, que no existe"
   done
+done
+
+echo "5. Referencias internas de los prompts"
+# El archivo de sesión de cada prompt debe llevar su propio número y nombre (se rompe al renumerar).
+for p in docs/prompts/[0-9][0-9]-*.md; do
+  [ -e "$p" ] || break
+  name=$(basename "$p" .md)
+  for s in $(grep -oE 'AAAA-MM-DD-[0-9]{2}-[a-z]+(-[a-z]+)*' "$p" | sort -u); do
+    case "${s#AAAA-MM-DD-}" in
+      "$name"*) ;;
+      *) err "$p nombra su archivo de sesión como $s (debería empezar por AAAA-MM-DD-$name)" ;;
+    esac
+  done
+done
+# Todo comando /NN-nombre citado en los prompts, los comandos y los índices debe existir.
+for ref in $(cat docs/prompts/*.md .claude/commands/*.md CLAUDE.md README.md 2>/dev/null \
+    | grep -oE '(^|[^a-zA-Z0-9_./-])/[0-9]{2}-[a-z]+(-[a-z]+)*' | grep -oE '/[0-9]{2}-[a-z]+(-[a-z]+)*' | sort -u); do
+  [ -f ".claude/commands/${ref#/}.md" ] || err "se cita el comando $ref, que no existe en .claude/commands/"
 done
 
 echo "Resultado: $errors errores, $warnings avisos"

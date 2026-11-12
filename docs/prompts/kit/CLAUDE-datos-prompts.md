@@ -5,6 +5,7 @@ Los prompts de `docs/prompts/` son genéricos. Cuando un prompt dice `DP.<clave>
 | Clave | Qué poner | Valor en este proyecto |
 |---|---|---|
 | `nombre` | Nombre del servicio | `[mi-servicio]` |
+| `stack` | Lenguaje, framework, build y librerías de prueba (define el rol de los prompts de código) | [Java 21, Spring Boot 3.5, Maven, JUnit 5, AssertJ, Mockito, Testcontainers] |
 | `dominio-negocio` | Negocio y país o contexto, en una línea (define el rol de los prompts de requisitos y reglas) | [Gestión de pedidos de una tienda en línea] |
 | `normativa` | Cómo se tratan las reglas con base legal o normativa | [Se marcan con ⚖️ y se validan con el área legal / No aplica] |
 | `paquete-base` | Paquete raíz de Java | `[com.empresa.servicio]` |
