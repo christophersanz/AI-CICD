@@ -28,7 +28,7 @@ El cambio funciona en una ejecución real (no solo con la sintaxis validada): lo
 - Mantén alineados `DP.ci` y `DP.ci-local` cuando el cambio aplique a ambos (por ejemplo, una prueba de humo compartida).
 
 ## Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-21-cambiar-pipeline-<tema>.md` (docs/sessions/README.md).
+Crea o retoma `docs/sessions/AAAA-MM-DD-08-cambiar-pipeline-<tema>.md` (docs/sessions/README.md).
 
 ### Paso 1 — Análisis de impacto y plan (sin cambiar nada)
 1. Estado actual de lo que se va a tocar (confírmalo leyendo los archivos y, si aplica, `gh run list`, `gh api` o la API del CI local).
