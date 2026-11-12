@@ -97,7 +97,8 @@ flowchart LR
     DEP -.->|POST /deploys| RENDER
 
     subgraph JK[Jenkins local de práctica · docker/jenkins · :8080]
-        JF[Jenkinsfile<br/>Build, pruebas y cobertura → Imagen Docker<br/>sin publicar]
+        JF[Jenkinsfile<br/>Compilar → Pruebas → Cobertura → Imagen<br/>→ Verificación efímera → Despliegue local]
+        JF --> LOC[(contract-api-deploy :8090<br/>+ contract-api-deploy-db)]
     end
     MAIN -.->|clona master| JF
 ```
@@ -110,7 +111,7 @@ flowchart LR
 | SonarCloud | Paso opcional del job 1 | Análisis estático y Quality Gate, solo si existe el secreto `SONAR_TOKEN` ([ADR-0011](../adr/0011-analisis-estatico-sonarcloud.md)) |
 | GHCR / Docker Hub | `ghcr.io/christophersanz/ai-cicd`, `christopherdocker/ai-cicd` | Registros de la imagen; Docker Hub solo si existen `DOCKERHUB_USERNAME` y `DOCKERHUB_TOKEN` |
 | Render | `render.yaml` (Blueprint) | Entorno persistente: servicio web con la imagen de Docker Hub y PostgreSQL 16 sin acceso externo ([ADR-0013](../adr/0013-despliegue-en-render.md)) |
-| Jenkins | `Jenkinsfile` + `docker/jenkins/` | Mismas etapas en local para practicar; no publica ni sustituye al CI ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)) |
+| Jenkins | `Jenkinsfile` + `docker/jenkins/` | Pipeline local de práctica por etapas que termina con la API desplegada en `localhost:8090`; no publica ni sustituye al CI ([ADR-0010](../adr/0010-jenkins-local-de-practica.md), [ADR-0014](../adr/0014-jenkins-por-etapas-y-despliegue-local.md)) |
 
 El detalle del pipeline está en la [guía de CI/CD](ci-cd.md); las variables de entorno, en [technical.md §4](../technical.md#4-configuración).
 

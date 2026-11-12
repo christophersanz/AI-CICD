@@ -1,11 +1,11 @@
 # Jenkins local de práctica
 
-Jenkins en Docker, ya configurado para ejecutar el `Jenkinsfile` de este repositorio: compila, ejecuta todas las pruebas (incluidas las de Testcontainers), verifica la cobertura y construye la imagen Docker. Es solo para practicar; el CI oficial es GitHub Actions (ADR-0009 y ADR-0010).
+Jenkins en Docker, ya configurado para ejecutar el `Jenkinsfile` de este repositorio: compila, ejecuta las pruebas unitarias y las de integración (Testcontainers), verifica la cobertura, construye la imagen Docker, la prueba en un entorno efímero y la despliega en tu máquina (`http://localhost:8090`), cada paso en su propia etapa del *Stage View* (ADR-0014). Es solo para practicar; el CI oficial es GitHub Actions (ADR-0009 y ADR-0010).
 
 ## Requisitos
 
 - Docker Desktop en ejecución (contenedores Linux).
-- Puerto `8080` libre.
+- Puertos `8080` (Jenkins) y `8090` (API desplegada, configurable con `DEPLOY_PORT`) libres.
 - Conexión a internet la primera vez (descarga plugins, dependencias de Maven e imágenes).
 
 ## Levantar Jenkins
@@ -37,6 +37,8 @@ Variables en `docker/jenkins/.env`, creado a partir de la plantilla `docker/jenk
 | `JENKINS_ADMIN_PASSWORD` | `admin` | Contraseña del administrador |
 | `REPO_URL` | `https://github.com/christophersanz/AI-CICD.git` | Cambiarla si trabajas sobre tu propio fork |
 | `REPO_BRANCH` | `master` | Rama que construye el job |
+| `DEPLOY_ADMIN_PASSWORD` | *(vacía)* | Contraseña del `admin` del entorno desplegado (12–64 caracteres). Vacía, la etapa *Despliegue local* se omite. Solo se aplica en el primer despliegue |
+| `DEPLOY_PORT` | `8090` | Puerto de `127.0.0.1` donde queda la API desplegada |
 
 Ejemplo en PowerShell para construir tu fork:
 
@@ -47,10 +49,34 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 ## Cómo funciona
 
-- La imagen (`Dockerfile`) parte de `jenkins/jenkins:lts-jdk21` y añade el cliente de Docker con `buildx`.
+- La imagen (`Dockerfile`) parte de `jenkins/jenkins:lts-jdk21` y añade el cliente de Docker con `buildx` y `jq` (para la prueba de humo).
+- Para llegar a los contenedores de la verificación y del despliegue, Jenkins se une a sus redes (`contract-api-verify-<build>`, `contract-api-deploy`).
 - Jenkins usa el Docker de tu máquina mediante `/var/run/docker.sock`: los contenedores de las pruebas y de `docker build` aparecen junto a los tuyos en `docker ps`. Por eso Testcontainers usa `TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal`.
 - El contenedor se ejecuta como `root` y controla el Docker del host. Es aceptable solo en local: no expongas este Jenkins en una red.
 - Jenkins solo escucha en `127.0.0.1`, y la contraseña por defecto es solo para uso local.
+
+## Despliegue local
+
+La última etapa ejecuta `scripts/deploy-local.sh` y deja corriendo, con `--restart unless-stopped`:
+
+| Contenedor | Qué es |
+|---|---|
+| `contract-api-deploy` | La API con la imagen `contract-api:jenkins-<build>` y el perfil `prod`, en `http://localhost:8090` |
+| `contract-api-deploy-db` | PostgreSQL 16 con el volumen `contract-api-deploy-data` (los datos sobreviven a los despliegues) |
+
+- Las claves JWT y la contraseña de la base se generan en el primer despliegue y se guardan en el volumen de Jenkins (`/var/jenkins_home/contract-api-deploy`). Por eso un token sigue valiendo después de un redeploy.
+- Inicia sesión con `admin` y tu `DEPLOY_ADMIN_PASSWORD`: `POST http://localhost:8090/api/v1/auth/login`.
+- Cada despliegue repite la prueba de humo. Si falla, el script vuelve a levantar la imagen anterior y el build termina en rojo.
+- Solo se conservan la imagen desplegada y la anterior; los demás tags `contract-api:jenkins-*` se borran.
+
+Para borrar el entorno desplegado (datos incluidos):
+
+```bash
+docker rm -f contract-api-deploy contract-api-deploy-db
+docker volume rm contract-api-deploy-data
+docker network rm contract-api-deploy
+docker exec contract-api-jenkins rm -rf /var/jenkins_home/contract-api-deploy
+```
 
 ## Detener y limpiar
 

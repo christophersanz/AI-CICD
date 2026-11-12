@@ -36,7 +36,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | Documentación API | springdoc-openapi (OpenAPI 3) |
 | Observabilidad | Micrometer + OpenTelemetry, logs estructurados en JSON |
 | Pruebas | JUnit 5, AssertJ, Mockito, Testcontainers, spring-security-test; cobertura con JaCoCo (≥ 80 % de líneas en `domain` y `application`) |
-| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional) (ADR-0009); GitHub Flow con checks obligatorios y despliegue con aprobación en el environment `production` (ADR-0012) a Render (`render.yaml`, ADR-0013); `Jenkinsfile` solo para Jenkins local de práctica (ADR-0010) |
+| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional) (ADR-0009); GitHub Flow con checks obligatorios y despliegue con aprobación en el environment `production` (ADR-0012) a Render (`render.yaml`, ADR-0013); `Jenkinsfile` solo para Jenkins local de práctica, por etapas y con despliegue local en `localhost:8090` (ADR-0010, ADR-0014) |
 
 ## 3. Comandos habituales
 
@@ -69,4 +69,4 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 - Evita la sobreingeniería: no introduzcas CQRS, event sourcing ni nuevos módulos sin una necesidad justificada.
 - No añadas dependencias nuevas al `pom.xml` sin indicarlo y justificarlo.
 - Ejecuta `./mvnw clean verify` antes de dar una tarea por terminada: es lo mismo que ejecuta el CI, incluido el umbral de cobertura.
-- Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009/ADR-0012/ADR-0013 o registra uno nuevo.
+- Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009/ADR-0012/ADR-0013/ADR-0014 o registra uno nuevo.

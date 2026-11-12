@@ -2,6 +2,7 @@
 
 - **Estado:** Aceptado
 - **Fecha:** 2026-10-17
+- **Ampliado por:** [ADR-0014](0014-jenkins-por-etapas-y-despliegue-local.md) (etapas separadas, verificación y despliegue local).
 
 ## Contexto
 

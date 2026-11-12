@@ -339,7 +339,7 @@ El `Dockerfile` tiene dos etapas:
 
 ### 9.3 Jenkins local
 
-`Jenkinsfile` reproduce las mismas dos etapas en un Jenkins local de práctica (`docker/jenkins/`, [ADR-0010](adr/0010-jenkins-local-de-practica.md)). No forma parte del flujo oficial.
+`Jenkinsfile` en un Jenkins local de práctica (`docker/jenkins/`, [ADR-0010](adr/0010-jenkins-local-de-practica.md), [ADR-0014](adr/0014-jenkins-por-etapas-y-despliegue-local.md)), con las etapas **Compilar → Pruebas unitarias → Pruebas de integración → Cobertura → Imagen Docker → Verificación de la imagen → Despliegue local**. La verificación levanta la imagen en un entorno efímero con la prueba de humo de GitHub Actions. El despliegue deja la API en `http://localhost:8090` (`DEPLOY_PORT`) con un PostgreSQL propio y persistente (`contract-api-deploy-db`), y vuelve a la imagen anterior si la prueba de humo falla. Se omite si `docker/jenkins/.env` no define `DEPLOY_ADMIN_PASSWORD`. No publica imágenes ni forma parte del flujo oficial.
 
 ### 9.4 Flujo de ramas
 

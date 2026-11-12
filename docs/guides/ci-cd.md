@@ -410,14 +410,24 @@ secrets:
 
 ## 10. Jenkins local
 
-Para practicar con Jenkins hay un entorno listo en [`docker/jenkins/`](../../docker/jenkins/README.md) que ejecuta el [`Jenkinsfile`](../../Jenkinsfile) del repositorio: mismas etapas que el CI (`./mvnw clean verify` e imagen Docker), sin publicar.
+Para practicar con Jenkins hay un entorno listo en [`docker/jenkins/`](../../docker/jenkins/README.md) que ejecuta el [`Jenkinsfile`](../../Jenkinsfile) del repositorio ([ADR-0014](../adr/0014-jenkins-por-etapas-y-despliegue-local.md)). Cada paso es una columna del *Stage View*:
+
+| Etapa | Qué hace |
+|---|---|
+| Compilar | `./mvnw clean install -DskipTests` (instala `domain` y `application` en la caché de Jenkins) |
+| Pruebas unitarias | `domain` y `application` |
+| Pruebas de integración | `infrastructure`: slices web y persistencia con Testcontainers |
+| Cobertura | Informe JaCoCo y umbral del 80 % en `domain` y `application` |
+| Imagen Docker | `docker build -t contract-api:jenkins-<build>` (no se publica) |
+| Verificación de la imagen | Entorno efímero (red, PostgreSQL y claves temporales) con la prueba de humo de GitHub Actions; se retira al terminar |
+| Despliegue local | Deja la API en <http://localhost:8090> con su PostgreSQL persistente; si la prueba de humo falla, vuelve a la imagen anterior |
 
 ```bash
 cp docker/jenkins/.env.example docker/jenkins/.env   # una sola vez; no se versiona
 docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d --build
 ```
 
-El arranque falla si no existe `docker/jenkins/.env`. Ese archivo define el usuario y la contraseña del administrador (`JENKINS_ADMIN_USER`, `JENKINS_ADMIN_PASSWORD`; la plantilla trae `admin` / `admin`, cámbialos si quieres) y el repositorio y la rama que construye el job (`REPO_URL`, `REPO_BRANCH=master`).
+El arranque falla si no existe `docker/jenkins/.env`. Ese archivo define el usuario y la contraseña del administrador (`JENKINS_ADMIN_USER`, `JENKINS_ADMIN_PASSWORD`; la plantilla trae `admin` / `admin`, cámbialos si quieres) y el repositorio y la rama que construye el job (`REPO_URL`, `REPO_BRANCH=master`). Para la etapa **Despliegue local** define también `DEPLOY_ADMIN_PASSWORD` (contraseña del `admin` de ese entorno, 12–64 caracteres) y, si quieres, `DEPLOY_PORT` (por defecto `8090`); sin contraseña la etapa se omite. Tras cambiar `.env`, vuelve a ejecutar el `up -d`.
 
 Abre <http://localhost:8080>, entra con el usuario y la contraseña de `docker/jenkins/.env` y ejecuta el job **contract-api** con **Build Now** una vez. La primera ejecución tarda unos minutos porque descarga dependencias e imágenes. Jenkins construye solo, también tras cada reinicio: sondea `master` cada ~5 minutos (`pollSCM` en el `Jenkinsfile` y en el job de `casc.yaml`, porque GitHub no puede enviar webhooks a `localhost`) y lanza un build si hay commits nuevos. Los detalles (variables, fork, limpieza) están en su [README](../../docker/jenkins/README.md).
 
@@ -455,3 +465,5 @@ Jenkins es solo de práctica: el CI oficial que valida cada push a `master` es G
 | *An ADMIN user already exists; initial administrator not created.* | La base ya tenía un administrador | Es lo esperado: usa sus credenciales |
 | `port is already allocated` | Otro proceso usa el puerto (8080 Jenkins, 8081 la API) | Detenerlo o publicar en otro puerto (`-p 8082:8081`) |
 | `docker build` falla en Jenkins con `--mount` | Falta BuildKit (`buildx`) | La imagen de `docker/jenkins` ya lo incluye; reconstruirla con `--build` |
+| La etapa *Despliegue local* aparece omitida | `docker/jenkins/.env` no define `DEPLOY_ADMIN_PASSWORD` | Añadirla y repetir el `up -d` de Jenkins |
+| *Despliegue local* falla en el login y vuelve a la imagen anterior | Se cambió `DEPLOY_ADMIN_PASSWORD` después del primer despliegue: el `admin` ya existe con la contraseña original | Volver a la contraseña original, o borrar el entorno (`docker rm -f contract-api-deploy contract-api-deploy-db && docker volume rm contract-api-deploy-data`) |
