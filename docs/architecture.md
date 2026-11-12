@@ -190,7 +190,7 @@ infrastructure/
 ## 8. Transversales
 
 - **Transacciones:** delimitadas en el caso de uso (`@Transactional` a nivel de clase o método).
-- **Seguridad:** en incorporación por fases (ADR-0005, diseño en `docs/design/003-security-design.md`). Tokens propios (JWT RS256 + refresh token opaco), RBAC por permisos. `domain` y `application` no dependen de Spring Security.
+- **Seguridad:** en incorporación por fases (ADR-0005, diseño en `docs/design/seguridad.md`). Tokens propios (JWT RS256 + refresh token opaco), RBAC por permisos. `domain` y `application` no dependen de Spring Security.
 - **Logs:** JSON estructurado con `traceId`; nunca registrar datos sensibles (tokens, contraseñas, datos personales).
 - **Configuración:** perfiles `local`, `dev`, `prod`; secretos por variables de entorno, nunca en el repositorio.
 

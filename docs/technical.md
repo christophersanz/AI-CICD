@@ -4,8 +4,8 @@ Referencia del **estado implementado** de `contract-api` (octubre de 2026). Desc
 
 - El diseño y las reglas de arquitectura están en [architecture.md](architecture.md).
 - Las reglas de negocio están en [business-rules.md](business-rules.md).
-- El diseño de seguridad completo y sus fases están en [design/003-security-design.md](design/003-security-design.md).
-- Las guías con diagramas y explicaciones están en [guides/arquitectura.md](guides/arquitectura.md) y [guides/ci-cd.md](guides/ci-cd.md).
+- El diseño de seguridad completo y sus fases están en [design/seguridad.md](design/seguridad.md).
+- Las guías con diagramas y explicaciones están en [guides/diagramas-arquitectura.md](guides/diagramas-arquitectura.md) y [guides/ci-cd.md](guides/ci-cd.md).
 
 Si este documento y el código no coinciden, manda el código; actualiza este documento en el mismo cambio.
 
@@ -119,7 +119,7 @@ Todos los errores usan RFC 9457 (`application/problem+json`). `GlobalExceptionHa
 
 ## 3. Seguridad
 
-Diseño completo en [design/003-security-design.md](design/003-security-design.md) y decisión en [ADR-0005](adr/0005-incorporar-seguridad.md). Guía de prueba manual: [design/003-security-local-testing.md](design/003-security-local-testing.md).
+Diseño completo en [design/seguridad.md](design/seguridad.md) y decisión en [ADR-0005](adr/0005-incorporar-seguridad.md). Guía de prueba manual: [design/seguridad-pruebas-locales.md](design/seguridad-pruebas-locales.md).
 
 ### 3.1 Cadenas de filtros
 
@@ -265,7 +265,7 @@ Una migración ya aplicada no se edita: los cambios van en una `V<n>` nueva.
 
 ## 7. Build y pruebas
 
-Proyecto Maven multimódulo (`contract-api-v2`, versión `0.1.0-SNAPSHOT`) sobre Spring Boot 3.5 y Java 21:
+Proyecto Maven multimódulo (`contract-api`, versión `0.1.0-SNAPSHOT`) sobre Spring Boot 3.5 y Java 21:
 
 | Módulo | Depende de | Dependencias principales |
 |---|---|---|

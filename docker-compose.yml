@@ -59,5 +59,5 @@ services:
 
 volumes:
   postgres-data:
-    name: api-contratos-ca-v3_postgres-data   # keeps your existing data
+    name: contract-api_postgres-data   # volumen propio de este proyecto (no compartido con otros)
   pgadmin-data:

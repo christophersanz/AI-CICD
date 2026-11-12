@@ -367,6 +367,89 @@ Un `401` con código `AUTH-002` en el login significa usuario o contraseña inco
 docker rm -f contract-api-prod
 ```
 
+### 8.6 macOS (zsh)
+
+Mismos pasos que 8.1–8.5, con lo que cambia en macOS. Ningún secreto se escribe en un archivo versionado ni en el historial: la contraseña del administrador y el token de GHCR se piden con `read -s`.
+
+**Claves y variables, con una base propia (una sola vez).** Una base aparte (`contracts_prod`) hace que el administrador se cree con tu contraseña: la base `contracts` de `docker compose` ya tiene su propio `admin`, creado con la contraseña de `.env`, y el administrador inicial solo se crea si no existe ninguno (BR-USR-007).
+
+```zsh
+mkdir -p ~/contract-api-prod && cd ~/contract-api-prod
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private.pem
+openssl pkey -in private.pem -pubout -out public.pem
+PUB=$(awk '{printf "%s\\n", $0}' public.pem)
+PRIV=$(awk '{printf "%s\\n", $0}' private.pem)
+read -s "ADMIN_PW?Contraseña del admin (12-64 caracteres): "; echo
+
+cat > prod.env <<EOF
+DB_URL=jdbc:postgresql://host.docker.internal:5432/contracts_prod
+DB_USERNAME=contract
+DB_PASSWORD=contract
+SECURITY_JWT_PUBLIC_KEY=$PUB
+SECURITY_JWT_PRIVATE_KEY=$PRIV
+SECURITY_BOOTSTRAP_ADMIN_USERNAME=admin
+SECURITY_BOOTSTRAP_ADMIN_PASSWORD=$ADMIN_PW
+EOF
+chmod 600 private.pem prod.env
+unset PUB PRIV ADMIN_PW
+
+docker exec contract-api-postgres psql -U contract -d postgres -c "CREATE DATABASE contracts_prod OWNER contract"
+```
+
+El administrador se crea con esa contraseña en el primer arranque; cambiarla después en `prod.env` no la actualiza.
+
+**Descargar la imagen.** La imagen es `linux/amd64`: en un Mac con Apple Silicon hay que indicarlo con `--platform` y corre emulada (el arranque tarda alrededor de un minuto).
+
+```zsh
+# Docker Hub (pública, sin login)
+docker pull --platform linux/amd64 christopherdocker/ai-cicd:latest
+
+# GHCR (privada): token classic con read:packages, sin escribirlo en el comando
+read -s "t?Token GHCR: "; echo
+print -r -- "$t" | docker login ghcr.io -u <usuario-github> --password-stdin
+unset t
+docker pull --platform linux/amd64 ghcr.io/<usuario-github>/ai-cicd:latest
+```
+
+Para una versión concreta, usa la etiqueta `sha-<corto>` del commit (sección 7).
+
+**Levantar dos contenedores de la misma imagen.** Demuestra que la imagen es reproducible: dos instancias con la misma base y las mismas claves, de modo que un token emitido por una vale en la otra. El 8081 queda libre para la API de `docker compose`.
+
+```zsh
+docker rm -f contract-api-prod contract-api-prod-2 2>/dev/null
+docker run -d --platform linux/amd64 --name contract-api-prod -p 8082:8081 \
+  --env-file ~/contract-api-prod/prod.env ghcr.io/<usuario-github>/ai-cicd:latest
+docker run -d --platform linux/amd64 --name contract-api-prod-2 -p 8083:8081 \
+  --env-file ~/contract-api-prod/prod.env ghcr.io/<usuario-github>/ai-cicd:latest
+docker logs -f contract-api-prod      # espera "Started ContractApiApplication"; sal con Ctrl+C
+```
+
+**Probar la API.**
+
+```zsh
+API=http://localhost:8082
+read -s "ADMIN_PW?Contraseña del admin: "; echo
+BODY=$(jq -n --arg p "$ADMIN_PW" '{username: "admin", password: $p}')
+LOGIN=$(curl -fsS -X POST "$API/api/v1/auth/login" -H "Content-Type: application/json" -d "$BODY")
+H="Authorization: Bearer $(echo "$LOGIN" | jq -r '.accessToken')"
+
+curl -fsS "$API/api/v1/auth/me" -H "$H" | jq .
+curl -fsS "$API/actuator/health" -H "$H" | jq .
+curl -fsS "$API/api/v1/employees?page=0&size=20" -H "$H" | jq .
+curl -fsS http://localhost:8083/api/v1/auth/me -H "$H" | jq .   # el mismo token vale en la segunda instancia
+unset ADMIN_PW BODY LOGIN H
+```
+
+**Limpiar.**
+
+```zsh
+docker rm -f contract-api-prod contract-api-prod-2
+# Borrar también los datos (irreversible):
+# docker exec contract-api-postgres psql -U contract -d postgres -c "DROP DATABASE contracts_prod"
+```
+
+**Enlaces útiles.** Repositorio <https://github.com/christophersanz/AI-CICD> · ejecuciones de GitHub Actions <https://github.com/christophersanz/AI-CICD/actions> · imagen en GHCR <https://github.com/christophersanz/AI-CICD/pkgs/container/ai-cicd> · etiquetas en Docker Hub <https://hub.docker.com/r/christopherdocker/ai-cicd/tags> · Jenkins local <http://localhost:8080> · pgAdmin <http://localhost:5050> (credenciales de Jenkins en `docker/jenkins/.env`; las de pgAdmin, en `docker-compose.yml`).
+
 ## 9. Manejo de secretos
 
 `private.pem` firma todos los tokens de acceso: quien la tenga puede emitir tokens válidos.

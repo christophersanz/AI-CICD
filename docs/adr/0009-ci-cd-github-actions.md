@@ -2,7 +2,7 @@
 
 - **Estado:** Aceptado; el flujo de ramas (una sola rama con push directo) fue reemplazado por [ADR-0012](0012-github-flow-y-despliegue-con-aprobacion.md) (GitHub Flow con checks obligatorios y despliegue con aprobación)
 - **Fecha:** 2026-10-17
-- **Nota:** ADR-0006 a ADR-0008 están reservados para la fase 4 de seguridad (`docs/design/003-security-design.md`, paso 4.3).
+- **Nota:** ADR-0006 a ADR-0008 están reservados para la fase 4 de seguridad (`docs/design/seguridad.md`, paso 4.3).
 
 ## Contexto
 

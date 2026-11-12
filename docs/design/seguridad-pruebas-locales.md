@@ -1,6 +1,6 @@
 # Probar la seguridad en local (fase 1)
 
-Complemento de `003-security-design.md`. Explica cómo arrancar `contract-api` con el perfil `local`, iniciar sesión con el administrador inicial y llamar a los endpoints privados desde PowerShell o Postman.
+Complemento de `seguridad.md`. Explica cómo arrancar `contract-api` con el perfil `local`, iniciar sesión con el administrador inicial y llamar a los endpoints privados desde PowerShell o Postman.
 
 > En `local`, si no hay claves configuradas (`SECURITY_JWT_PUBLIC_KEY`/`SECURITY_JWT_PRIVATE_KEY`), la API genera un **par RSA efímero** al arrancar: cada reinicio invalida todos los access tokens emitidos. Los refresh tokens (en BD) siguen existiendo, pero el access token hay que pedirlo de nuevo.
 
@@ -55,6 +55,8 @@ Invoke-RestMethod -Method Post -Uri "$base/auth/logout" -Headers $headers -Conte
 Tras el logout el access token sigue siendo válido hasta que expira (≤ 15 min): es stateless (ver §6 del diseño).
 
 ## 3. Postman
+
+La colección y el entorno están en [`docs/api/postman/`](../api/postman/); cómo importarlos o ejecutarlos con `newman`: [`docs/api/README.md`](../api/README.md#colección-postman).
 
 ### Variables
 
