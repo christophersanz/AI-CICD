@@ -12,7 +12,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | docs/api/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
 | docs/guides/arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
 | docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
-| @docs/prompts/prompts.md | Prompts reutilizables para tareas frecuentes | Al iniciar una tarea recurrente (nuevo caso de uso, revisión, ADR, etc.) |
+| @docs/prompts/prompts.md | Índice de comandos (`.claude/commands/`), estructura común de los prompts y plantilla para tareas sin comando | Al iniciar una tarea recurrente (nuevo caso de uso, reglas de negocio, pruebas, revisión, documentación, pipeline) |
 
 ## 1. Descripción del proyecto
 
@@ -59,6 +59,7 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 ## 4. Cómo debe trabajar Claude en este repo
 
+- Para tareas recurrentes usa los comandos de `.claude/commands/` (`/business-rules`, `/implement-usecase`, `/tests`, `/review`, `/sonar-fix`, `/document`, `/pipeline`; índice en `docs/prompts/prompts.md`). Todos presentan un plan y esperan aprobación antes de cambiar código, y guardan su progreso en `docs/sessions/`.
 - Antes de crear código, identifica **en qué capa** va y respeta la regla de dependencia (`docs/architecture.md`, sección 3).
 - Antes de tocar lógica de negocio, verifica las invariantes y reglas en `docs/business-rules.md`. **No inventes reglas de negocio:** si falta una, pregunta.
 - Para una funcionalidad nueva, sigue este orden: **dominio → puerto de entrada → caso de uso → puerto de salida → adaptador → controller → pruebas**.

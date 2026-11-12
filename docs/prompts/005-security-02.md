@@ -2,6 +2,8 @@
 description: Completa la fase 1 de seguridad de contract-api (pasos 1.6–1.8): emisión de tokens, login y AuthController
 ---
 
+> **Histórico.** Prompt tal como se ejecutó durante el curso; se conserva como evidencia (ver `docs/prompts/prompts.md` §4). Para trabajo nuevo usa `docs/design/003-security-design.md`. Los pasos 1.6–1.8 ya están hechos.
+
 Completa la **fase 1 de seguridad** de contract-api implementando los pasos **1.6, 1.7 y 1.8** de
 @docs/design/003-security-design.md, siguiendo @CLAUDE.md, @docs/architecture.md,
 @docs/business-rules.md y @docs/adr/0005-incorporar-seguridad.md.

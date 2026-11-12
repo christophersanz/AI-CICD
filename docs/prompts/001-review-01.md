@@ -1,3 +1,5 @@
+> **Histórico.** Prompt tal como se ejecutó durante el curso; se conserva como evidencia (ver `docs/prompts/prompts.md` §4). Para trabajo nuevo usa `/review` (`.claude/commands/review.md`). Esta versión pide ArchUnit y "application sin frameworks", dos contradicciones que señaló la propia revisión (`docs/reviews/001-review-01-result.md`, H-02 y H-03).
+
 # Rol
 Actúa como Arquitecto de Software Senior y revisor técnico experto en Java 21, Spring Boot 3,
 Clean Architecture, DDD táctico, seguridad de APIs y buenas prácticas de ingeniería.

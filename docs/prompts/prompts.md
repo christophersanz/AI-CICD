@@ -1,167 +1,83 @@
-# Prompts reutilizables
+# Prompts del proyecto
 
-Catálogo de prompts para tareas frecuentes en este repositorio. Copia el prompt, rellena los campos `[ ]` y pégalo en Claude.
-Todos asumen que Claude ya cargó `CLAUDE.md`, `docs/architecture.md` y `docs/business-rules.md`.
+Índice de los prompts de `contract-api`. Las tareas frecuentes son **comandos de Claude Code** versionados en `.claude/commands/`: se ejecutan con `/nombre argumentos` y ya incluyen el contexto, el plan, la verificación y el informe. Para tareas que no tienen comando, usa la plantilla de la sección 3, que sigue la misma estructura.
 
-## Índice
+## 1. Comandos
 
-1. [Diseño de arquitectura](#1-diseño-de-arquitectura)
-2. [Nuevo caso de uso](#2-nuevo-caso-de-uso)
-3. [Nuevo endpoint REST](#3-nuevo-endpoint-rest)
-4. [Nuevo adaptador de salida](#4-nuevo-adaptador-de-salida)
-5. [Revisión de código](#5-revisión-de-código)
-6. [Generar pruebas](#6-generar-pruebas)
-7. [Refactorización hacia Clean Architecture](#7-refactorización-hacia-clean-architecture)
-8. [Registrar un ADR](#8-registrar-un-adr)
-9. [Documentar reglas de negocio](#9-documentar-reglas-de-negocio)
+| Comando | Cuándo | Entrega |
+|---|---|---|
+| `/business-rules <tema>` | Antes de implementar algo cuyo comportamiento no está claro, o para completar las preguntas abiertas | Preguntas a RR.HH./al autor y reglas `BR-*` nuevas en `business-rules.md` |
+| `/implement-usecase <NombreUseCase>` | Implementar un caso de uso documentado en `business-rules.md` §6 | Dominio → API → pruebas, paso a paso con aprobación |
+| `/tests <clase o caso de uso>` | Completar o mejorar pruebas | Matriz regla → prueba y pruebas nuevas con sus patrones |
+| `/review [alcance]` | Antes de integrar un cambio grande o de una entrega | Informe en `docs/reviews/NNN-review-<alcance>.md` |
+| `/sonar-fix` | El Quality Gate de SonarQube falla en Jenkins | Cada hallazgo corregido o justificado en el código |
+| `/document <alcance>` | JavaDoc, OpenAPI, diagramas, ADR o guías desactualizados | Documentación técnica alineada con el código |
+| `/pipeline <cambio>` | Cambiar GitHub Actions, Jenkins, Docker o el despliegue | Cambio verificado de punta a punta, con ADR |
 
-## 1. Diseño de arquitectura
+Orden habitual para una funcionalidad nueva: `/business-rules` → `/implement-usecase` → `/tests` → `/review` → `/document`.
 
-Úsalo al iniciar el proyecto o un nuevo bounded context.
+## 2. Estructura común de todo prompt
 
-```markdown
-Actúa como Arquitecto de Software Senior experto en Java 21, Spring Boot 3, Clean Architecture,
-Arquitectura Hexagonal y DDD.
+Cada comando y la plantilla de la sección 3 tienen estas partes. Si una falta, el prompt está incompleto.
 
-Diseña la arquitectura de una API REST para el siguiente contexto:
-- Dominio / negocio: [describe el negocio]
-- Casos de uso principales: [lista]
-- Requisitos no funcionales: [p. ej. 500 req/s, auditoría, alta disponibilidad]
-- Restricciones tecnológicas: [p. ej. PostgreSQL, Kafka, Kubernetes]
-- Repositorio y CI/CD: [p. ej. GitHub Flow con PR obligatorio y checks requeridos en el ruleset; despliegue con aprobación en un environment a Render; GitHub Actions
-  como CI oficial (build, pruebas, cobertura, SonarCloud e imagen Docker en GHCR y Docker Hub);
-  Jenkins local de práctica con `Jenkinsfile`]
-- Equipo: [tamaño y nivel]
+1. **Rol:** experto concreto para la tarea (arquitecto, especialista en seguridad, QA, DevOps).
+2. **Contexto y fuentes de verdad:** qué existe hoy y qué documentos mandan (`CLAUDE.md`, `architecture.md`, `business-rules.md`, `technical.md`, ADR). Si el código contradice un documento, se reporta; no se elige en silencio.
+3. **Objetivo verificable:** cómo se sabe que terminó (una prueba, un endpoint que responde, un Quality Gate en verde).
+4. **Restricciones (qué NO hacer):** no inventar reglas de negocio; no añadir dependencias sin justificarlas; no integrar PRs ni aprobar despliegues; no tocar archivos fuera del alcance.
+5. **Análisis de impacto y plan, sin cambiar código:** primero se presenta qué se toca, en qué orden y con qué riesgos. **Nada se implementa hasta que el autor lo aprueba.**
+6. **Pasos pequeños con aprobación:** un paso a la vez; al terminar cada uno, archivos tocados, resumen, resultado de compilación y pruebas, y pausa hasta "continuar".
+7. **Verificación:** `./mvnw clean verify` en verde y, si cambia el pipeline o el código de producción, el Jenkins local con el Quality Gate de SonarQube.
+8. **Informe final:** qué se hizo, qué se decidió, qué queda pendiente (con su regla o pregunta abierta) y qué documentos se actualizaron.
+9. **Archivo de sesión:** el progreso se guarda en `docs/sessions/` (ver su [README](../sessions/README.md)) para retomar sin perder contexto ni repetir trabajo.
 
-Respeta las reglas de docs/architecture.md. Entrega:
-1. Visión general y justificación de decisiones clave.
-2. Diagrama de capas en Mermaid.
-3. Estructura de módulos y paquetes.
-4. Modelo de dominio: entidades, value objects, agregados e invariantes.
-5. Casos de uso con sus puertos de entrada y salida.
-6. Código Java de un caso de uso completo de extremo a extremo.
-7. Diseño de endpoints REST y formato de errores (RFC 9457).
-8. Transversales: seguridad, transacciones, observabilidad, configuración.
-9. Estrategia de pruebas.
-10. Repositorio y CI/CD: flujo de ramas y protección en GitHub, pipeline de GitHub Actions (etapas,
-    quality gates, publicación y etiquetado de la imagen), su equivalente en Jenkins (`Jenkinsfile`)
-    y manejo de secretos, con diagrama en Mermaid.
-11. 3-5 ADRs con alternativas descartadas.
-12. Riesgos y trade-offs.
+Buenas prácticas que aplican a todos:
+- Un tema por sesión: seguridad, negocio e infraestructura en sesiones distintas (consumen menos tokens y el contexto no se mezcla).
+- No quedarse con el primer resultado: revisar, pedir otra revisión y comparar. Cada iteración se nota en `docs/ai-log.md`.
+- Todo cambio va en una rama corta con PR (ADR-0012); el *Squash and merge* y la aprobación de `production` son del autor.
 
-Si falta información crítica, haz primero un máximo de 5 preguntas concretas.
-Evita la sobreingeniería: adapta la complejidad al problema y al equipo.
-```
-
-## 2. Nuevo caso de uso
+## 3. Plantilla para tareas sin comando
 
 ```markdown
-Implementa el caso de uso [NombreDelCasoDeUso] siguiendo docs/architecture.md.
+# Rol
+Actúa como [rol experto] en Java 21, Spring Boot 3, Clean Architecture y DDD.
 
-- Actor: [quién lo ejecuta]
-- Entrada: [datos]
-- Salida: [datos]
-- Reglas de negocio aplicables: [IDs de docs/business-rules.md, p. ej. BR-CTR-001]
-- Puertos de salida necesarios: [repositorios, clientes externos, eventos]
+# Contexto
+- Fuentes de verdad: @CLAUDE.md, @docs/architecture.md, @docs/business-rules.md [y ADR o guías que apliquen].
+- Situación actual: [qué existe hoy; confírmalo contra el código, no lo asumas].
 
-Sigue el orden: dominio → puerto de entrada → caso de uso → puerto de salida → adaptador → controller → pruebas.
-Incluye pruebas unitarias del dominio y del caso de uso.
-Si alguna regla no está definida en business-rules.md, pregúntame antes de suponerla.
-Al terminar, actualiza la tabla de casos de uso en business-rules.md.
+# Objetivo
+[Qué se quiere lograr] — se considera terminado cuando [criterio verificable].
+
+# Restricciones
+- No inventes reglas de negocio: si falta una, pregúntame.
+- No añadas dependencias, no integres PRs ni apruebes despliegues.
+- Fuera de alcance: [lo que no se toca].
+
+# Forma de trabajo
+1. Analiza el impacto y presenta un plan (archivos, orden, riesgos). No cambies código todavía.
+2. Tras mi aprobación, ejecuta un paso a la vez y detente al final de cada uno.
+3. Mantén el archivo de sesión en docs/sessions/ (docs/sessions/README.md).
+
+# Verificación e informe final
+- `./mvnw clean verify` en verde [y Jenkins con Quality Gate si cambia código de producción o el pipeline].
+- Informe: cambios, decisiones, pendientes y documentación actualizada.
 ```
 
-## 3. Nuevo endpoint REST
+Casos frecuentes con esta plantilla:
+- **Nuevo endpoint REST:** rol arquitecto; objetivo "método y ruta responden según `architecture.md` §6, con `@PreAuthorize` por permiso (`business-rules.md` §4.1) y `@WebMvcTest` para el éxito y cada error"; regenerar `docs/api/openapi.*`.
+- **Nuevo adaptador de salida:** rol arquitecto; objetivo "el puerto `[NombrePort]` tiene adaptador en `infrastructure` con prueba de integración (Testcontainers o WireMock)"; incluir migración Flyway si aplica.
+- **Refactorización:** rol arquitecto; el plan debe tener pasos pequeños, cada uno compilable y con pruebas verdes, y no cambiar códigos de error, contratos REST ni esquema.
+- **Registrar un ADR:** `docs/adr/NNNN-titulo.md` con estado, contexto, decisión, al menos dos alternativas con pros y contras, y consecuencias; máximo una página, en español.
 
-```markdown
-Expón el caso de uso [NombreUseCase] como endpoint REST.
+## 4. Prompts históricos
 
-- Método y ruta: [p. ej. POST /api/v1/contracts]
-- Roles autorizados: [p. ej. HR, ADMIN, EMPLOYEE]
-- Request: [campos y validaciones de formato]
-- Response: [campos]
+Los archivos numerados son los prompts que se usaron durante el curso, tal como se ejecutaron. Se conservan como evidencia del proceso (los citan `docs/ai-log.md`, `docs/reviews/` y `docs/design/`); no se usan para trabajo nuevo.
 
-Cumple la sección 6 de docs/architecture.md (códigos HTTP, Problem Details, OpenAPI).
-Incluye test @WebMvcTest para el caso exitoso y para cada error esperado.
-```
-
-## 4. Nuevo adaptador de salida
-
-```markdown
-Implementa el adaptador [Persistence | RestClient | Messaging] para el puerto [NombrePort].
-
-- Tecnología: [p. ej. Spring Data JPA / RestClient / Kafka]
-- Detalles: [tabla, endpoint externo, topic, etc.]
-- Manejo de fallos: [reintentos, timeout, circuit breaker si aplica]
-
-El adaptador vive en infrastructure/, mapea entre modelos técnicos y de dominio, y no filtra
-tipos técnicos hacia application. Incluye prueba de integración con Testcontainers
-(o WireMock para clientes HTTP). Incluye la migración Flyway si aplica.
-```
-
-## 5. Revisión de código
-
-```markdown
-Revisa los siguientes cambios [pega el diff o indica los archivos] como arquitecto de software.
-
-Evalúa, en este orden:
-1. Violaciones a las reglas de arquitectura (docs/architecture.md, sección 3).
-2. Reglas de negocio mal ubicadas o incumplidas (docs/business-rules.md).
-3. Errores de lógica, concurrencia o transacciones.
-4. Cobertura y calidad de las pruebas.
-5. Convenciones de nombres y estilo.
-
-Para cada hallazgo indica: archivo y línea, severidad (alta/media/baja), problema y corrección propuesta.
-No reportes preferencias de estilo menores si no hay una regla que las respalde.
-```
-
-## 6. Generar pruebas
-
-```markdown
-Genera las pruebas para [clase o caso de uso].
-
-- Tipo: [unitaria de dominio | unitaria de caso de uso | integración | slice web]
-- Cubre: camino feliz, cada regla de negocio aplicable ([IDs]) y casos límite.
-
-Sigue la sección 9 de docs/architecture.md: nombres should<Resultado>When<Condición>,
-estructura Given/When/Then, AssertJ, sin Spring en pruebas de dominio.
-```
-
-## 7. Refactorización hacia Clean Architecture
-
-```markdown
-Analiza [paquete, clase o módulo] y propón cómo migrarlo a la arquitectura de docs/architecture.md.
-
-1. Diagnóstico: qué reglas de arquitectura se violan actualmente.
-2. Plan de migración en pasos pequeños e independientes, cada uno compilable y con pruebas verdes.
-3. Riesgos de cada paso.
-
-No escribas código todavía; espera mi aprobación del plan.
-```
-
-## 8. Registrar un ADR
-
-```markdown
-Redacta un ADR en docs/adr/[NNNN]-[titulo-en-kebab-case].md sobre: [decisión].
-
-Estructura:
-- Estado: [Propuesto | Aceptado | Reemplazado por ADR-XXXX]
-- Contexto: problema y fuerzas en juego.
-- Decisión: qué se decidió.
-- Alternativas consideradas: al menos 2, con pros y contras.
-- Consecuencias: positivas, negativas y acciones de seguimiento.
-
-Máximo una página. En español.
-```
-
-## 9. Documentar reglas de negocio
-
-```markdown
-A partir de la siguiente descripción funcional, actualiza docs/business-rules.md:
-
-[pega la historia de usuario, requisito o notas de la reunión]
-
-- Añade términos nuevos al glosario.
-- Crea reglas con ID BR-[CONTEXTO]-[NNN], indicando capa y código de error.
-- Actualiza estados, casos de uso, eventos y catálogo de errores si corresponde.
-- Lo ambiguo o contradictorio va a "Preguntas abiertas", no lo supongas.
-```
+| Archivo | Uso | Reemplazado por |
+|---|---|---|
+| `001-review-01.md` | Revisión integral (sesión 02) | `/review` |
+| `002.-refactoring-v1.md` | Refactor del dominio por agregado (sesión 03) | Plantilla §3 (refactorización) |
+| `003-security-01.md` | Diseño de la seguridad 3A (sesión 03) | `docs/design/003-security-design.md` |
+| `004-implement-usecase.md` | Caso de uso paso a paso (sesión 03) | `/implement-usecase` |
+| `005-security-02.md` | Seguridad fase 1, pasos 1.6–1.8 (sesión 04) | `docs/design/003-security-design.md` |
+| `006-cicd.md` | Puesta en marcha del CI/CD con parche (sesión 04) | `/pipeline` |
