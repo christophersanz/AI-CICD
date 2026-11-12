@@ -25,7 +25,7 @@ Si este documento y el código no coinciden, manda el código; actualiza este do
 
 ## 2. API REST
 
-URL base local: `http://localhost:8081`. Documentación interactiva (solo fuera de `prod`): `/swagger-ui.html`; especificación OpenAPI: `/v3/api-docs` (JSON) y `/v3/api-docs.yaml`; copia versionada en [api/openapi.yaml](api/openapi.yaml).
+URL base local: `http://localhost:8081`. Documentación interactiva (solo fuera de `prod`): `/swagger-ui.html`; especificación OpenAPI: `/v3/api-docs` (JSON) y `/v3/api-docs.yaml`; copia versionada en [api/contract/openapi.yaml](api/contract/openapi.yaml).
 
 ### 2.1 Endpoints
 

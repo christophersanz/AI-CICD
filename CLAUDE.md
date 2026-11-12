@@ -9,7 +9,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | @docs/architecture.md | Capas, módulos, reglas de dependencia, convenciones de código, API REST, errores y pruebas | Siempre que se cree o modifique código |
 | @docs/business-rules.md | Glosario, entidades, invariantes, casos de uso y estados del dominio | Antes de implementar o cambiar lógica de negocio |
 | docs/technical.md | Estado implementado: endpoints, seguridad, variables de entorno, esquema de BD, build y CI/CD | Al cambiar endpoints, configuración, migraciones o el pipeline (actualizarlo en el mismo cambio) |
-| docs/api/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
+| docs/api/contract/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
 | docs/guides/diagramas-arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
 | docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
 | @docs/prompts/README.md | Índice de los prompts `docs/prompts/NN-nombre.md` (por orden de uso), sus comandos de Claude Code, la estructura común, las fuentes y el kit reutilizable | Al iniciar una tarea recurrente (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión, pipeline) |
@@ -102,6 +102,6 @@ Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/k
 | `despliegue` | Verificación efímera de la imagen y despliegue en Render (`render.yaml`) tras la aprobación del environment `production` (ADR-0013); despliegue local de Jenkins en <http://localhost:8090> (ADR-0014) |
 | `ci-local` | Jenkins en <http://localhost:8080>: `Jenkinsfile` y `docker/jenkins/` (compose, `casc.yaml`, `scripts/`, `.env` no versionado con `REPO_BRANCH`) |
 | `sonarqube` | SonarQube local en <http://localhost:9000>, proyecto y Quality Gate `contract-api`; credenciales `SONAR_ADMIN_PASSWORD` en `docker/jenkins/.env`; condiciones en `docker/jenkins/scripts/sonar-analysis.sh` (ADR-0015) |
-| `openapi` | `docs/api/openapi.yaml` y `.json`, generados con springdoc; cómo regenerarlos en `docs/api/README.md` |
+| `openapi` | `docs/api/contract/openapi.yaml` y `.json`, generados con springdoc; cómo regenerarlos en `docs/api/README.md` |
 | `postman` | Colección y entorno local en `docs/api/postman/` (se ejecutan con `newman` o el Postman CLI) |
 | `guias` | `docs/guides/diagramas-arquitectura.md` (diagramas) y `docs/guides/ci-cd.md` (pipeline y *Problemas frecuentes*) |
