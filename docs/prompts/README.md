@@ -2,58 +2,41 @@
 
 Prompts genéricos para desarrollar con Claude Code una API Java con Clean Architecture y DDD (este archivo es la portada de la carpeta, no un prompt). Nacieron en `contract-api` y forman un **kit reutilizable** (§6).
 
-- **Un archivo por prompt: `docs/prompts/NN-nombre.md`.** `NN` es el **orden** en que se usa: `0x` desarrollo, `09`–`18` ciclo de revisión, `2x` calidad, operación y prompts. No hay versiones paralelas ni copias: para mejorar un prompt se edita **ese mismo archivo**, en un commit propio que explique el cambio. La historia queda en git (`git log -p docs/prompts/NN-nombre.md`).
+- **Nueve prompts, un archivo cada uno: `docs/prompts/NN-nombre.md`.** `NN` es el **orden** en que se usan (01 a 09). No hay versiones paralelas ni copias: para mejorar un prompt se edita **ese mismo archivo**, en un commit propio que explique el cambio. La historia queda en git (`git log -p docs/prompts/NN-nombre.md`).
 - **Cada prompt tiene un comando de Claude Code** con el mismo nombre (`/02-implementar-caso-uso`) en `.claude/commands/`. El comando tiene tres líneas y solo carga ese archivo, como el `06.0.-fix.md` de los modelos del curso ("Lee y ejecuta las instrucciones de @prompts/…"). Sin Claude Code, se copia el prompt y se reemplaza `{ARGUMENTO}` a mano.
 - **Los datos del proyecto no están en los prompts.** Cuando un prompt dice `DP.<clave>` (por ejemplo, `DP.build` o `DP.rama-principal`), el valor sale de `CLAUDE.md` → *Datos para los prompts*. Es lo único que cambia de un proyecto a otro.
 
-## 1. Prompts en orden
+## 1. Los 9 prompts, en orden
 
-### 0x · Desarrollo de una funcionalidad
-
-| # | Archivo | Comando y argumento | Cuándo | Entrega |
-|---|---|---|---|---|
-| 00 | [`00-refinar-requisitos.md`](00-refinar-requisitos.md) | `/00-refinar-requisitos <requerimiento>` | Llega una funcionalidad nueva | MVPs, historias con criterios de aceptación y dudas en `docs/requirements/` |
-| 01 | [`01-reglas-negocio.md`](01-reglas-negocio.md) | `/01-reglas-negocio <tema>` | El comportamiento no está claro o hay preguntas abiertas | Preguntas al autor y reglas `BR-*` en `business-rules.md` |
-| 02 | [`02-implementar-caso-uso.md`](02-implementar-caso-uso.md) | `/02-implementar-caso-uso <NombreUseCase>` | Implementar un caso de uso de `business-rules.md` §6 | Dominio → API → pruebas, con autovalidación por capa |
-| 03 | [`03-pruebas.md`](03-pruebas.md) | `/03-pruebas <clase o caso de uso>` | Completar o mejorar pruebas | Matriz regla → prueba y pruebas con su patrón |
-| 04 | [`04-documentar.md`](04-documentar.md) | `/04-documentar <alcance>` | JavaDoc, OpenAPI, diagramas, ADR o guías desactualizados | Documentación alineada con el código |
-| 05 | [`05-revisar-pr.md`](05-revisar-pr.md) | `/05-revisar-pr <número o rama>` | Antes del *Squash and merge* | Informe del diff y `APROBAR` / `CAMBIOS REQUERIDOS` |
-| 06 | [`06-refactorizar.md`](06-refactorizar.md) | `/06-refactorizar <objetivo>` | Reorganizar código sin cambiar el comportamiento | Refactor en pasos compilables con tabla de movimientos |
-
-### 09–18 · Ciclo de revisión (siempre en este orden)
-
-| # | Archivo | Comando | Revisa | Modifica código |
+| # | Archivo | Comando | Para qué | Modifica código |
 |---|---|---|---|:-:|
-| 09 | [`09-reglas-revision.md`](09-reglas-revision.md) | *(lo incluyen todas las revisiones)* | Fuentes de verdad, severidades ERROR / WARNING / INFO, formato y numeración de rondas | — |
-| 10 | [`10-revisar-dominio.md`](10-revisar-dominio.md) | `/10-revisar-dominio [ronda]` | `domain` | No |
-| 11 | [`11-revisar-aplicacion.md`](11-revisar-aplicacion.md) | `/11-revisar-aplicacion [ronda]` | `application` | No |
-| 12 | [`12-revisar-infraestructura.md`](12-revisar-infraestructura.md) | `/12-revisar-infraestructura [ronda]` | Persistencia, adaptadores y configuración | No |
-| 13 | [`13-revisar-api.md`](13-revisar-api.md) | `/13-revisar-api [ronda]` | Controllers, DTOs, errores y OpenAPI | No |
-| 14 | [`14-revisar-seguridad.md`](14-revisar-seguridad.md) | `/14-revisar-seguridad [ronda]` | Seguridad transversal (OWASP) | No |
-| 15 | [`15-revisar-cicd.md`](15-revisar-cicd.md) | `/15-revisar-cicd [ronda]` | Pipeline, imagen, CI local y despliegues | No |
-| 16 | [`16-revisar-arquitectura.md`](16-revisar-arquitectura.md) | `/16-revisar-arquitectura [ronda]` | Integral, consolidando 10–15 | No |
-| 17 | [`17-corregir-hallazgos.md`](17-corregir-hallazgos.md) | `/17-corregir-hallazgos [ronda]` | Corrige los ERROR y WARNING confirmados | **Sí, el único** |
-| 18 | [`18-revision-final.md`](18-revision-final.md) | `/18-revision-final [ronda]` | Verifica las correcciones: `FINAL STATUS: READY` / `NOT READY` | No |
+| 01 | [`01-definir.md`](01-definir.md) | `/01-definir requisitos <idea>` · `/01-definir reglas <tema>` | Convertir una idea en MVPs e historias, o cerrar reglas de negocio preguntando | No (solo documentos) |
+| 02 | [`02-implementar-caso-uso.md`](02-implementar-caso-uso.md) | `/02-implementar-caso-uso <NombreUseCase>` | Implementar un caso de uso de `business-rules.md` §6, capa por capa | Sí |
+| 03 | [`03-pruebas.md`](03-pruebas.md) | `/03-pruebas <clase o caso de uso>` | Completar pruebas con matriz regla → prueba y patrones de prueba | Solo pruebas |
+| 04 | [`04-documentar.md`](04-documentar.md) | `/04-documentar <alcance>` | JavaDoc, OpenAPI, diagramas, ADR y guías alineados con el código | Solo documentación |
+| 05 | [`05-refactorizar.md`](05-refactorizar.md) | `/05-refactorizar <objetivo>` | Reorganizar código sin cambiar el comportamiento | Sí |
+| 06 | [`06-revisar.md`](06-revisar.md) | `/06-revisar <modo> [ronda]` | Revisar por capa, un PR o la entrega final (`READY` / `NOT READY`) | **No** |
+| 07 | [`07-corregir.md`](07-corregir.md) | `/07-corregir ronda <NNN>` · `/07-corregir sonar` | Corregir lo que encontró una revisión o el Quality Gate | Sí |
+| 08 | [`08-cambiar-pipeline.md`](08-cambiar-pipeline.md) | `/08-cambiar-pipeline <cambio>` | Cambiar el CI, el CI local, la imagen o el despliegue | Sí (pipeline) |
+| 09 | [`09-mejorar-prompt.md`](09-mejorar-prompt.md) | `/09-mejorar-prompt <tarea o archivo>` | Crear un prompt o mejorar uno existente | Solo prompts |
 
-### 2x · Calidad, operación y prompts
+### Orden de la revisión (dentro de `/06-revisar`)
 
-| # | Archivo | Comando | Cuándo |
-|---|---|---|---|
-| 20 | [`20-corregir-sonar.md`](20-corregir-sonar.md) | `/20-corregir-sonar [regla o archivo]` | El Quality Gate (`DP.sonarqube`) falla |
-| 21 | [`21-cambiar-pipeline.md`](21-cambiar-pipeline.md) | `/21-cambiar-pipeline <cambio>` | Cambiar el CI, el CI local, la imagen o el despliegue |
-| 22 | [`22-crear-o-mejorar-prompt.md`](22-crear-o-mejorar-prompt.md) | `/22-crear-o-mejorar-prompt <tarea o archivo>` | Hace falta un prompt nuevo o mejorar uno existente |
+`dominio` → `aplicacion` → `infraestructura` → `api` → `seguridad` → `cicd` → `arquitectura` → **`/07-corregir ronda NNN`** → `final`
+
+Cada modo deja su informe en `docs/reviews/NNN-<paso>-<modo>.md` (`NNN` es la ronda) y dice cuál es el siguiente paso. `/06-revisar pr <n>` revisa un PR antes de integrarlo.
 
 ### Flujos típicos
 
-- **Funcionalidad nueva:** `00` → `01` (por cada duda) → `02` → `03` → `04` → `05` → merge.
-- **Antes de una entrega:** `10` → `11` → `12` → `13` → `14` → `15` → `16` → `17` → `18`, hasta `READY`.
-- **Después de un cambio acotado:** solo las revisiones de las capas tocadas, en orden, y luego `17` → `18`.
-- **Reorganizar código:** `06` → la revisión de la capa tocada.
-- **Build en rojo por el Quality Gate:** `20`.
+- **Funcionalidad nueva:** `/01-definir requisitos` → `/01-definir reglas` (por cada duda) → `/02-implementar-caso-uso` → `/03-pruebas` → `/04-documentar` → `/06-revisar pr <n>` → merge.
+- **Antes de una entrega:** el orden completo de `/06-revisar`, `/07-corregir ronda NNN` y `/06-revisar final`, hasta `READY`.
+- **Después de un cambio acotado:** solo los modos de las capas tocadas, en orden, y luego `/07-corregir` → `/06-revisar final`.
+- **Reorganizar código:** `/05-refactorizar` → `/06-revisar <capa tocada>`.
+- **Build en rojo por el Quality Gate:** `/07-corregir sonar`.
 
 ## 2. Estructura común de todo prompt
 
-Cada prompt tiene estas 10 partes. Si falta una, el prompt está incompleto. `22-crear-o-mejorar-prompt` las aplica al crear uno nuevo.
+Cada prompt tiene estas 10 partes. Si falta una, el prompt está incompleto. `/09-mejorar-prompt` las aplica.
 
 1. **Rol:** experto concreto para la tarea ("actúa como arquitecto de software especializado en Java…", sesión 02).
 2. **Contexto y fuentes de verdad:** qué existe hoy y qué documentos mandan (`CLAUDE.md`, `architecture.md`, `business-rules.md`, `technical.md`, ADR). Si el código contradice un documento, se reporta; no se elige en silencio.
@@ -66,7 +49,7 @@ Cada prompt tiene estas 10 partes. Si falta una, el prompt está incompleto. `22
 9. **Informe final:** archivos creados, modificados, movidos y eliminados; pruebas (ejecutadas, exitosas, fallidas, con error, omitidas); decisiones; pendientes con su regla o pregunta abierta; documentación actualizada. **Nunca afirmar que funciona sin compilar y probar.**
 10. **Archivo de sesión:** el progreso queda en `docs/sessions/` (ver su [README](../sessions/README.md)) para retomar sin perder contexto ni gastar tokens.
 
-En las revisiones se añade: **separar revisar de corregir** (solo `17` modifica código), **no inventar problemas** y **no inflar la severidad**.
+En las revisiones se añade: **separar revisar de corregir** (`/06-revisar` nunca modifica código; corrige `/07-corregir`), **no inventar problemas** y **no inflar la severidad**.
 
 Buenas prácticas para todos:
 - Prompts cortos y enfocados que remiten a los documentos, no prompts de "15 páginas" (sesión 01). Un tema por sesión: seguridad, negocio e infraestructura por separado (sesión 05).
@@ -95,7 +78,7 @@ Buenas prácticas para todos:
 
 ## 4. Plantilla rápida para tareas sin prompt
 
-Para una tarea puntual que no justifica un prompt propio (si se va a repetir, usa `/22-crear-o-mejorar-prompt`):
+Para una tarea puntual que no justifica un prompt propio (si se va a repetir, usa `/09-mejorar-prompt`):
 
 ```markdown
 ## Rol
@@ -126,12 +109,12 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 
 | Prompt del curso | Uso | Lo reemplaza |
 |---|---|---|
-| [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | Revisión integral (sesión 02); informe en `docs/reviews/001-16-arquitectura.md` | [`16-revisar-arquitectura.md`](16-revisar-arquitectura.md) y el resto del ciclo `10`–`18` |
-| [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) | Refactor del dominio por agregado (sesión 03) | [`06-refactorizar.md`](06-refactorizar.md) |
-| [`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md) | Diseño de la seguridad 3A (sesión 03) | `DP.seguridad` y [`14-revisar-seguridad.md`](14-revisar-seguridad.md) |
+| [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | Revisión integral (sesión 02); informe en `docs/reviews/001-7-arquitectura.md` | [`06-revisar.md`](06-revisar.md) (todos sus modos) |
+| [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) | Refactor del dominio por agregado (sesión 03) | [`05-refactorizar.md`](05-refactorizar.md) |
+| [`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md) | Diseño de la seguridad 3A (sesión 03) | `DP.seguridad` y [`06-revisar.md`](06-revisar.md) modo `seguridad` |
 | [`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md) | Caso de uso paso a paso (sesión 03) | [`02-implementar-caso-uso.md`](02-implementar-caso-uso.md) |
 | [`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md) | Seguridad fase 1, pasos 1.6–1.8 (sesión 04) | — (seguridad implementada) |
-| [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) | Puesta en marcha del CI/CD con parche (sesión 04) | [`21-cambiar-pipeline.md`](21-cambiar-pipeline.md) |
+| [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) | Puesta en marcha del CI/CD con parche (sesión 04) | [`08-cambiar-pipeline.md`](08-cambiar-pipeline.md) |
 
 ## 6. Usar el kit en otro proyecto
 
@@ -151,7 +134,7 @@ Pasos:
 docs/prompts/kit/instalar.sh /ruta/al/otro-proyecto
 
 # 2. En el otro proyecto: completar CLAUDE.md → "Datos para los prompts" (cada [...])
-#    y los documentos de arquitectura y negocio (o usar /00-refinar-requisitos y /01-reglas-negocio)
+#    y los documentos de arquitectura y negocio (o usar /01-definir requisitos y /01-definir reglas)
 
 # 3. Comprobar
 cd /ruta/al/otro-proyecto && docs/prompts/kit/verificar.sh

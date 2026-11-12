@@ -1,5 +1,5 @@
 ---
-description: Desarrollo 3: completa y mejora las pruebas de una clase o caso de uso, con patrones de prueba explícitos
+description: 3/9 Completar y mejorar pruebas de una clase o caso de uso, con patrones de prueba explícitos
 argument-hint: <Clase | NombreUseCase | módulo>
 ---
 

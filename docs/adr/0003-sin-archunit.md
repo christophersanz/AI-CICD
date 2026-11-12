@@ -12,7 +12,7 @@
 No se agrega ArchUnit. Las reglas de arquitectura se garantizan por:
 
 - La **estructura de módulos Maven**: `domain` no declara dependencias de frameworks y `application` solo depende de `domain` (y de `spring-tx` para `@Transactional`). Una importación prohibida no compila.
-- La **revisión de código** con el ciclo de revisión `10`–`18` de `docs/prompts/` (reglas comunes en `docs/prompts/09-reglas-revision.md`; antes, la sección 5 de `docs/prompts/README.md`).
+- La **revisión de código** con `/06-revisar` (`docs/prompts/06-revisar.md`, revisión por capa en orden; antes, la sección 5 de `docs/prompts/README.md`).
 
 ## Alternativas consideradas
 

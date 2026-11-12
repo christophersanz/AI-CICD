@@ -18,7 +18,7 @@ Referencia técnica del servicio: **cómo** se estructura y escribe el código. 
 7. **Los puertos de salida los define `application`** y los implementa `infrastructure`.
 8. **Las invariantes de negocio viven en el dominio.**
 9. **Aislamiento dentro de `infrastructure`:** `api` solo invoca puertos de entrada.
-[Ajusta o añade reglas; se verifican con el ciclo de revisión `10`–`18`.]
+[Ajusta o añade reglas; se verifican con `/06-revisar`.]
 
 ## 4. Flujo de una petición
 [Controller → puerto de entrada → caso de uso → dominio / puertos de salida → Result → Response; errores a Problem Details.]

@@ -1,5 +1,5 @@
 ---
-description: Desarrollo 2: implementa un caso de uso paso a paso (ficha → dominio → API → pruebas → cierre)
+description: 2/9 Implementar un caso de uso paso a paso (ficha → dominio → API → pruebas → cierre)
 argument-hint: <NombreDelCasoDeUso>
 ---
 

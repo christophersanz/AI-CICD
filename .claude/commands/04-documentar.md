@@ -1,5 +1,5 @@
 ---
-description: Desarrollo 4: genera o actualiza la documentación técnica (JavaDoc, OpenAPI, diagramas, ADR, guías)
+description: 4/9 Documentación técnica: JavaDoc, OpenAPI, diagramas, ADR y guías
 argument-hint: <javadoc | openapi | diagramas | adr | guias | todo> [módulo o tema]
 ---
 

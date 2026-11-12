@@ -24,7 +24,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 9 | 2026-10-24 | Presentación final | sesión Claude Code | [__ h] | [__ h] | 2 |
 | 10 | 2026-11-11 | GitHub Flow, despliegue con aprobación y Render (PR #1, #2) | sesión Claude Code | [__ h] | [__ h] | 1 |
 | 11 | 2026-11-12 | Jenkins por etapas, despliegue local y SonarQube (PR #3–#5) | sesión Claude Code | [__ h] | [__ h] | 3 |
-| 12 | 2026-11-12 | Prompts v2: comandos de Claude Code ordenados, ciclo de revisión y archivos de sesión | sesión Claude Code | [__ h] | [__ h] | 3 |
+| 12 | 2026-11-12 | Prompts v2: 9 prompts genéricos ordenados, kit reutilizable y archivos de sesión | sesión Claude Code | [__ h] | [__ h] | 3 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -38,7 +38,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 
 ### #2 — Revisión integral ([`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md))
 
-- **Resultado:** `docs/reviews/001-16-arquitectura.md`. 20 hallazgos: 1 alto, 6 medios, 13 bajos. Build en verde (dominio 94,2 % de líneas).
+- **Resultado:** `docs/reviews/001-7-arquitectura.md`. 20 hallazgos: 1 alto, 6 medios, 13 bajos. Build en verde (dominio 94,2 % de líneas).
 - **Aceptado:** trazabilidad de reglas de negocio contra el código y las pruebas, plan de acción priorizado.
 - **Corregido:**
   - El prompt de revisión contradecía dos ADRs vigentes: se corrigió el prompt, no el código.
@@ -123,12 +123,13 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 ### #12 — Prompts v2
 
 - **Origen:** los prompts 001–005 eran copia de los del docente y estaban desfasados (ArchUnit, "seguridad no implementada", flujo de una sola rama); [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) tenía 911 líneas con un parche incrustado. Se combinaron las prácticas del docente (sesiones 01–05), la serie de revisión de los modelos del curso (`use-case-ca-v1/prompts` 01–07), los prompts de F1 y las presentaciones de Juan José, Ángel y Jairo (tabla en `docs/prompts/README.md` §3).
-- **Aceptado:** `docs/prompts/README.md` como índice corto con la estructura común (rol, fuentes de verdad, objetivo verificable, qué no hacer, plan con aprobación, pasos, verificación, informe final, archivo de sesión); 20 prompts en `docs/prompts/` genéricos con nombre `NN-nombre.md` (orden de uso, un archivo por prompt, sin duplicados ni versiones paralelas): desarrollo (`00-refinar-requisitos` a `06-refactorizar`), ciclo de revisión (`09-reglas-revision`, `10-revisar-dominio` a `16-revisar-arquitectura`, `17-corregir-hallazgos` como único que modifica código y `18-revision-final` con `FINAL STATUS: READY`/`NOT READY`) y calidad, operación y prompts (`20-corregir-sonar`, `21-cambiar-pipeline`, `22-crear-o-mejorar-prompt`); comandos de Claude Code de tres líneas que solo cargan el prompt vigente; archivos de sesión en `docs/sessions/`; datos propios del proyecto en `CLAUDE.md` §5 (*Datos para los prompts*) y kit para otros proyectos en `docs/prompts/kit/` (plantillas e `instalar.sh`); los prompts 001–006 del curso quedan en el historial de git.
+- **Aceptado:** `docs/prompts/README.md` como índice corto con la estructura común (rol, fuentes de verdad, objetivo verificable, qué no hacer, plan con aprobación, pasos, verificación, informe final, archivo de sesión); 9 prompts genéricos en `docs/prompts/` (`01-definir`, `02-implementar-caso-uso`, `03-pruebas`, `04-documentar`, `05-refactorizar`, `06-revisar` con modos por capa en orden, PR y final `READY`/`NOT READY`, `07-corregir` para rondas de revisión y Quality Gate, `08-cambiar-pipeline`, `09-mejorar-prompt`), un archivo por prompt y comandos de Claude Code de tres líneas que solo cargan ese archivo; archivos de sesión en `docs/sessions/`; datos propios del proyecto en `CLAUDE.md` §5 (*Datos para los prompts*) y kit para otros proyectos en `docs/prompts/kit/` (plantillas e `instalar.sh`); los prompts 001–006 del curso quedan en el historial de git.
 - **Corregido:**
   - La primera versión no revisó los prompts de los modelos del curso ni los de F1; se detectó al pedirle a la IA que verificara sus fuentes y se incorporaron (revisión por capa, corrección separada, revisión final con veredicto).
   - Un reemplazo masivo de nombres de comandos cambió también la ruta `docs/business-rules.md` en todos los comandos; se detectó al revisar el resultado y se revirtió.
   - La segunda versión guardaba el contenido en `.claude/commands/` (carpeta oculta en el IDE); el contenido pasó a `docs/prompts/` y los comandos quedaron como lanzadores.
   - Se probó un esquema con versiones en el nombre (`-01`, `-02`) y carpeta `historico/`; se descartó a pedido del autor por duplicar archivos: un solo archivo por prompt y la historia en git.
+  - Llegaron a ser 20 prompts (un comando por capa revisada, como la serie de los modelos del curso); se redujeron a 9 juntando actividades iguales: requisitos y reglas en `01-definir`, las revisiones por capa, de PR y final en `06-revisar` (con modos y el mismo orden), y las correcciones de revisión y de SonarQube en `07-corregir`.
   - Los prompts tenían datos de `contract-api` escritos dentro (paquete, agregados, reglas, ADR, Jenkins, Render, puertos); se movieron a `CLAUDE.md` §5 como claves `DP.*` para reutilizarlos en otros proyectos.
   - Se revisaron los 60 archivos de prompts de CURS-000617 (18 distintos) y las transcripciones de las sesiones 01–05; se incorporó el prompt DevOps de `CURS-000617-CICD-v2`, que no se había leído.
   - El endpoint de *hotspots* de SonarQube usa `project`, no `projectKey`; se comprobó contra el SonarQube local.
@@ -140,7 +141,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 |---|---|---|
 | Pruebas | 362 ejecutadas, 0 fallos (163 domain, 46 application, 153 infrastructure) | `./mvnw clean verify`, 2026-11-12 |
 | Cobertura de líneas | 95,3 % / 96,7 % / 96,3 % (domain / application / infrastructure) | JaCoCo, 2026-11-12 |
-| Cobertura en la primera revisión | 94,2 % / 90,0 % / 92,7 % | `docs/reviews/001-16-arquitectura.md` |
+| Cobertura en la primera revisión | 94,2 % / 90,0 % / 92,7 % | `docs/reviews/001-7-arquitectura.md` |
 | Duración del pipeline | 1 min 55 s – 3 min 11 s | GitHub Actions |
 | Issues de Sonar | 1 bug y 2 vulnerabilidades en el primer análisis → 0 y 0 (Quality Gate en verde) | SonarQube local, Jenkins #10 y #11 (2026-11-12) |
 | Hallazgos de la revisión con IA | 20 (1 alto, 6 medios, 13 bajos) | revisión 001 |

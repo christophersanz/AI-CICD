@@ -2,7 +2,7 @@
 
 Cada prompt de `docs/prompts/` (o su comando de Claude Code) guarda aquí su progreso. Así una tarea larga se puede retomar en otra sesión de Claude Code (o después de compactar el contexto) sin volver a explicar todo ni repetir trabajo: al empezar, Claude lee el archivo y continúa desde el último paso.
 
-Los prompts de revisión (`05`, `10`–`16` y `18`) no crean archivo de sesión: no modifican nada y su informe en `docs/reviews/` cumple esa función.
+`/06-revisar` no crea archivo de sesión: no modifican nada y su informe en `docs/reviews/` cumple esa función.
 
 ## Nombre
 

@@ -1,9 +1,9 @@
-# 22 · Crear o mejorar un prompt
+# 09 · Crear o mejorar un prompt
 
 | | |
 |---|---|
-| **Comando** | `/22-crear-o-mejorar-prompt <tarea nueva | archivo de docs/prompts a mejorar>` |
-| **Archivo** | `docs/prompts/22-crear-o-mejorar-prompt.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Comando** | `/09-mejorar-prompt <tarea nueva | archivo de docs/prompts a mejorar>` |
+| **Archivo** | `docs/prompts/09-mejorar-prompt.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
 | **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
@@ -22,7 +22,7 @@ Un prompt en `docs/prompts/NN-nombre.md` con las 10 partes de la estructura com�
 ## Restricciones
 - **Antes de crear uno nuevo, busca duplicados:** si otro prompt ya cubre la tarea, propón mejorarlo (nueva versión) en lugar de crear otro.
 - Corto y enfocado: un prompt por tarea, que remite a los documentos en lugar de copiarlos. Nada de prompts de "15 páginas" (sesión 01) ni de parches incrustados.
-- No inventes reglas de negocio ni decisiones de arquitectura dentro del prompt: si hacen falta, el prompt debe preguntar o remitir a `/01-reglas-negocio`.
+- No inventes reglas de negocio ni decisiones de arquitectura dentro del prompt: si hacen falta, el prompt debe preguntar o remitir a `/01-definir reglas`.
 - No modifiques código del proyecto.
 
 ## Forma de trabajo
@@ -30,7 +30,7 @@ Un prompt en `docs/prompts/NN-nombre.md` con las 10 partes de la estructura com�
 ### Paso 1 — Análisis (sin escribir el prompt)
 1. Tarea, actor y resultado esperado.
 2. Prompts existentes relacionados y si hay duplicación (cita las secciones).
-3. Número propuesto según el orden (`0x` desarrollo, `09`–`18` revisión, `2x` calidad, operación y prompts) y nombre en español, verbo + objeto (`07-migrar-version-java`).
+3. **Primero, ¿cabe en un prompt existente?** Lo normal es agregar un modo o una sección a uno de los 9 (como los modos de `/06-revisar` o `/07-corregir`) en lugar de crear otro. Solo si no encaja: número siguiente según el orden de uso y nombre en español, verbo + objeto (`07-migrar-version-java`).
 4. Para una mejora: qué funciona del prompt actual, qué falla (con ejemplos de ejecuciones si los hay, p. ej. en `docs/sessions/` o `docs/ai-log.md`) y qué cambiaría.
 **Espera mi aprobación.**
 
@@ -38,7 +38,7 @@ Un prompt en `docs/prompts/NN-nombre.md` con las 10 partes de la estructura com�
 Escribe el prompt con:
 1. Cabecera: título `# NN · Título` y tabla con comando, archivo y origen.
 2. Las 10 partes: rol, contexto y fuentes de verdad, validación del argumento (`{ARGUMENTO}`), objetivo verificable, restricciones (qué NO hacer), análisis de impacto y plan con aprobación, pasos pequeños, verificación, informe final y archivo de sesión.
-3. Si es una revisión: remite a `docs/prompts/09-reglas-revision.md` y no modifica código.
+3. Si es una revisión: remite a `docs/prompts/06-revisar.md` y no modifica código.
 
 ### Paso 3 — Registro (un solo archivo por prompt)
 - **Nuevo:** `docs/prompts/NN-nombre.md` y el lanzador `.claude/commands/NN-nombre.md` (mismo formato que los demás: `description`, `argument-hint`, `@docs/prompts/...` y `ARGUMENTO = $ARGUMENTS`).

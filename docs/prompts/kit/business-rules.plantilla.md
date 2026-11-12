@@ -1,6 +1,6 @@
 # Reglas de negocio
 
-Fuente de verdad del **qué** hace el sistema. Plantilla del kit de prompts. Los prompts citan estas secciones por número (`business-rules.md` §1 a §9): conserva la numeración. Para completarla, usa `/00-refinar-requisitos` y `/01-reglas-negocio`.
+Fuente de verdad del **qué** hace el sistema. Plantilla del kit de prompts. Los prompts citan estas secciones por número (`business-rules.md` §1 a §9): conserva la numeración. Para completarla, usa `/01-definir requisitos` y `/01-definir reglas`.
 
 > Cada regla lleva un identificador `BR-<CTX>-NNN` para referenciarla en código, pruebas y PRs.
 

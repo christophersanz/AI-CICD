@@ -1,9 +1,9 @@
-# 21 · Cambiar el pipeline de CI/CD
+# 08 · Cambiar el pipeline de CI/CD
 
 | | |
 |---|---|
-| **Comando** | `/21-cambiar-pipeline <cambio a realizar en el pipeline o el despliegue>` |
-| **Archivo** | `docs/prompts/21-cambiar-pipeline.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Comando** | `/08-cambiar-pipeline <cambio a realizar en el pipeline o el despliegue>` |
+| **Archivo** | `docs/prompts/08-cambiar-pipeline.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
 | **Origen** | Mejora del prompt del curso [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.

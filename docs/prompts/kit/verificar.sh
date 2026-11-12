@@ -46,7 +46,6 @@ ls docs/prompts/ 2>/dev/null | grep -qE '^[0-9]{2}-.*-[0-9]{2}\.md$' && err "hay
 for p in docs/prompts/[0-9][0-9]-*.md; do
   [ -e "$p" ] || { err "no hay prompts en docs/prompts/"; break; }
   name=$(basename "$p" .md)
-  [ "$name" = "09-reglas-revision" ] && continue
   [ -f ".claude/commands/$name.md" ] || err "falta el comando .claude/commands/$name.md"
 done
 for c in .claude/commands/[0-9][0-9]-*.md; do

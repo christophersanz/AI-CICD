@@ -68,7 +68,7 @@ echo "Copiados: $copied · omitidos: $skipped · documentos creados: $created"
 echo
 echo "Siguientes pasos:"
 echo "  1. Completa en CLAUDE.md la sección \"Datos para los prompts\" (cada [...])."
-echo "  2. Completa docs/architecture.md y docs/business-rules.md (o usa /00-refinar-requisitos y /01-reglas-negocio)."
+echo "  2. Completa docs/architecture.md y docs/business-rules.md (o usa /01-definir requisitos y /01-definir reglas)."
 echo "  3. Comprueba la instalación: docs/prompts/kit/verificar.sh"
 echo "  4. Abre Claude Code en la raíz del proyecto y escribe / para ver los comandos."
 echo

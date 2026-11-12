@@ -1,9 +1,9 @@
-# 06 · Refactorizar sin cambiar el comportamiento
+# 05 · Refactorizar sin cambiar el comportamiento
 
 | | |
 |---|---|
-| **Comando** | `/06-refactorizar <paquete, clase, módulo u objetivo de la refactorización>` |
-| **Archivo** | `docs/prompts/06-refactorizar.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Comando** | `/05-refactorizar <paquete, clase, módulo u objetivo de la refactorización>` |
+| **Archivo** | `docs/prompts/05-refactorizar.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
 | **Origen** | Mejora del prompt del curso [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
@@ -51,7 +51,7 @@ Crea o retoma `docs/sessions/AAAA-MM-DD-06-refactorizar-<tema>.md` (`docs/sessio
 1. `DP.build` en verde y el número de pruebas antes y después.
 2. Comprueba de nuevo la regla de dependencia en los archivos tocados.
 3. Actualiza `architecture.md` y el glosario si cambió la estructura, y registra el ADR si la decisión es arquitectónica.
-4. Rama `refactor/<tema>`, commit en español, PR; recomienda `/10-revisar-dominio` (o la revisión de la capa tocada).
+4. Rama `refactor/<tema>`, commit en español, PR; recomienda `/06-revisar dominio` (o la revisión de la capa tocada).
 
 ## Informe final
 Estructura final (árbol), archivos creados, movidos (origen → destino), modificados y eliminados; pruebas (ejecutadas, exitosas, fallidas, con error, omitidas); documentos actualizados; pendientes (si no hay: "Sin problemas pendientes"). **No afirmes que funciona si no se compiló y probó.**

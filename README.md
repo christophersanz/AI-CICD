@@ -17,7 +17,7 @@ API REST para la gestión de contratos laborales. Java 21, Spring Boot 3, Clean 
 | [docs/guides/ci-cd.md](docs/guides/ci-cd.md) | Guía de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones, imágenes en GHCR y Docker Hub, ejecución y Jenkins local |
 | [docs/design/003-security-local-testing.md](docs/design/003-security-local-testing.md) | Probar la API en local con PowerShell y Postman |
 | [postman/](postman/) | Colección Postman (login y endpoints, con aserciones de códigos HTTP) y entorno local |
-| [docs/prompts/](docs/prompts/README.md) | Prompts numerados por orden de uso (`NN-nombre.md`, un archivo por prompt): desarrollo `00`–`06`, ciclo de revisión `09`–`18`, calidad, operación y prompts `20`–`22`; cada uno con su comando de Claude Code en `.claude/commands/`. Son genéricos y forman un kit reutilizable (`docs/prompts/kit/`) |
+| [docs/prompts/](docs/prompts/README.md) | 9 prompts numerados por orden de uso (`NN-nombre.md`, un archivo por prompt): definir, implementar, probar, documentar, refactorizar, revisar (por capa, PR o final), corregir, cambiar el pipeline y mejorar prompts; cada uno con su comando de Claude Code en `.claude/commands/`. Son genéricos y forman un kit reutilizable (`docs/prompts/kit/`) |
 | [docs/sessions/](docs/sessions/README.md) | Archivos de sesión: progreso de cada comando para retomarlo sin perder contexto |
 | [docs/ai-log.md](docs/ai-log.md) | Bitácora de IA: tareas, lo aceptado, lo corregido, tiempos y métricas |
 

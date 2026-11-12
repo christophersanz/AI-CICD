@@ -19,7 +19,7 @@ Actúa como desarrollador senior de Java 21 y Spring Boot 3 experto en Clean Arc
 ## Validación del argumento
 - Vacío: muestra los casos de uso de `business-rules.md` §6 indicando cuáles ya tienen código y pide que vuelva a ejecutar el comando con uno.
 - No coincide con un caso de uso documentado: sugiere el más parecido y espera confirmación.
-- Si el caso de uso depende de preguntas abiertas (§9) que bloquean su comportamiento, recomienda primero `/01-reglas-negocio <tema>` y detente.
+- Si el caso de uso depende de preguntas abiertas (§9) que bloquean su comportamiento, recomienda primero `/01-definir reglas <tema>` y detente.
 
 ## Objetivo
 El caso de uso responde por su endpoint con los códigos de `architecture.md` §6, cada regla y error de su ficha tiene al menos una prueba, `DP.build` pasa y el Quality Gate (`DP.sonarqube`) sigue en verde.
@@ -36,7 +36,7 @@ El caso de uso responde por su endpoint con los códigos de `architecture.md` §
 - Crea o retoma `docs/sessions/AAAA-MM-DD-02-implementar-caso-uso-{ARGUMENTO}.md` (docs/sessions/README.md).
 - **Un paso a la vez.** Al terminar cada paso: archivos creados o modificados (ruta completa), resumen de 3–5 líneas con las decisiones, si compila y si pasan las pruebas del paso; actualiza el archivo de sesión y **espera mi "continuar"**.
 - Si detectas un problema en un paso anterior, dilo antes de seguir; no lo corrijas en silencio.
-- **Autovalidación por capa:** al terminar los pasos 1 (dominio), 3 (caso de uso), 4 (persistencia) y 5 (API), repasa sin modificar nada las comprobaciones del comando de revisión de esa capa (`docs/prompts/10-revisar-dominio.md`, `11-revisar-aplicacion.md`, `12-revisar-infraestructura.md`, `13-revisar-api.md`) solo sobre los archivos del paso, y reporta los ERROR y WARNING antes de pedir "continuar".
+- **Autovalidación por capa:** al terminar los pasos 1 (dominio), 3 (caso de uso), 4 (persistencia) y 5 (API), repasa sin modificar nada las comprobaciones del comando de revisión de esa capa (secciones `dominio`, `aplicacion`, `infraestructura` y `api` de `docs/prompts/06-revisar.md`) solo sobre los archivos del paso, y reporta los ERROR y WARNING antes de pedir "continuar".
 - Si una prueba falla, investiga la causa raíz antes de cambiar código; corrige solo problemas verificados y no reescribas código no relacionado.
 
 ### Paso 0 — Ficha y análisis de impacto (sin código)
@@ -70,9 +70,9 @@ Aplica los criterios de `/03-pruebas` (o ejecútalo después con `{ARGUMENTO}`):
 1. `DP.build` en verde.
 2. Documentación del mismo cambio: `business-rules.md` (tabla de casos de uso, reglas o errores aclarados), `technical.md` (endpoints, permisos, migraciones), el contrato OpenAPI regenerado (`DP.openapi`) y la colección de `DP.postman` si hay endpoint nuevo.
 3. Commit en español en imperativo, push y PR con la plantilla (`.github/pull_request_template.md`) completa.
-4. Tras el merge, el CI local (`DP.ci-local`) construye la rama principal; si el Quality Gate falla, `/20-corregir-sonar`.
+4. Tras el merge, el CI local (`DP.ci-local`) construye la rama principal; si el Quality Gate falla, `/07-corregir sonar`.
 
 ## Informe final
-Archivos creados, modificados, movidos y eliminados; pruebas (ejecutadas, exitosas, fallidas, con error, omitidas); endpoint y permiso, reglas cubiertas con sus pruebas, cobertura medida, documentos actualizados, PR abierto y TODOs pendientes referenciados a su regla o pregunta abierta (si no hay: "Sin problemas pendientes"). Siguiente paso recomendado: `/05-revisar-pr <número>`.
+Archivos creados, modificados, movidos y eliminados; pruebas (ejecutadas, exitosas, fallidas, con error, omitidas); endpoint y permiso, reglas cubiertas con sus pruebas, cobertura medida, documentos actualizados, PR abierto y TODOs pendientes referenciados a su regla o pregunta abierta (si no hay: "Sin problemas pendientes"). Siguiente paso recomendado: `/06-revisar pr <número>`.
 
 **No afirmes que funciona si no se compiló y probó.**
