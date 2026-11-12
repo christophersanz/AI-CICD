@@ -1,24 +1,24 @@
-# 18 · Ciclo de revisión 9/9 — Revisión final (v01)
+# 18 · Ciclo de revisión 9/9 — Revisión final
 
 | | |
 |---|---|
 | **Comando** | `/18-revision-final [NNN de la ronda; vacío = la última ronda con informe 17]` |
-| **Archivo** | `docs/prompts/18-revision-final-01.md` |
-| **Versión anterior** | — |
+| **Archivo** | `docs/prompts/18-revision-final.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3) |
 
-> `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+> `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
 ## Rol
 Actúa como Arquitecto de Software Senior responsable de aprobar la entrega. Tu decisión se basa en evidencia verificada hoy, no en lo que dicen los informes anteriores.
 
 ## Reglas comunes
-Aplica `docs/prompts/09-reglas-revision-01.md`: orden del ciclo, fuentes de verdad, severidades, reglas y formato del informe. Esta revisión no modifica código.
+Aplica `docs/prompts/09-reglas-revision.md`: orden del ciclo, fuentes de verdad, severidades, reglas y formato del informe. Esta revisión no modifica código.
 
 ## Alcance
 El estado **actual** del repositorio tras `/17-corregir-hallazgos`. Ronda: `{ARGUMENTO}` (vacía = la última ronda que tenga informe `17`). Lee todos los informes `NNN-1*` de la ronda.
 
 ## Comprobaciones
-1. **Build y pruebas:** `./mvnw clean verify`, con pruebas por módulo (ejecutadas, exitosas, fallidas, con error, omitidas) y cobertura. Si el build o las pruebas fallan, el estado es NOT READY.
+1. **Build y pruebas:** `DP.build`, con pruebas por módulo (ejecutadas, exitosas, fallidas, con error, omitidas) y cobertura. Si el build o las pruebas fallan, el estado es NOT READY.
 2. **Correcciones reportadas:** no asumas que un hallazgo marcado como corregido en el informe `17` lo está. Verifícalo contra el código y las pruebas actuales:
 
    | Hallazgo (informe de origen) | Corrección reportada | Verificación actual | PASS / FAIL |
@@ -27,7 +27,7 @@ El estado **actual** del repositorio tras `/17-corregir-hallazgos`. Ronda: `{ARG
 3. **Revisión por capa** resumida (comprobaciones de `10` a `15`) para detectar regresiones introducidas por las correcciones.
 4. **Regla de dependencia** con las dependencias reales (imports y `pom.xml`).
 5. **Trazabilidad completa** de `business-rules.md` §4: `Regla | Implementación | Prueba | PASS / FAIL / NOT COVERED`.
-6. **Quality Gate** de SonarQube del Jenkins local, si está disponible (`docker/jenkins/README.md`).
+6. **Quality Gate** (`DP.sonarqube`), si está disponible.
 7. **Diferidos deliberadamente:** los hallazgos que el informe `17` marcó como diferidos y los pendientes de §9. No se reportan como defectos, salvo que contradigan una regla obligatoria; en ese caso, con la evidencia exacta.
 
 ## Entrega

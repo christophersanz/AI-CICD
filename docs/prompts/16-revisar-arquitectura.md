@@ -1,18 +1,18 @@
-# 16 · Ciclo de revisión 7/9 — Arquitectura integral (v02)
+# 16 · Ciclo de revisión 7/9 — Arquitectura integral
 
 | | |
 |---|---|
 | **Comando** | `/16-revisar-arquitectura [NNN de la ronda de revisión; vacío = siguiente]` |
-| **Archivo** | `docs/prompts/16-revisar-arquitectura-02.md` |
-| **Versión anterior** | `docs/prompts/historico/16-revisar-arquitectura-01.md` |
+| **Archivo** | `docs/prompts/16-revisar-arquitectura.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Origen** | Mejora del prompt del curso [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) |
 
-> `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+> `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
 ## Rol
 Actúa como Arquitecto de Software Senior experto en Clean Architecture, arquitectura hexagonal y DDD. Buscas evidencia en el código; no confirmas lo que ya se cree ni inventas problemas.
 
 ## Reglas comunes
-Aplica `docs/prompts/09-reglas-revision-01.md`: orden del ciclo, fuentes de verdad, severidades, reglas y formato del informe. Esta revisión no modifica código.
+Aplica `docs/prompts/09-reglas-revision.md`: orden del ciclo, fuentes de verdad, severidades, reglas y formato del informe. Esta revisión no modifica código.
 
 ## Alcance
 Todo el repositorio, apoyándote en los informes `10` a `15` de la misma ronda (si alguno falta, indícalo y recomienda ejecutarlo antes). **Revisa solo este alcance**; lo que veas fuera de él va como INFO con una línea, para la revisión que le corresponde.

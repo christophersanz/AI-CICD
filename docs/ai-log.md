@@ -4,7 +4,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 
 - **Asistente principal:** Claude Code (con `CLAUDE.md`, `docs/architecture.md` y `docs/business-rules.md` como contexto).
 - **Flujo:** Explore → Plan → Code → Commit. Cada cambio se acepta solo con `./mvnw clean verify` en verde.
-- **Prompts versionados:** `docs/prompts/NN-nombre-VV.md` (orden y versión; índice en `docs/prompts/README.md`), cada uno con su comando de Claude Code en `.claude/commands/`. Los prompts `001`–`006` del curso están en `docs/prompts/historico/`. El progreso de cada prompt queda en `docs/sessions/`.
+- **Prompts versionados en git:** `docs/prompts/NN-nombre.md` (un archivo por prompt; índice en `docs/prompts/README.md`), cada uno con su comando de Claude Code en `.claude/commands/`. Los prompts `001`–`006` que se usaron en el curso se consultan en el commit [`33f74fc`](https://github.com/christophersanz/AI-CICD/tree/33f74fc/docs/prompts). El progreso de cada prompt queda en `docs/sessions/`.
 - **Regla:** nunca se pegan secretos ni datos reales; las credenciales de los ejemplos son de prueba.
 
 > Los campos `[__]` son tiempos que solo el autor puede medir: complétalos con tus valores reales. El resto de los datos sale del repositorio (revisiones, diseño, historial y builds).
@@ -14,12 +14,12 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | # | Fecha | Tarea | Prompt | Con IA | Sin IA (est.) | Errores de la IA corregidos |
 |---|---|---|---|---|---|---|
 | 1 | [__] | Diseño de arquitectura y modelo de dominio | `docs/prompts/README.md` (antes `README.md`) §1, primera versión | [__ h] | [__ h] | [__] |
-| 2 | 2026-09-26 | Revisión integral del repositorio | `historico/16-revisar-arquitectura-01.md` | [__ h] | [__ h] | 3 |
-| 3 | 2026-10-03 | Refactor del dominio por agregado | `historico/06-refactorizar-01.md` | [__ h] | [__ h] | [__] |
-| 4 | 2026-10-03 | Diseño de la seguridad (3A) | `historico/07-implementar-seguridad-01.md` | [__ h] | [__ h] | [__] |
-| 5 | [__] | Casos de uso de empleados | `historico/02-implementar-caso-uso-01.md` | [__ h] | [__ h] | [__] |
-| 6 | 2026-10-16 | Seguridad fase 1: tokens, login, `AuthController` | `historico/07-implementar-seguridad-02.md` | [__ h] | [__ h] | 3 |
-| 7 | 2026-10-24 | CI/CD, Docker y SonarCloud | `historico/21-cambiar-pipeline-01.md` | [__ h] | [__ h] | 3 |
+| 2 | 2026-09-26 | Revisión integral del repositorio | [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | [__ h] | [__ h] | 3 |
+| 3 | 2026-10-03 | Refactor del dominio por agregado | [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) | [__ h] | [__ h] | [__] |
+| 4 | 2026-10-03 | Diseño de la seguridad (3A) | [`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md) | [__ h] | [__ h] | [__] |
+| 5 | [__] | Casos de uso de empleados | [`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md) | [__ h] | [__ h] | [__] |
+| 6 | 2026-10-16 | Seguridad fase 1: tokens, login, `AuthController` | [`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md) | [__ h] | [__ h] | 3 |
+| 7 | 2026-10-24 | CI/CD, Docker y SonarCloud | [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) | [__ h] | [__ h] | 3 |
 | 8 | 2026-10-24 | Autorización con `@PreAuthorize` y colección Postman | sesión Claude Code | [__ h] | [__ h] | 3 |
 | 9 | 2026-10-24 | Presentación final | sesión Claude Code | [__ h] | [__ h] | 2 |
 | 10 | 2026-11-11 | GitHub Flow, despliegue con aprobación y Render (PR #1, #2) | sesión Claude Code | [__ h] | [__ h] | 1 |
@@ -36,7 +36,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Corregido:** [__]
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
-### #2 — Revisión integral (`historico/16-revisar-arquitectura-01.md`)
+### #2 — Revisión integral ([`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md))
 
 - **Resultado:** `docs/reviews/001-16-arquitectura.md`. 20 hallazgos: 1 alto, 6 medios, 13 bajos. Build en verde (dominio 94,2 % de líneas).
 - **Aceptado:** trazabilidad de reglas de negocio contra el código y las pruebas, plan de acción priorizado.
@@ -46,25 +46,25 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - Hallazgo alto H-01: Hibernate registra el DNI al violar la clave única. **Pendiente** de corregir.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
-### #3 — Refactor del dominio (`historico/06-refactorizar-01.md`)
+### #3 — Refactor del dominio ([`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md))
 
 - **Aceptado:** paquetes por agregado con `common` y `shared` (ADR-0004), `Guard` y excepciones de dominio en lugar de `NullPointerException`, `Clock` como parámetro en vez de `now()`.
 - **Corregido:** [__]
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
-### #4 — Diseño de la seguridad (`historico/07-implementar-seguridad-01.md`)
+### #4 — Diseño de la seguridad ([`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md))
 
 - **Aceptado:** `docs/design/003-security-design.md` y ADR-0005: JWT RS256 propio, refresh token opaco con rotación y detección de reutilización, RBAC por permisos, implementación por fases.
 - **Corregido:** [__]
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
-### #5 — Casos de uso de empleados (`historico/02-implementar-caso-uso-01.md`)
+### #5 — Casos de uso de empleados ([`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md))
 
 - **Aceptado:** `RegisterEmployee`, `UpdateEmployee`, `GetEmployee` y `ListEmployees` siguiendo el orden dominio → puerto → caso de uso → adaptador → controller → pruebas.
 - **Corregido:** [__]
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
-### #6 — Seguridad fase 1 (`historico/07-implementar-seguridad-02.md`)
+### #6 — Seguridad fase 1 ([`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md))
 
 - **Aceptado:** `TokenIssuerAdapter`, login, refresh, logout, `/auth/me`, creación del administrador inicial.
 - **Corregido** (desviaciones D6 y D9 del diseño 003):
@@ -73,7 +73,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - La creación de usuarios quedaba abierta a cualquier autenticado: regla de URL temporal con `user:manage`.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
-### #7 — CI/CD (`historico/21-cambiar-pipeline-01.md`)
+### #7 — CI/CD ([`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md))
 
 - **Aceptado:** workflow de GitHub Actions, SonarCloud (ADR-0011), imagen en GHCR, API en `docker compose`, `.env.example`, Jenkins local.
 - **Corregido:**
@@ -122,12 +122,14 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 
 ### #12 — Prompts v2
 
-- **Origen:** los prompts 001–005 eran copia de los del docente y estaban desfasados (ArchUnit, "seguridad no implementada", flujo de una sola rama); `historico/21-cambiar-pipeline-01.md` tenía 911 líneas con un parche incrustado. Se combinaron las prácticas del docente (sesiones 01–05), la serie de revisión de los modelos del curso (`use-case-ca-v1/prompts` 01–07), los prompts de F1 y las presentaciones de Juan José, Ángel y Jairo (tabla en `docs/prompts/README.md` §3).
-- **Aceptado:** `docs/prompts/README.md` como índice corto con la estructura común (rol, fuentes de verdad, objetivo verificable, qué no hacer, plan con aprobación, pasos, verificación, informe final, archivo de sesión); 20 prompts en `docs/prompts/` con nombre `NN-nombre-VV.md` (orden y versión) y sin duplicados: desarrollo (`00-refinar-requisitos` a `06-refactorizar`), ciclo de revisión (`09-reglas-revision`, `10-revisar-dominio` a `16-revisar-arquitectura`, `17-corregir-hallazgos` como único que modifica código y `18-revision-final` con `FINAL STATUS: READY`/`NOT READY`) y calidad, operación y prompts (`20-corregir-sonar`, `21-cambiar-pipeline`, `22-crear-o-mejorar-prompt`); comandos de Claude Code de tres líneas que solo cargan el prompt vigente; archivos de sesión en `docs/sessions/`; prompts 001–006 movidos a `docs/prompts/historico/`.
+- **Origen:** los prompts 001–005 eran copia de los del docente y estaban desfasados (ArchUnit, "seguridad no implementada", flujo de una sola rama); [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) tenía 911 líneas con un parche incrustado. Se combinaron las prácticas del docente (sesiones 01–05), la serie de revisión de los modelos del curso (`use-case-ca-v1/prompts` 01–07), los prompts de F1 y las presentaciones de Juan José, Ángel y Jairo (tabla en `docs/prompts/README.md` §3).
+- **Aceptado:** `docs/prompts/README.md` como índice corto con la estructura común (rol, fuentes de verdad, objetivo verificable, qué no hacer, plan con aprobación, pasos, verificación, informe final, archivo de sesión); 20 prompts en `docs/prompts/` genéricos con nombre `NN-nombre.md` (orden de uso, un archivo por prompt, sin duplicados ni versiones paralelas): desarrollo (`00-refinar-requisitos` a `06-refactorizar`), ciclo de revisión (`09-reglas-revision`, `10-revisar-dominio` a `16-revisar-arquitectura`, `17-corregir-hallazgos` como único que modifica código y `18-revision-final` con `FINAL STATUS: READY`/`NOT READY`) y calidad, operación y prompts (`20-corregir-sonar`, `21-cambiar-pipeline`, `22-crear-o-mejorar-prompt`); comandos de Claude Code de tres líneas que solo cargan el prompt vigente; archivos de sesión en `docs/sessions/`; datos propios del proyecto en `CLAUDE.md` §5 (*Datos para los prompts*) y kit para otros proyectos en `docs/prompts/kit/` (plantillas e `instalar.sh`); los prompts 001–006 del curso quedan en el historial de git.
 - **Corregido:**
   - La primera versión no revisó los prompts de los modelos del curso ni los de F1; se detectó al pedirle a la IA que verificara sus fuentes y se incorporaron (revisión por capa, corrección separada, revisión final con veredicto).
   - Un reemplazo masivo de nombres de comandos cambió también la ruta `docs/business-rules.md` en todos los comandos; se detectó al revisar el resultado y se revirtió.
-  - La segunda versión guardaba el contenido en `.claude/commands/` (carpeta oculta en el IDE) y no tenía versión en el nombre; el contenido pasó a `docs/prompts/NN-nombre-VV.md` y los comandos quedaron como lanzadores.
+  - La segunda versión guardaba el contenido en `.claude/commands/` (carpeta oculta en el IDE); el contenido pasó a `docs/prompts/` y los comandos quedaron como lanzadores.
+  - Se probó un esquema con versiones en el nombre (`-01`, `-02`) y carpeta `historico/`; se descartó a pedido del autor por duplicar archivos: un solo archivo por prompt y la historia en git.
+  - Los prompts tenían datos de `contract-api` escritos dentro (paquete, agregados, reglas, ADR, Jenkins, Render, puertos); se movieron a `CLAUDE.md` §5 como claves `DP.*` para reutilizarlos en otros proyectos.
   - Se revisaron los 60 archivos de prompts de CURS-000617 (18 distintos) y las transcripciones de las sesiones 01–05; se incorporó el prompt DevOps de `CURS-000617-CICD-v2`, que no se había leído.
   - El endpoint de *hotspots* de SonarQube usa `project`, no `projectKey`; se comprobó contra el SonarQube local.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]

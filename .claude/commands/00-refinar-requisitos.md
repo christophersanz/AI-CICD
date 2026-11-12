@@ -3,8 +3,8 @@ description: Desarrollo 0: refina un requerimiento o funcionalidad nueva, lo div
 argument-hint: <descripción del requerimiento, historia de usuario o ruta a las notas>
 ---
 
-@docs/prompts/00-refinar-requisitos-01.md
+@docs/prompts/00-refinar-requisitos.md
 
-Lee y ejecuta las instrucciones de `docs/prompts/00-refinar-requisitos-01.md`.
+Lee y ejecuta las instrucciones de `docs/prompts/00-refinar-requisitos.md`.
 
 ARGUMENTO = $ARGUMENTS

@@ -3,9 +3,9 @@ description: Ciclo de revisión 3/9: revisa persistencia, seguridad y configurac
 argument-hint: [NNN de la ronda de revisión; vacío = siguiente]
 ---
 
-@docs/prompts/09-reglas-revision-01.md
-@docs/prompts/12-revisar-infraestructura-01.md
+@docs/prompts/09-reglas-revision.md
+@docs/prompts/12-revisar-infraestructura.md
 
-Lee y ejecuta las instrucciones de `docs/prompts/12-revisar-infraestructura-01.md` con las reglas comunes de `docs/prompts/09-reglas-revision-01.md`.
+Lee y ejecuta las instrucciones de `docs/prompts/12-revisar-infraestructura.md` con las reglas comunes de `docs/prompts/09-reglas-revision.md`.
 
 ARGUMENTO = $ARGUMENTS

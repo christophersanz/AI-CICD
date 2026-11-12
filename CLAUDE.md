@@ -12,7 +12,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | docs/api/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
 | docs/guides/arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
 | docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
-| @docs/prompts/README.md | Índice de los prompts `docs/prompts/NN-nombre-VV.md` (orden y versión), sus comandos de Claude Code, la estructura común y las fuentes | Al iniciar una tarea recurrente (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión, pipeline) |
+| @docs/prompts/README.md | Índice de los prompts `docs/prompts/NN-nombre.md` (por orden de uso), sus comandos de Claude Code, la estructura común, las fuentes y el kit reutilizable | Al iniciar una tarea recurrente (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión, pipeline) |
 
 ## 1. Descripción del proyecto
 
@@ -59,7 +59,7 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 ## 4. Cómo debe trabajar Claude en este repo
 
-- Para tareas recurrentes usa los prompts de `docs/prompts/` (`NN-nombre-VV.md`: `NN` = orden, `VV` = versión) mediante su comando `/NN-nombre` de `.claude/commands/`, que solo carga el prompt vigente. Orden: `00`–`06` desarrollo (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión de PR, refactorización), `10`–`18` ciclo de revisión (por capa → arquitectura → corrección → revisión final `READY`/`NOT READY`) y `20`–`22` calidad, operación y prompts; índice en `docs/prompts/README.md`. Todos presentan un plan y esperan aprobación antes de cambiar código, y guardan su progreso en `docs/sessions/`. Las revisiones no modifican código: solo `/17-corregir-hallazgos` corrige. Un prompt se mejora creando su siguiente versión (`/22-crear-o-mejorar-prompt`); la anterior pasa a `docs/prompts/historico/`.
+- Para tareas recurrentes usa los prompts de `docs/prompts/` (`NN-nombre.md`, `NN` = orden de uso; un solo archivo por prompt) mediante su comando `/NN-nombre` de `.claude/commands/`, que solo carga ese archivo. Los datos propios del proyecto que usan los prompts están en la sección 5. Orden: `00`–`06` desarrollo (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión de PR, refactorización), `10`–`18` ciclo de revisión (por capa → arquitectura → corrección → revisión final `READY`/`NOT READY`) y `20`–`22` calidad, operación y prompts; índice en `docs/prompts/README.md`. Todos presentan un plan y esperan aprobación antes de cambiar código, y guardan su progreso en `docs/sessions/`. Las revisiones no modifican código: solo `/17-corregir-hallazgos` corrige. Un prompt se mejora editando su único archivo (`/22-crear-o-mejorar-prompt`); su historia queda en git.
 - Antes de crear código, identifica **en qué capa** va y respeta la regla de dependencia (`docs/architecture.md`, sección 3).
 - Antes de tocar lógica de negocio, verifica las invariantes y reglas en `docs/business-rules.md`. **No inventes reglas de negocio:** si falta una, pregunta.
 - Para una funcionalidad nueva, sigue este orden: **dominio → puerto de entrada → caso de uso → puerto de salida → adaptador → controller → pruebas**.
@@ -71,3 +71,33 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 - No añadas dependencias nuevas al `pom.xml` sin indicarlo y justificarlo.
 - Ejecuta `./mvnw clean verify` antes de dar una tarea por terminada: es lo mismo que ejecuta el CI, incluido el umbral de cobertura.
 - Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009/ADR-0012/ADR-0013/ADR-0014/ADR-0015 o registra uno nuevo.
+
+## 5. Datos para los prompts (DP)
+
+Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/kit/`). Cuando un prompt dice `DP.<clave>`, el valor sale de esta tabla. En otro proyecto solo cambia esta sección.
+
+| Clave | Valor en este proyecto |
+|---|---|
+| `nombre` | `contract-api` |
+| `dominio-negocio` | Gestión de contratos laborales de una organización en Perú (RR.HH.) |
+| `normativa` | Reglas con base en la normativa laboral peruana: se marcan con ⚖️ y se validan con RR.HH./asesoría legal; no citar artículos de ley sin verificarlos |
+| `paquete-base` | `pe.edu.galaxy.training.ia.ca` |
+| `modulos` | `domain`, `application`, `infrastructure` (la API REST está en `infrastructure/api`) |
+| `build` | `./mvnw clean verify` (compila, ejecuta todas las pruebas y verifica la cobertura; requiere Docker para Testcontainers) |
+| `base-datos` | PostgreSQL 16 |
+| `migraciones` | Flyway en `infrastructure/src/main/resources/db/migration` |
+| `pruebas-integracion` | Testcontainers con PostgreSQL real (nunca H2) |
+| `cobertura-minima` | 80 % de líneas en `domain` y `application` (JaCoCo; el build falla por debajo) |
+| `rama-principal` | `master` |
+| `flujo-git` | GitHub Flow: rama corta + PR, ruleset `master-protegida` con checks requeridos, solo *squash* y rama al día (ADR-0012) |
+| `seguridad` | JWT RS256 propio + refresh token opaco de un solo uso; permisos con `@PreAuthorize` según `business-rules.md` §4.1; diseño en `docs/design/003-security-design.md` (ADR-0005) |
+| `adr-arquitectura` | ADR-0003 (sin ArchUnit) y ADR-0004 (paquetes del dominio por agregado) |
+| `adr-cicd` | ADR-0009 a ADR-0015 |
+| `ci` | GitHub Actions: `.github/workflows/ci-cd.yml`, scripts en `.github/scripts/` (prueba de humo compartida `smoke-test.sh`), ruleset versionado en `.github/ruleset/` |
+| `imagen` | `Dockerfile` multi-stage (JRE 21, usuario sin privilegios, perfil `prod`), publicada en GHCR y Docker Hub con etiquetas `latest`, `sha-<corto>` y versión |
+| `despliegue` | Verificación efímera de la imagen y despliegue en Render (`render.yaml`) tras la aprobación del environment `production` (ADR-0013); despliegue local de Jenkins en <http://localhost:8090> (ADR-0014) |
+| `ci-local` | Jenkins en <http://localhost:8080>: `Jenkinsfile` y `docker/jenkins/` (compose, `casc.yaml`, `scripts/`, `.env` no versionado con `REPO_BRANCH`) |
+| `sonarqube` | SonarQube local en <http://localhost:9000>, proyecto y Quality Gate `contract-api`; credenciales `SONAR_ADMIN_PASSWORD` en `docker/jenkins/.env`; condiciones en `docker/jenkins/scripts/sonar-analysis.sh` (ADR-0015) |
+| `openapi` | `docs/api/openapi.yaml` y `.json`, generados con springdoc; cómo regenerarlos en `docs/api/README.md` |
+| `postman` | Colección en `postman/` |
+| `guias` | `docs/guides/arquitectura.md` (diagramas) y `docs/guides/ci-cd.md` (pipeline y *Problemas frecuentes*) |

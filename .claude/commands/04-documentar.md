@@ -3,8 +3,8 @@ description: Desarrollo 4: genera o actualiza la documentación técnica (JavaDo
 argument-hint: <javadoc | openapi | diagramas | adr | guias | todo> [módulo o tema]
 ---
 
-@docs/prompts/04-documentar-01.md
+@docs/prompts/04-documentar.md
 
-Lee y ejecuta las instrucciones de `docs/prompts/04-documentar-01.md`.
+Lee y ejecuta las instrucciones de `docs/prompts/04-documentar.md`.
 
 ARGUMENTO = $ARGUMENTS

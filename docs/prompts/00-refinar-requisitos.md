@@ -1,15 +1,15 @@
-# 00 · Refinar requisitos en MVPs e historias (v01)
+# 00 · Refinar requisitos en MVPs e historias
 
 | | |
 |---|---|
 | **Comando** | `/00-refinar-requisitos <descripción del requerimiento, historia de usuario o ruta a las notas>` |
-| **Archivo** | `docs/prompts/00-refinar-requisitos-01.md` |
-| **Versión anterior** | — |
+| **Archivo** | `docs/prompts/00-refinar-requisitos.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3) |
 
-> `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+> `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
 ## Rol
-Actúa como analista funcional y product owner técnico con experiencia en sistemas de RR.HH. y contratos laborales. Conviertes una idea en un alcance pequeño, priorizado y verificable, sin inventar reglas de negocio.
+Actúa como analista funcional y product owner técnico con experiencia en el negocio del proyecto (`DP.dominio-negocio`). Conviertes una idea en un alcance pequeño, priorizado y verificable, sin inventar reglas de negocio.
 
 ## Contexto y fuentes de verdad
 - Lee: `docs/business-rules.md` (alcance del bounded context, **fuera de alcance**, casos de uso de §6 y preguntas abiertas de §9) y `CLAUDE.md`.
@@ -21,7 +21,7 @@ Un backlog priorizado del requerimiento, dividido en MVPs, donde cada historia t
 ## Restricciones
 - **No escribas código ni modifiques `business-rules.md`** en este comando: el resultado es el documento de requisitos.
 - No inventes reglas: lo ambiguo va como pregunta, no como supuesto.
-- Respeta el bounded context: lo que es de otro sistema (planillas, CTS, firma digital certificada, entidades del Estado) se marca como fuera de alcance o como integración futura.
+- Respeta el bounded context: lo que `business-rules.md` §1 declara fuera de alcance o es de otro sistema se marca como fuera de alcance o como integración futura.
 - Separa lo que es backend de esta API de lo que es frontend, otro servicio o proceso manual.
 - Evita la sobreingeniería: el MVP 1 debe poder implementarse con los módulos actuales.
 
@@ -30,7 +30,7 @@ Crea o retoma `docs/sessions/AAAA-MM-DD-00-refinar-requisitos-<tema>.md` (docs/s
 
 ### Paso 1 — Entendimiento (sin escribir el documento)
 1. Resume el requerimiento en 3–5 líneas: actores, objetivo de negocio y resultado esperado.
-2. Clasifica cada parte: dentro del alcance de `contract-api`, fuera de alcance, otra aplicación (frontend, integración).
+2. Clasifica cada parte: dentro del alcance de `DP.nombre`, fuera de alcance, otra aplicación (frontend, integración).
 3. Relación con lo existente: casos de uso de §6 ya implementados, documentados sin implementar o nuevos; reglas `BR-*` y preguntas abiertas afectadas.
 4. Hazme como máximo **7 preguntas** que cambien el alcance o la prioridad, cada una con opciones y tu recomendación.
 **Espera mis respuestas.**

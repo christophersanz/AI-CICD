@@ -1,12 +1,12 @@
-# 09 · Reglas comunes de revisión (v01)
+# 09 · Reglas comunes de revisión
 
 | | |
 |---|---|
 | **Comando** | — (lo incluyen los comandos `/05-revisar-pr`, `/10` a `/16` y `/18-revision-final`) |
-| **Archivo** | `docs/prompts/09-reglas-revision-01.md` |
-| **Versión anterior** | — |
+| **Archivo** | `docs/prompts/09-reglas-revision.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3) |
 
-Las aplican todos los prompts de revisión (`05-revisar-pr`, `10` a `16` y `18-revision-final`); sus comandos de Claude Code incluyen este archivo. Cambiarlas aquí cambia todas las revisiones.
+`DP.<clave>` es un dato del proyecto (`CLAUDE.md` → *Datos para los prompts*). Las aplican todos los prompts de revisión (`05-revisar-pr`, `10` a `16` y `18-revision-final`); sus comandos de Claude Code incluyen este archivo. Cambiarlas aquí cambia todas las revisiones.
 
 > **Una revisión no modifica código, pruebas, configuración ni documentación.** El único archivo que crea es su informe. Las correcciones se hacen con `/17-corregir-hallazgos`.
 
@@ -19,7 +19,7 @@ Las aplican todos los prompts de revisión (`05-revisar-pr`, `10` a `16` y `18-r
 | 3 | `/12-revisar-infraestructura` | `infrastructure` (persistencia, seguridad, config) | `NNN-12-infraestructura.md` |
 | 4 | `/13-revisar-api` | `infrastructure/api` | `NNN-13-api.md` |
 | 5 | `/14-revisar-seguridad` | Seguridad transversal | `NNN-14-seguridad.md` |
-| 6 | `/15-revisar-cicd` | Pipeline, Docker, Jenkins, despliegues | `NNN-15-cicd.md` |
+| 6 | `/15-revisar-cicd` | Pipeline, imagen, CI local y despliegues | `NNN-15-cicd.md` |
 | 7 | `/16-revisar-arquitectura` | Integral, con los informes 10–15 | `NNN-16-arquitectura.md` |
 | 8 | `/17-corregir-hallazgos` | Corrige los ERROR y WARNING confirmados (único que modifica código) | `NNN-17-correcciones.md` |
 | 9 | `/18-revision-final` | Verifica las correcciones y decide `READY` / `NOT READY` | `NNN-18-final.md` |
@@ -51,12 +51,12 @@ Se usan solo estas, **sin inflarlas**:
 
 - Solo hallazgos con evidencia verificable (`archivo:línea`, clase o método). **No inventar problemas si el código cumple.** Antes de reportar un ERROR, volver a verificar la evidencia.
 - Respetar la capa de cada regla: **no marcar como error de `domain` una regla que `business-rules.md` asigna a `application`**, ni al revés.
-- No son hallazgos: lo que un ADR descartó (por ejemplo, ArchUnit, ADR-0003); lo pendiente por una pregunta abierta de §9 que el código resuelve de forma neutral con su TODO; los diferidos deliberadamente en un informe `17` anterior; una preferencia de estilo sin regla que la respalde. Si alguno contradice una regla obligatoria, sí se reporta con la evidencia exacta.
+- No son hallazgos: lo que un ADR descartó (por ejemplo, los de `DP.adr-arquitectura`); lo pendiente por una pregunta abierta de §9 que el código resuelve de forma neutral con su TODO; los diferidos deliberadamente en un informe `17` anterior; una preferencia de estilo sin regla que la respalde. Si alguno contradice una regla obligatoria, sí se reporta con la evidencia exacta.
 - Lo que no se pueda evaluar va como **No evaluado**, con el motivo.
 
 ## Antes de revisar
 
-Ejecutar `./mvnw clean verify` y anotar compilación y pruebas (ejecutadas, fallidas, con error y omitidas, por módulo) y la cobertura. Si el Jenkins local está activo, anotar el último Quality Gate de SonarQube (`docker/jenkins/README.md`).
+Ejecutar `DP.build` y anotar compilación y pruebas (ejecutadas, fallidas, con error y omitidas, por módulo) y la cobertura. Si el CI local (`DP.ci-local`) está activo, anotar el último Quality Gate (`DP.sonarqube`).
 
 ## Formato del informe
 

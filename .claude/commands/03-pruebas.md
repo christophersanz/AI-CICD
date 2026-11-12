@@ -3,8 +3,8 @@ description: Desarrollo 3: completa y mejora las pruebas de una clase o caso de 
 argument-hint: <Clase | NombreUseCase | módulo>
 ---
 
-@docs/prompts/03-pruebas-01.md
+@docs/prompts/03-pruebas.md
 
-Lee y ejecuta las instrucciones de `docs/prompts/03-pruebas-01.md`.
+Lee y ejecuta las instrucciones de `docs/prompts/03-pruebas.md`.
 
 ARGUMENTO = $ARGUMENTS

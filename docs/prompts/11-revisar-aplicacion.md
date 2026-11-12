@@ -1,21 +1,21 @@
-# 11 · Ciclo de revisión 2/9 — Aplicación (v01)
+# 11 · Ciclo de revisión 2/9 — Aplicación
 
 | | |
 |---|---|
 | **Comando** | `/11-revisar-aplicacion [NNN de la ronda de revisión; vacío = siguiente]` |
-| **Archivo** | `docs/prompts/11-revisar-aplicacion-01.md` |
-| **Versión anterior** | — |
+| **Archivo** | `docs/prompts/11-revisar-aplicacion.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3) |
 
-> `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+> `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
 ## Rol
 Actúa como arquitecto experto en Clean Architecture y casos de uso. Buscas evidencia en el código; no confirmas lo que ya se cree ni inventas problemas.
 
 ## Reglas comunes
-Aplica `docs/prompts/09-reglas-revision-01.md`: orden del ciclo, fuentes de verdad, severidades, reglas y formato del informe. Esta revisión no modifica código.
+Aplica `docs/prompts/09-reglas-revision.md`: orden del ciclo, fuentes de verdad, severidades, reglas y formato del informe. Esta revisión no modifica código.
 
 ## Alcance
-Paquete `pe.edu.galaxy.training.ia.ca.application` y sus pruebas (`application/src/test`). **Revisa solo este alcance**; lo que veas fuera de él va como INFO con una línea, para la revisión que le corresponde.
+Paquete `<DP.paquete-base>.application` y sus pruebas (módulo `application` de `DP.modulos`). **Revisa solo este alcance**; lo que veas fuera de él va como INFO con una línea, para la revisión que le corresponde.
 Ronda: `{ARGUMENTO}` (vacía = el siguiente NNN libre en `docs/reviews/`, o el de la ronda en curso si ya existe un informe `10`–`16` sin su `18`).
 
 ## Comprobaciones
@@ -24,7 +24,7 @@ Ronda: `{ARGUMENTO}` (vacía = el siguiente NNN libre en `docs/reviews/`, o el d
 3. `Command`/`Query`/`Result` como records inmutables en `dto`, con validación mínima de presencia (no reglas de negocio).
 4. Un servicio por caso de uso (`<Verbo><Entidad>Service`), sin `@Service`, registrado como bean en `infrastructure/config`.
 5. Los servicios orquestan (cargar → delegar al dominio → validar reglas de `application` → persistir) sin absorber reglas que §4 asigna a `domain`.
-6. Reglas que §4 asigna a `application` implementadas: existencia (BR-CTR-001), unicidad (BR-EMP-001, BR-USR-001), superposición (BR-CTR-005), límites acumulados (BR-CTR-008), estado del empleado (BR-EMP-006, 007), alcance de lectura (BR-CTR-012) y las de tokens (BR-USR-004 a 007), según lo implementado.
+6. Reglas que §4 asigna a `application` implementadas (típicamente existencia, unicidad, reglas entre agregados, límites acumulados y autorización por alcance), según lo implementado.
 7. Límites transaccionales: un `@Transactional` por caso de uso, sin llamadas externas dentro de la transacción que no lo requieran.
 8. Excepciones de aplicación (`NotFoundException`, `ConflictException` y subclases) con el código del catálogo.
 9. Pruebas con Mockito que mockean solo puertos de salida: camino feliz, cada regla y cada error.

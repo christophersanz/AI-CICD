@@ -3,8 +3,8 @@ description: Ciclo de revisión 8/9: corrige los hallazgos confirmados de la ron
 argument-hint: <NNN de la ronda | informes docs/reviews/NNN-1x-*.md> [solo: H-01,H-03 | excluir: H-05]
 ---
 
-@docs/prompts/17-corregir-hallazgos-01.md
+@docs/prompts/17-corregir-hallazgos.md
 
-Lee y ejecuta las instrucciones de `docs/prompts/17-corregir-hallazgos-01.md`.
+Lee y ejecuta las instrucciones de `docs/prompts/17-corregir-hallazgos.md`.
 
 ARGUMENTO = $ARGUMENTS

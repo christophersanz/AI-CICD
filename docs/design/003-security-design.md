@@ -2,7 +2,7 @@
 
 - **Estado:** Aprobado; fase 1 completada (2026-10-16, ver §5 "Estado de la fase 1"); fase 2: paso 2.1 completado (2026-10-24)
 - **Fecha:** 2026-10-03
-- **Origen:** `docs/prompts/historico/07-implementar-seguridad-01.md`
+- **Origen:** [`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md)
 - **Decisiones previas:** C1 = se reemplaza ADR-0001 (se incorpora seguridad). C2 = se mantiene ADR-0003 (sin ArchUnit). Implementación por fases.
 
 > Lo marcado con 🟡 depende de una pregunta abierta (§7) y no se implementará hasta tener respuesta;
@@ -317,7 +317,7 @@ Cada paso compila y deja `./mvnw clean verify` en verde.
 
 #### Estado de la fase 1 (2026-10-16)
 
-Pasos 1.0–1.8 ✅ completados (1.6–1.8 en `docs/prompts/historico/07-implementar-seguridad-02.md`). `./mvnw clean verify` en verde y verificación manual: arranque con perfil `local`, login con el administrador inicial y `POST /api/v1/employees` → `201`. Guía de prueba local: `docs/design/003-security-local-testing.md`.
+Pasos 1.0–1.8 ✅ completados (1.6–1.8 en [`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md)). `./mvnw clean verify` en verde y verificación manual: arranque con perfil `local`, login con el administrador inicial y `POST /api/v1/employees` → `201`. Guía de prueba local: `docs/design/003-security-local-testing.md`.
 
 **Desviaciones respecto al diseño**
 

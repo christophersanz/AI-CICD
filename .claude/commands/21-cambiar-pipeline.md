@@ -3,8 +3,8 @@ description: Operación: cambia el CI/CD (GitHub Actions, Jenkins, Docker, despl
 argument-hint: <cambio a realizar en el pipeline o el despliegue>
 ---
 
-@docs/prompts/21-cambiar-pipeline-02.md
+@docs/prompts/21-cambiar-pipeline.md
 
-Lee y ejecuta las instrucciones de `docs/prompts/21-cambiar-pipeline-02.md`.
+Lee y ejecuta las instrucciones de `docs/prompts/21-cambiar-pipeline.md`.
 
 ARGUMENTO = $ARGUMENTS

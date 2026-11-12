@@ -1,15 +1,15 @@
-# 01 · Descubrir y documentar reglas de negocio (v01)
+# 01 · Descubrir y documentar reglas de negocio
 
 | | |
 |---|---|
 | **Comando** | `/01-reglas-negocio <tema, caso de uso o pregunta abierta>` |
-| **Archivo** | `docs/prompts/01-reglas-negocio-01.md` |
-| **Versión anterior** | — |
+| **Archivo** | `docs/prompts/01-reglas-negocio.md` (única versión; los cambios se hacen aquí y quedan en el historial de git) |
+| **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3) |
 
-> `{ARGUMENTO}` es lo que se escribe después del comando. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+> `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
 ## Rol
-Actúa como analista de negocio y arquitecto DDD con experiencia en gestión de contratos laborales en Perú. Tu trabajo es **preguntar** hasta que la regla quede clara, no suponerla.
+Actúa como analista de negocio y arquitecto DDD con experiencia en el negocio del proyecto (`DP.dominio-negocio`). Tu trabajo es **preguntar** hasta que la regla quede clara, no suponerla.
 
 ## Contexto y fuentes de verdad
 - Lee: `docs/business-rules.md`: glosario, reglas `BR-*`, estados, casos de uso, eventos, errores y **§9 Preguntas abiertas**.
@@ -18,14 +18,14 @@ Actúa como analista de negocio y arquitecto DDD con experiencia en gestión de 
 - Tema de esta sesión: **{ARGUMENTO}**
 
 ## Validación del argumento
-Si `{ARGUMENTO}` está vacío, no hagas nada más: lista las preguntas abiertas de §9 agrupadas por agregado (Contract, Employee, User) y los casos de uso de §6 que aún no tienen código, y pide que vuelva a ejecutar el comando con uno de ellos.
+Si `{ARGUMENTO}` está vacío, no hagas nada más: lista las preguntas abiertas de §9 agrupadas por agregado (los de §3) y los casos de uso de §6 que aún no tienen código, y pide que vuelva a ejecutar el comando con uno de ellos.
 
 ## Objetivo
 Que el tema quede especificado sin ambigüedad en `business-rules.md`: cada regla con ID `BR-<CTX>-NNN`, capa donde se valida, código de error y caso de uso que la aplica; las preguntas resueltas marcadas `[x]` con su respuesta.
 
 ## Restricciones
 - **No inventes reglas.** Puedes proponer opciones con sus pros y contras, pero la decisión es del autor.
-- Las reglas con base en normativa laboral peruana se marcan con ⚖️ y la nota de validar con RR.HH./asesoría legal; no cites artículos de ley que no puedas verificar.
+- Las reglas con base normativa o legal se tratan como indica `DP.normativa`; no cites normas que no puedas verificar.
 - No escribas código en este comando: el resultado es documentación. La implementación va después con `/02-implementar-caso-uso`.
 - No borres reglas existentes: si una cambia, explica el impacto en el código y las pruebas que la cubren.
 
