@@ -10,9 +10,13 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | @docs/business-rules.md | Glosario, entidades, invariantes, casos de uso y estados del dominio | Antes de implementar o cambiar lógica de negocio |
 | docs/technical.md | Estado implementado: endpoints, seguridad, variables de entorno, esquema de BD, build y CI/CD | Al cambiar endpoints, configuración, migraciones o el pipeline (actualizarlo en el mismo cambio) |
 | docs/api/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
-| docs/guides/arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
+| docs/guides/diagramas-arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
 | docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
 | @docs/prompts/README.md | Índice de los prompts `docs/prompts/NN-nombre.md` (por orden de uso), sus comandos de Claude Code, la estructura común, las fuentes y el kit reutilizable | Al iniciar una tarea recurrente (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión, pipeline) |
+| docs/design/seguridad.md | Diseño de la seguridad y sus fases | Al tocar autenticación, autorización o tokens |
+| docs/reviews/ | Informes de revisión por ronda (`NNN-<paso>-<modo>.md`) | Antes de corregir (`/07-corregir`) o al hacer la revisión final |
+| docs/sessions/ | Progreso de cada prompt | Al retomar una tarea larga |
+| docs/ai-log.md | Bitácora de IA (tareas, correcciones y métricas) | Al terminar una tarea con IA (anotar la entrada) |
 
 ## 1. Descripción del proyecto
 
@@ -90,7 +94,7 @@ Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/k
 | `cobertura-minima` | 80 % de líneas en `domain` y `application` (JaCoCo; el build falla por debajo) |
 | `rama-principal` | `master` |
 | `flujo-git` | GitHub Flow: rama corta + PR, ruleset `master-protegida` con checks requeridos, solo *squash* y rama al día (ADR-0012) |
-| `seguridad` | JWT RS256 propio + refresh token opaco de un solo uso; permisos con `@PreAuthorize` según `business-rules.md` §4.1; diseño en `docs/design/003-security-design.md` (ADR-0005) |
+| `seguridad` | JWT RS256 propio + refresh token opaco de un solo uso; permisos con `@PreAuthorize` según `business-rules.md` §4.1; diseño en `docs/design/seguridad.md` (ADR-0005) |
 | `adr-arquitectura` | ADR-0003 (sin ArchUnit) y ADR-0004 (paquetes del dominio por agregado) |
 | `adr-cicd` | ADR-0009 a ADR-0015 |
 | `ci` | GitHub Actions: `.github/workflows/ci-cd.yml`, scripts en `.github/scripts/` (prueba de humo compartida `smoke-test.sh`), ruleset versionado en `.github/ruleset/` |
@@ -100,4 +104,4 @@ Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/k
 | `sonarqube` | SonarQube local en <http://localhost:9000>, proyecto y Quality Gate `contract-api`; credenciales `SONAR_ADMIN_PASSWORD` en `docker/jenkins/.env`; condiciones en `docker/jenkins/scripts/sonar-analysis.sh` (ADR-0015) |
 | `openapi` | `docs/api/openapi.yaml` y `.json`, generados con springdoc; cómo regenerarlos en `docs/api/README.md` |
 | `postman` | Colección en `postman/` |
-| `guias` | `docs/guides/arquitectura.md` (diagramas) y `docs/guides/ci-cd.md` (pipeline y *Problemas frecuentes*) |
+| `guias` | `docs/guides/diagramas-arquitectura.md` (diagramas) y `docs/guides/ci-cd.md` (pipeline y *Problemas frecuentes*) |

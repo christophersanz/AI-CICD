@@ -26,6 +26,6 @@ Los prompts de `docs/prompts/` son genéricos. Cuando un prompt dice `DP.<clave>
 | `sonarqube` | Servidor, proyecto, Quality Gate, credenciales y dónde se definen sus condiciones | [SonarQube en http://localhost:9000, proyecto `[mi-servicio]` / SonarCloud / No aplica] |
 | `openapi` | Dónde está el contrato OpenAPI y cómo se regenera | [`docs/api/openapi.yaml`, generado con springdoc] |
 | `postman` | Colección de pruebas de la API | [`postman/` / No aplica] |
-| `guias` | Guías con diagramas y la guía del pipeline | [`docs/guides/arquitectura.md`, `docs/guides/ci-cd.md`] |
+| `guias` | Guías con diagramas y la guía del pipeline | [`docs/guides/diagramas-arquitectura.md`, `docs/guides/ci-cd.md`] |
 
 `docs/prompts/kit/verificar.sh` comprueba que estén todas las claves que usan los prompts.

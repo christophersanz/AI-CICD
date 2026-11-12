@@ -54,7 +54,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 
 ### #4 — Diseño de la seguridad ([`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md))
 
-- **Aceptado:** `docs/design/003-security-design.md` y ADR-0005: JWT RS256 propio, refresh token opaco con rotación y detección de reutilización, RBAC por permisos, implementación por fases.
+- **Aceptado:** `docs/design/seguridad.md` y ADR-0005: JWT RS256 propio, refresh token opaco con rotación y detección de reutilización, RBAC por permisos, implementación por fases.
 - **Corregido:** [__]
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 

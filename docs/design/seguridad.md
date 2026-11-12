@@ -317,7 +317,7 @@ Cada paso compila y deja `./mvnw clean verify` en verde.
 
 #### Estado de la fase 1 (2026-10-16)
 
-Pasos 1.0–1.8 ✅ completados (1.6–1.8 en [`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md)). `./mvnw clean verify` en verde y verificación manual: arranque con perfil `local`, login con el administrador inicial y `POST /api/v1/employees` → `201`. Guía de prueba local: `docs/design/003-security-local-testing.md`.
+Pasos 1.0–1.8 ✅ completados (1.6–1.8 en [`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md)). `./mvnw clean verify` en verde y verificación manual: arranque con perfil `local`, login con el administrador inicial y `POST /api/v1/employees` → `201`. Guía de prueba local: `docs/design/seguridad-pruebas-locales.md`.
 
 **Desviaciones respecto al diseño**
 

@@ -6,20 +6,33 @@ API REST para la gestión de contratos laborales. Java 21, Spring Boot 3, Clean 
 
 ## Documentación
 
+Los nombres de los tres documentos base (`architecture.md`, `business-rules.md`, `technical.md`) están en inglés por convención del curso, y porque los prompts y el kit los citan con ese nombre. El resto de la documentación usa nombres en español.
+
 | Documento | Contenido |
 |---|---|
-| [CLAUDE.md](CLAUDE.md) | Punto de entrada: stack, comandos y forma de trabajo |
-| [docs/architecture.md](docs/architecture.md) | Capas, reglas de dependencia, convenciones y pruebas |
-| [docs/business-rules.md](docs/business-rules.md) | Reglas de negocio, casos de uso y errores |
+| [CLAUDE.md](CLAUDE.md) | Punto de entrada: stack, comandos, flujo de Git, forma de trabajar y datos para los prompts |
+| **Base** | |
+| [docs/architecture.md](docs/architecture.md) | Capas, reglas de dependencia, convenciones, API, errores y pruebas |
+| [docs/business-rules.md](docs/business-rules.md) | Glosario, agregados, reglas de negocio, estados, casos de uso, errores y preguntas abiertas |
 | [docs/technical.md](docs/technical.md) | Estado implementado: endpoints, seguridad, configuración, base de datos y CI/CD |
-| [docs/adr/](docs/adr/) | Decisiones de arquitectura (CI/CD: ADR-0009; SonarCloud: ADR-0011) |
-| [docs/guides/arquitectura.md](docs/guides/arquitectura.md) | Guía visual de la arquitectura: contexto, módulos, puertos y adaptadores, dominio, flujos de petición, tokens y errores |
-| [docs/guides/ci-cd.md](docs/guides/ci-cd.md) | Guía de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones, imágenes en GHCR y Docker Hub, ejecución y Jenkins local |
-| [docs/design/003-security-local-testing.md](docs/design/003-security-local-testing.md) | Probar la API en local con PowerShell y Postman |
+| **Decisiones y diseño** | |
+| [docs/adr/](docs/adr/) | Decisiones de arquitectura: dominio (0001–0004), seguridad (0005; 0006–0008 reservados), CI/CD (0009–0015) |
+| [docs/design/seguridad.md](docs/design/seguridad.md) | Diseño de la seguridad (3A, JWT, refresh tokens, permisos) y sus fases |
+| [docs/design/seguridad-pruebas-locales.md](docs/design/seguridad-pruebas-locales.md) | Probar la seguridad en local con PowerShell y Postman |
+| **Guías** | |
+| [docs/guides/diagramas-arquitectura.md](docs/guides/diagramas-arquitectura.md) | Diagramas de la arquitectura: contexto, módulos, puertos y adaptadores, dominio, flujos de petición, tokens y errores |
+| [docs/guides/ci-cd.md](docs/guides/ci-cd.md) | CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones, imágenes, ejecutar la imagen (Windows y macOS) y Jenkins local |
+| **API** | |
+| [docs/api/](docs/api/README.md) | Contrato OpenAPI 3.1 (`openapi.yaml` y `.json`) y cómo regenerarlo |
 | [postman/](postman/) | Colección Postman (login y endpoints, con aserciones de códigos HTTP) y entorno local |
-| [docs/prompts/](docs/prompts/README.md) | 9 prompts numerados por orden de uso (`NN-nombre.md`, un archivo por prompt): definir, implementar, probar, documentar, refactorizar, revisar (por capa, PR o final), corregir, cambiar el pipeline y mejorar prompts; cada uno con su comando de Claude Code en `.claude/commands/`. Son genéricos y forman un kit reutilizable (`docs/prompts/kit/`) |
-| [docs/sessions/](docs/sessions/README.md) | Archivos de sesión: progreso de cada comando para retomarlo sin perder contexto |
+| **Trabajo con IA** | |
+| [docs/prompts/](docs/prompts/README.md) | 9 prompts genéricos por orden de uso (`NN-nombre.md`), cada uno con su comando de Claude Code en `.claude/commands/`, y el kit para reutilizarlos en otros proyectos (`docs/prompts/kit/`) |
+| [docs/reviews/](docs/reviews/) | Informes de revisión, `NNN-<paso>-<modo>.md` por ronda |
+| [docs/sessions/](docs/sessions/README.md) | Archivos de sesión: progreso de cada prompt para retomarlo sin perder contexto |
 | [docs/ai-log.md](docs/ai-log.md) | Bitácora de IA: tareas, lo aceptado, lo corregido, tiempos y métricas |
+| **Infraestructura local** | |
+| [docker/jenkins/](docker/jenkins/README.md) | Jenkins local con SonarQube y despliegue local |
+| `docker/pgadmin/` | Servidor preconfigurado de pgAdmin para `docker compose` |
 
 ## Levantar todo con Docker (recomendado)
 
