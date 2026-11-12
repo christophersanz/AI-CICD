@@ -68,6 +68,17 @@ pipeline {
             }
         }
 
+        // SonarQube local con el Quality Gate "contract-api" (ADR-0015): si no se cumple, no se construye la imagen.
+        // Se omite si docker/jenkins/.env no define SONAR_ADMIN_PASSWORD.
+        stage('Análisis SonarQube') {
+            when {
+                expression { env.SONAR_ADMIN_PASSWORD?.trim() }
+            }
+            steps {
+                sh 'docker/jenkins/scripts/sonar-analysis.sh'
+            }
+        }
+
         stage('Imagen Docker') {
             steps {
                 sh 'DOCKER_BUILDKIT=1 docker build -t "$IMAGE" .'
