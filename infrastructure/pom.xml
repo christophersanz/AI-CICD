@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>pe.edu.galaxy.training.ia.ca</groupId>
-        <artifactId>contract-api-v2</artifactId>
+        <artifactId>contract-api</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 

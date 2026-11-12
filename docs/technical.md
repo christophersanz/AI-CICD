@@ -265,7 +265,7 @@ Una migración ya aplicada no se edita: los cambios van en una `V<n>` nueva.
 
 ## 7. Build y pruebas
 
-Proyecto Maven multimódulo (`contract-api-v2`, versión `0.1.0-SNAPSHOT`) sobre Spring Boot 3.5 y Java 21:
+Proyecto Maven multimódulo (`contract-api`, versión `0.1.0-SNAPSHOT`) sobre Spring Boot 3.5 y Java 21:
 
 | Módulo | Depende de | Dependencias principales |
 |---|---|---|
