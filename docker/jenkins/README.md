@@ -1,11 +1,11 @@
 # Jenkins local de práctica
 
-Jenkins en Docker, ya configurado para ejecutar el `Jenkinsfile` de este repositorio: compila, ejecuta las pruebas unitarias y las de integración (Testcontainers), verifica la cobertura, construye la imagen Docker, la prueba en un entorno efímero y la despliega en tu máquina (`http://localhost:8090`), cada paso en su propia etapa del *Stage View* (ADR-0014). Es solo para practicar; el CI oficial es GitHub Actions (ADR-0009 y ADR-0010).
+Jenkins en Docker, ya configurado para ejecutar el `Jenkinsfile` de este repositorio: compila, ejecuta las pruebas unitarias y las de integración (Testcontainers), verifica la cobertura, pasa el Quality Gate de un SonarQube local, construye la imagen Docker, la prueba en un entorno efímero y la despliega en tu máquina (`http://localhost:8090`), cada paso en su propia etapa del *Stage View* (ADR-0014). Es solo para practicar; el CI oficial es GitHub Actions (ADR-0009 y ADR-0010).
 
 ## Requisitos
 
-- Docker Desktop en ejecución (contenedores Linux).
-- Puertos `8080` (Jenkins) y `8090` (API desplegada, configurable con `DEPLOY_PORT`) libres.
+- Docker Desktop en ejecución (contenedores Linux), con al menos 6 GB de memoria asignada (SonarQube usa ~2 GB).
+- Puertos `8080` (Jenkins), `9000` (SonarQube) y `8090` (API desplegada, configurable con `DEPLOY_PORT`) libres.
 - Conexión a internet la primera vez (descarga plugins, dependencias de Maven e imágenes).
 
 ## Levantar Jenkins
@@ -39,6 +39,7 @@ Variables en `docker/jenkins/.env`, creado a partir de la plantilla `docker/jenk
 | `REPO_BRANCH` | `master` | Rama que construye el job |
 | `DEPLOY_ADMIN_PASSWORD` | *(vacía)* | Contraseña del `admin` del entorno desplegado (12–64 caracteres). Vacía, la etapa *Despliegue local* se omite. Solo se aplica en el primer despliegue |
 | `DEPLOY_PORT` | `8090` | Puerto de `127.0.0.1` donde queda la API desplegada |
+| `SONAR_ADMIN_PASSWORD` | *(vacía)* | Contraseña de `admin` en SonarQube (12+ caracteres con mayúscula, minúscula, dígito y símbolo). En el primer análisis Jenkins cambia la de por defecto (`admin`) por esta. Vacía, la etapa *Análisis SonarQube* se omite |
 
 Ejemplo en PowerShell para construir tu fork:
 
@@ -54,6 +55,28 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 - Jenkins usa el Docker de tu máquina mediante `/var/run/docker.sock`: los contenedores de las pruebas y de `docker build` aparecen junto a los tuyos en `docker ps`. Por eso Testcontainers usa `TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal`.
 - El contenedor se ejecuta como `root` y controla el Docker del host. Es aceptable solo en local: no expongas este Jenkins en una red.
 - Jenkins solo escucha en `127.0.0.1`, y la contraseña por defecto es solo para uso local.
+
+## SonarQube
+
+El compose levanta también `contract-api-sonarqube` (<http://localhost:9000>, usuario `admin` y tu `SONAR_ADMIN_PASSWORD`). La etapa *Análisis SonarQube* (`scripts/sonar-analysis.sh`, ADR-0015) prepara en el primer build lo que falte:
+
+- cambia la contraseña por defecto de `admin`;
+- genera un token de análisis, que se guarda en el volumen de Jenkins;
+- crea el proyecto `contract-api` y el Quality Gate `contract-api`.
+
+Después analiza el código con la cobertura de JaCoCo y espera el resultado del Quality Gate.
+
+| Condición (todo el código) | Falla si |
+|---|---|
+| Bugs | hay más de 0 |
+| Vulnerabilidades | hay más de 0 |
+| Security hotspots revisados | menos del 100 % |
+| Rating de mantenibilidad | peor que A |
+| Cobertura | menos del 80 % |
+
+Si el Quality Gate falla, el build se detiene antes de construir la imagen. El log de la etapa muestra el valor de cada condición. Si un hallazgo no aplica, se justifica en el código con `@SuppressWarnings("java:Sxxxx")` y un comentario que explique por qué, no marcándolo en el panel. Así la decisión queda versionada y se revisa en el PR.
+
+SonarQube usa la base embebida H2, que sirve para practicar pero no permite actualizar de versión conservando los datos. Para cambiar la imagen, borra los volúmenes `contract-api-jenkins_sonarqube-*` (`down -v` borra también los de Jenkins); el siguiente build vuelve a prepararlo todo.
 
 ## Despliegue local
 

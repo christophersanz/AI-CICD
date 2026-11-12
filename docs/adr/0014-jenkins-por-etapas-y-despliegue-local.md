@@ -37,4 +37,4 @@ El `Jenkinsfile` tenía dos etapas (`./mvnw clean verify` e imagen Docker), y el
   - Maven se invoca varias veces por build, lo que añade unos segundos frente a un único `verify`.
   - Jenkins se conecta a las redes de los contenedores que crea, lo que refuerza el riesgo ya aceptado de que controle el Docker del host (ADR-0010).
   - Cambiar `DEPLOY_ADMIN_PASSWORD` después del primer despliegue no cambia la contraseña del `admin` existente (BR-USR-007).
-- Seguimiento: SonarQube local con Quality Gate; reemplazar el Docker local por un servidor real (SSH + `docker compose`) si se necesita un entorno compartido.
+- Seguimiento: SonarQube local con Quality Gate (resuelto en [ADR-0015](0015-sonarqube-local-en-jenkins.md)); reemplazar el Docker local por un servidor real (SSH + `docker compose`) si se necesita un entorno compartido.
