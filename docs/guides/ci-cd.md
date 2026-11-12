@@ -371,7 +371,7 @@ docker rm -f contract-api-prod
 
 Mismos pasos que 8.1–8.5, con lo que cambia en macOS. Ningún secreto se escribe en un archivo versionado ni en el historial: la contraseña del administrador y el token de GHCR se piden con `read -s`.
 
-**Claves y variables, con una base propia (una sola vez).** Una base aparte (`contracts_prod`) hace que el administrador se cree con tu contraseña: en la base `contracts` de `docker compose` ya existe un `admin` creado antes y el login daría 401 (BR-USR-007).
+**Claves y variables, con una base propia (una sola vez).** Una base aparte (`contracts_prod`) hace que el administrador se cree con tu contraseña: la base `contracts` de `docker compose` ya tiene su propio `admin`, creado con la contraseña de `.env`, y el administrador inicial solo se crea si no existe ninguno (BR-USR-007).
 
 ```zsh
 mkdir -p ~/contract-api-prod && cd ~/contract-api-prod
