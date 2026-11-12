@@ -23,8 +23,8 @@ Los nombres de los tres documentos base (`architecture.md`, `business-rules.md`,
 | [docs/guides/diagramas-arquitectura.md](docs/guides/diagramas-arquitectura.md) | Diagramas de la arquitectura: contexto, módulos, puertos y adaptadores, dominio, flujos de petición, tokens y errores |
 | [docs/guides/ci-cd.md](docs/guides/ci-cd.md) | CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones, imágenes, ejecutar la imagen (Windows y macOS) y Jenkins local |
 | **API** | |
-| [docs/api/](docs/api/README.md) | Contrato OpenAPI 3.1 (`openapi.yaml` y `.json`) y cómo regenerarlo |
-| [postman/](postman/) | Colección Postman (login y endpoints, con aserciones de códigos HTTP) y entorno local |
+| [docs/api/](docs/api/README.md) | Contrato OpenAPI 3.1 (`openapi.yaml` y `.json`), cómo regenerarlo y la colección Postman |
+| [docs/api/postman/](docs/api/postman/) | Colección Postman (login y endpoints, con aserciones de códigos HTTP) y entorno local, junto al contrato OpenAPI |
 | **Trabajo con IA** | |
 | [docs/prompts/](docs/prompts/README.md) | 9 prompts genéricos por orden de uso (`NN-nombre.md`), cada uno con su comando de Claude Code en `.claude/commands/`, y el kit para reutilizarlos en otros proyectos (`docs/prompts/kit/`) |
 | [docs/reviews/](docs/reviews/) | Informes de revisión, `NNN-<paso>-<modo>.md` por ronda |

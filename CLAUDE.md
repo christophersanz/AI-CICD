@@ -103,5 +103,5 @@ Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/k
 | `ci-local` | Jenkins en <http://localhost:8080>: `Jenkinsfile` y `docker/jenkins/` (compose, `casc.yaml`, `scripts/`, `.env` no versionado con `REPO_BRANCH`) |
 | `sonarqube` | SonarQube local en <http://localhost:9000>, proyecto y Quality Gate `contract-api`; credenciales `SONAR_ADMIN_PASSWORD` en `docker/jenkins/.env`; condiciones en `docker/jenkins/scripts/sonar-analysis.sh` (ADR-0015) |
 | `openapi` | `docs/api/openapi.yaml` y `.json`, generados con springdoc; cómo regenerarlos en `docs/api/README.md` |
-| `postman` | Colección en `postman/` |
+| `postman` | Colección y entorno local en `docs/api/postman/` (se ejecutan con `newman` o el Postman CLI) |
 | `guias` | `docs/guides/diagramas-arquitectura.md` (diagramas) y `docs/guides/ci-cd.md` (pipeline y *Problemas frecuentes*) |

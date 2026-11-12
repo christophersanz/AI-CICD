@@ -56,6 +56,8 @@ Tras el logout el access token sigue siendo válido hasta que expira (≤ 15 min
 
 ## 3. Postman
 
+La colección y el entorno están en [`docs/api/postman/`](../api/postman/); cómo importarlos o ejecutarlos con `newman`: [`docs/api/README.md`](../api/README.md#colección-postman).
+
 ### Variables
 
 | Dónde | Variable | Valor |

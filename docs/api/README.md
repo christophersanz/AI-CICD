@@ -4,6 +4,7 @@
 |---|---|
 | `openapi.yaml` | Contrato OpenAPI 3.1 en YAML (para leer, versionar y revisar en diffs) |
 | `openapi.json` | El mismo contrato en JSON (para importar en Postman, Swagger Editor o generadores de clientes) |
+| `postman/` | Colección Postman con pruebas de los endpoints (`contract-api.postman_collection.json`) y su entorno local (`contract-api.local.postman_environment.json`) |
 
 El contrato **se genera desde el código** con springdoc-openapi (anotaciones `@Operation`, `@ApiResponse`
 y `@Schema` de los controllers y DTOs de `infrastructure/api`). La fuente de verdad es el código: si cambia
@@ -60,3 +61,18 @@ docker exec contract-api-postgres psql -U contract -d postgres -c "DROP DATABASE
 ```
 
 Se usa una base temporal para que las migraciones de Flyway no toquen `contracts` ni `contracts_prod`.
+
+## Colección Postman
+
+`postman/` tiene la colección `contract-api` (login JWT y endpoints, con aserciones de códigos HTTP) y el entorno `contract-api local` (`baseUrl`, usuarios y contraseñas **de prueba** del perfil `local`). Requiere la API levantada con `docker compose up -d --build`.
+
+- **En Postman:** *Import* de los dos archivos, selecciona el entorno `contract-api local` y ejecuta la colección en orden (*Run collection*). Variables y scripts de la colección: [`docs/design/seguridad-pruebas-locales.md`](../design/seguridad-pruebas-locales.md) §3.
+- **Desde la terminal** (raíz del repositorio):
+
+```bash
+newman run docs/api/postman/contract-api.postman_collection.json \
+  -e docs/api/postman/contract-api.local.postman_environment.json
+```
+
+Si cambia un endpoint, actualiza la colección en el mismo cambio que el contrato OpenAPI.
+
