@@ -1,3 +1,5 @@
+> **Histórico — versión 01.** Nombre original en el curso: `006-cicd.md` (sesión 04). Se conserva tal como se ejecutó, como evidencia (ver `docs/prompts/README.md` §5). Para trabajo nuevo usa `docs/prompts/21-cambiar-pipeline-02.md` (versión 02). Describe el flujo de una sola rama, reemplazado por GitHub Flow (ADR-0012), y trae un parche incrustado.
+
 Aplica en este repositorio (IA-CICD) los cambios de CI/CD y de arranque local que vienen en el parche de abajo. Sigue estos pasos en orden y detente a explicarme si alguno falla.
 
 Contexto de lo que corrige el parche:

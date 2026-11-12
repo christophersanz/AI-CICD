@@ -2,7 +2,7 @@
 
 - **Estado:** Aprobado; fase 1 completada (2026-10-16, ver §5 "Estado de la fase 1"); fase 2: paso 2.1 completado (2026-10-24)
 - **Fecha:** 2026-10-03
-- **Origen:** `docs/prompts/003-security-01.md`
+- **Origen:** `docs/prompts/historico/07-implementar-seguridad-01.md`
 - **Decisiones previas:** C1 = se reemplaza ADR-0001 (se incorpora seguridad). C2 = se mantiene ADR-0003 (sin ArchUnit). Implementación por fases.
 
 > Lo marcado con 🟡 depende de una pregunta abierta (§7) y no se implementará hasta tener respuesta;
@@ -317,7 +317,7 @@ Cada paso compila y deja `./mvnw clean verify` en verde.
 
 #### Estado de la fase 1 (2026-10-16)
 
-Pasos 1.0–1.8 ✅ completados (1.6–1.8 en `docs/prompts/005-security-02.md`). `./mvnw clean verify` en verde y verificación manual: arranque con perfil `local`, login con el administrador inicial y `POST /api/v1/employees` → `201`. Guía de prueba local: `docs/design/003-security-local-testing.md`.
+Pasos 1.0–1.8 ✅ completados (1.6–1.8 en `docs/prompts/historico/07-implementar-seguridad-02.md`). `./mvnw clean verify` en verde y verificación manual: arranque con perfil `local`, login con el administrador inicial y `POST /api/v1/employees` → `201`. Guía de prueba local: `docs/design/003-security-local-testing.md`.
 
 **Desviaciones respecto al diseño**
 
@@ -403,7 +403,7 @@ Pasos 1.0–1.8 ✅ completados (1.6–1.8 en `docs/prompts/005-security-02.md`)
 | Hash del refresh token | SHA-256 | Búsqueda directa por índice | Si se filtra la BD, no hay *work factor* | 256 bits de entropía hacen inviable la fuerza bruta; es la práctica estándar. |
 | Permisos en el JWT | Claim `perms` | Autorización sin BD | Token más grande; cambios de permisos con retraso | Catálogo pequeño (~12 permisos). |
 | Errores de login genéricos | `AUTH-002` para todo | No se puede averiguar qué usuarios existen ni su estado | Peor diagnóstico para soporte | El motivo real va a la auditoría. `DaoAuthenticationProvider` ya hace un hash ficticio cuando el usuario no existe (mitiga diferencias de tiempo). |
-| Sin ArchUnit (C2) | Módulos Maven | Sin dependencia nueva | La regla "`api` solo usa anotaciones de `security`" no se verifica automáticamente | Prompt de revisión (§5 de `prompts.md`). |
+| Sin ArchUnit (C2) | Módulos Maven | Sin dependencia nueva | La regla "`api` solo usa anotaciones de `security`" no se verifica automáticamente | Prompt de revisión (§5 de `README.md`). |
 | Alcance | Por fases | Cada fase entrega valor y se puede revisar | Entre la fase 1 y la 2 cualquier usuario autenticado puede llamar a todo | No desplegar fuera de entornos controlados hasta completar la fase 2. |
 
 ---

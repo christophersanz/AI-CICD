@@ -2,6 +2,8 @@
 description: Completa la fase 1 de seguridad de contract-api (pasos 1.6–1.8): emisión de tokens, login y AuthController
 ---
 
+> **Histórico — versión 02.** Nombre original en el curso: `005-security-02.md` (sesión 04). Se conserva tal como se ejecutó, como evidencia (ver `docs/prompts/README.md` §5). Para trabajo nuevo usa `docs/design/003-security-design.md`. Pasos 1.6–1.8 ya hechos; no hay versión vigente porque la seguridad está implementada.
+
 Completa la **fase 1 de seguridad** de contract-api implementando los pasos **1.6, 1.7 y 1.8** de
 @docs/design/003-security-design.md, siguiendo @CLAUDE.md, @docs/architecture.md,
 @docs/business-rules.md y @docs/adr/0005-incorporar-seguridad.md.

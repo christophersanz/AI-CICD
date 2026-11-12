@@ -1,3 +1,5 @@
+> **Histórico — versión 01.** Nombre original en el curso: `001-review-01.md` (sesión 02). Se conserva tal como se ejecutó, como evidencia (ver `docs/prompts/README.md` §5). Para trabajo nuevo usa el ciclo de revisión `10`–`18` (versión 02 de esta revisión integral: `docs/prompts/16-revisar-arquitectura-02.md`). Esta versión pide ArchUnit y "application sin frameworks", dos contradicciones que señaló la propia revisión (`docs/reviews/001-16-arquitectura.md`, H-02 y H-03).
+
 # Rol
 Actúa como Arquitecto de Software Senior y revisor técnico experto en Java 21, Spring Boot 3,
 Clean Architecture, DDD táctico, seguridad de APIs y buenas prácticas de ingeniería.

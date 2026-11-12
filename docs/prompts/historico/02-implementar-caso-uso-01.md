@@ -3,6 +3,8 @@ description: Implementa un caso de uso de contract-api paso a paso (dominio → 
 argument-hint: <NombreDelCasoDeUso>
 ---
 
+> **Histórico — versión 01.** Nombre original en el curso: `004-implement-usecase.md` (sesión 03). Se conserva tal como se ejecutó, como evidencia (ver `docs/prompts/README.md` §5). Para trabajo nuevo usa `docs/prompts/02-implementar-caso-uso-02.md` (versión 02). Esta versión dice que la seguridad no está implementada y pide ArchUnit; ya no es así.
+
 Implementa el caso de uso **$ARGUMENTS** de contract-api paso a paso, siguiendo
 @CLAUDE.md, @docs/architecture.md y @docs/business-rules.md.
 

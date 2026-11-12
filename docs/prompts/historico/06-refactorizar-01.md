@@ -1,3 +1,5 @@
+> **Histórico — versión 01.** Nombre original en el curso: `002.-refactoring-v1.md` (sesión 03). Se conserva tal como se ejecutó, como evidencia (ver `docs/prompts/README.md` §5). Para trabajo nuevo usa `docs/prompts/06-refactorizar-02.md` (versión 02). Este refactor del dominio por agregado ya está hecho (ADR-0004).
+
 Actúa como Arquitecto de Software Senior experto en Java 21, Clean Architecture y DDD táctico.
 
 Refactoriza la organización de paquetes del módulo `domain` de contract-api y mejora la
