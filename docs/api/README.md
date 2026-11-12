@@ -2,8 +2,8 @@
 
 | Archivo | Contenido |
 |---|---|
-| `openapi.yaml` | Contrato OpenAPI 3.1 en YAML (para leer, versionar y revisar en diffs) |
-| `openapi.json` | El mismo contrato en JSON (para importar en Postman, Swagger Editor o generadores de clientes) |
+| `contract/openapi.yaml` | Contrato OpenAPI 3.1 en YAML (para leer, versionar y revisar en diffs) |
+| `contract/openapi.json` | El mismo contrato en JSON (para importar en Postman, Swagger Editor o generadores de clientes) |
 | `postman/` | Colección Postman con pruebas de los endpoints (`contract-api.postman_collection.json`) y su entorno local (`contract-api.local.postman_environment.json`) |
 
 El contrato **se genera desde el código** con springdoc-openapi (anotaciones `@Operation`, `@ApiResponse`
@@ -52,9 +52,9 @@ SECURITY_BOOTSTRAP_ADMIN_USERNAME=admin SECURITY_BOOTSTRAP_ADMIN_PASSWORD=Tempor
 
 curl -sf localhost:8085/v3/api-docs | jq '
   .info = {"title":"contract-api","version":"0.1.0","description":"API REST de gestión de contratos laborales. Contrato generado con springdoc-openapi desde el código (ver docs/api/README.md)."}
-  | .servers = [{"url":"http://localhost:8081","description":"Local (docker compose / spring-boot:run)"}]' > docs/api/openapi.json
+  | .servers = [{"url":"http://localhost:8081","description":"Local (docker compose / spring-boot:run)"}]' > docs/api/contract/openapi.json
 ruby -ryaml -rjson -e 'puts JSON.parse(File.read(ARGV[0])).to_yaml(line_width: -1).sub(/\A---\n/, "")' \
-  docs/api/openapi.json > docs/api/openapi.yaml
+  docs/api/contract/openapi.json > docs/api/contract/openapi.yaml
 
 kill %1
 docker exec contract-api-postgres psql -U contract -d postgres -c "DROP DATABASE contracts_openapi"
