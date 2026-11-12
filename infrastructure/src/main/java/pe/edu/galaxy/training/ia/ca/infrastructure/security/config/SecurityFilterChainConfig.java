@@ -85,6 +85,11 @@ public class SecurityFilterChainConfig {
                 .build();
     }
 
+    // java:S4502 (CSRF desactivado) revisado: la API es stateless (sin sesión) y se autentica solo con el header
+    // Authorization: Bearer, que el navegador no adjunta solo; no hay cookies de autenticación que un sitio
+    // ajeno pueda aprovechar. El refresh token viaja en el body (business-rules.md §9). Si se pasara a una
+    // cookie HttpOnly, habría que reactivar CSRF.
+    @SuppressWarnings("java:S4502")
     private static HttpSecurity stateless(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)

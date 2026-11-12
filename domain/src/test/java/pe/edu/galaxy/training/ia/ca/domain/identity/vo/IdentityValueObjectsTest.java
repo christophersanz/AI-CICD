@@ -35,15 +35,24 @@ class IdentityValueObjectsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"contract:create", "contract:read:own", "user:manage", "system:monitor"})
+    @ValueSource(strings = {"contract:create", "contract:read:own", "user:manage", "system:monitor", "audit-log:read-all:own"})
     void shouldAcceptPermissionWhenItFollowsResourceActionScopeFormat(String value) {
         assertThat(new Permission(value).value()).isEqualTo(value);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"contract", "Contract:create", "contract:", "contract:read:own:extra", "contract create"})
+    @ValueSource(strings = {"contract", "Contract:create", "contract:", "contract:read:own:extra", "contract create",
+            "-contract:create", "contract-:create", "contract--x:create"})
     void shouldRejectPermissionWhenFormatIsInvalid(String value) {
         assertThatThrownBy(() -> new Permission(value)).isInstanceOf(InvalidValueException.class);
+    }
+
+    @Test
+    void shouldValidatePermissionWithoutStackOverflowWhenInputIsVeryLong() {
+        String longResource = "a" + "-a".repeat(100_000);
+
+        assertThat(new Permission(longResource + ":read").value()).startsWith("a-a");
+        assertThatThrownBy(() -> new Permission(longResource + ":")).isInstanceOf(InvalidValueException.class);
     }
 
     @Test
