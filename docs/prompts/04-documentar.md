@@ -26,7 +26,8 @@ Que la documentación del alcance coincida con el código actual y responda, sin
 - Nada de secretos, contraseñas ni URLs internas en la documentación.
 
 ## Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-04-documentar-<alcance>.md` (docs/sessions/README.md).
+- Rama `docs/<alcance>` desde `DP.rama-principal` actualizado; al terminar, commit en español, push y PR. No integres el PR.
+- Crea o retoma `docs/sessions/AAAA-MM-DD-04-documentar-<alcance>.md` (docs/sessions/README.md).
 
 ### Paso 1 — Inventario (sin escribir)
 Tabla `Elemento | Estado (falta / desfasado / correcto) | Evidencia` según el alcance:
@@ -49,4 +50,4 @@ Un bloque a la vez (un módulo de JavaDoc, un diagrama, un ADR), mostrando el di
 2. Enlaces relativos entre documentos válidos y `CLAUDE.md` actualizado si se añadió un documento nuevo.
 
 ## Informe final
-Elementos documentados por tipo (antes/después), documentos nuevos, contradicciones encontradas y cómo se resolvieron, y lo que queda pendiente.
+Elementos documentados por tipo (antes/después), documentos nuevos, contradicciones encontradas y cómo se resolvieron, resultado de `DP.build`, PR abierto y lo que queda pendiente.
