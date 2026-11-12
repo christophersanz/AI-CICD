@@ -10,7 +10,8 @@ pipeline {
     }
 
     // Jenkins corre en localhost y GitHub no puede llamarlo con un webhook: revisa el repositorio cada
-    // ~5 min y construye si hay commits nuevos. Se registra al terminar el primer build con este Jenkinsfile.
+    // ~5 min y construye si hay commits nuevos. El job de docker/jenkins/casc.yaml declara el mismo sondeo para que
+    // siga activo cuando JCasC recrea el job al reiniciar Jenkins; mantener ambos con la misma expresión.
     triggers {
         pollSCM('H/5 * * * *')
     }

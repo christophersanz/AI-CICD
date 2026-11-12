@@ -23,7 +23,7 @@ La primera vez tarda unos minutos (construye la imagen e instala los plugins). C
 2. Entra al job **contract-api** y pulsa **Build Now** (o **Construir ahora**) una vez.
 3. Revisa el avance en **Console Output** y, al terminar, los resultados de las pruebas y el informe de cobertura en los artefactos del build.
 
-Desde ese primer build, Jenkins **construye solo**: el `Jenkinsfile` declara `pollSCM('H/5 * * * *')`, así que revisa `REPO_BRANCH` en GitHub cada ~5 minutos y lanza un build cuando hay commits nuevos (en **Changes** aparecen los commits incluidos). Se usa sondeo porque GitHub no puede llamar a un Jenkins en `localhost` con un webhook. El registro de cada sondeo está en **Git Polling Log** del job.
+Jenkins **construye solo**, incluso antes de ese primer build y tras cada reinicio: el job de `casc.yaml` y el `Jenkinsfile` declaran `pollSCM('H/5 * * * *')`, así que revisa `REPO_BRANCH` en GitHub cada ~5 minutos y lanza un build cuando hay commits nuevos (en **Changes** aparecen los commits incluidos). Se usa sondeo porque GitHub no puede llamar a un Jenkins en `localhost` con un webhook. El registro de cada sondeo está en **Git Polling Log** del job. El sondeo va también en `casc.yaml` porque JCasC recrea el job en cada arranque: si solo estuviera en el `Jenkinsfile`, el job quedaría sin disparador hasta el siguiente build manual. Si cambias la expresión, cámbiala en los dos archivos. Jenkins solo sondea mientras está encendido; al levantarlo detecta en el primer sondeo los commits que se subieron con Jenkins apagado.
 
 No hay asistente inicial: los plugins, el usuario y el job se crean al arrancar con *Configuration as Code* (`casc.yaml`).
 
