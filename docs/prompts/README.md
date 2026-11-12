@@ -123,7 +123,7 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 | Archivo del kit (`docs/prompts/kit/`) | Para qué |
 |---|---|
 | `instalar.sh` | Copia los prompts, los comandos, el kit y `docs/sessions/README.md`, y crea los documentos que falten. **Nunca sobrescribe** `CLAUDE.md`, `architecture.md` ni `business-rules.md`. |
-| `verificar.sh` | Comprueba que el proyecto tiene todo lo que usan los prompts: documentos, claves `DP.*` (y cuáles faltan completar), secciones numeradas, comandos y un solo archivo por prompt. |
+| `verificar.sh` | Comprueba que el proyecto tiene todo lo que usan los prompts: documentos, claves `DP.*` (y cuáles faltan completar), secciones numeradas, comandos y un solo archivo por prompt. También detecta referencias obsoletas: comandos `/NN-nombre` citados que no existen y archivos de sesión con otro número. Ejecútalo después de cambiar cualquier prompt. |
 | `CLAUDE-datos-prompts.md` | Plantilla de la sección *Datos para los prompts*, con qué poner en cada clave. |
 | `CLAUDE.plantilla.md`, `architecture.plantilla.md`, `business-rules.plantilla.md` | Documentos base con las secciones que citan los prompts (`architecture.md` §2–§9, `business-rules.md` §1–§9 y §4.1). |
 
