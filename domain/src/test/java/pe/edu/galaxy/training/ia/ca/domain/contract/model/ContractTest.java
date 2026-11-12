@@ -12,6 +12,8 @@ import java.util.List;
 import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import pe.edu.galaxy.training.ia.ca.domain.common.event.DomainEvent;
 import pe.edu.galaxy.training.ia.ca.domain.common.exception.InvalidValueException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.event.ContractCreated;
@@ -21,6 +23,7 @@ import pe.edu.galaxy.training.ia.ca.domain.contract.event.ContractSigned;
 import pe.edu.galaxy.training.ia.ca.domain.contract.event.ContractTerminated;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.ContractNotEditableException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.ContractNotRenewableException;
+import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InconsistentContractStateException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InvalidContractPeriodException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InvalidContractStatusTransitionException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InvalidTerminationException;
@@ -438,15 +441,89 @@ class ContractTest {
         assertThat(contract.pullDomainEvents()).isEmpty();
     }
 
-    @Test
-    void shouldNotEmitEventsWhenContractIsRestored() {
-        // When
-        Contract contract = Contract.restore(ContractId.generate(), ContractNumber.of(2026, 9), EMPLOYEE_ID,
-                ContractType.FIXED_TERM, new JobTitle("Developer"), Salary.ofPen(new BigDecimal("3000")),
-                ContractPeriod.fixedTerm(START, END), ContractStatus.ACTIVE, List.of(), null);
+    @Nested
+    class Restore {
 
-        // Then
-        assertThat(contract.pullDomainEvents()).isEmpty();
-        assertThat(contract.status()).isEqualTo(ContractStatus.ACTIVE);
+        private Contract restore(ContractType type, ContractPeriod period, ContractStatus status,
+                                 List<ContractRenewal> renewals, Termination termination) {
+            return Contract.restore(ContractId.generate(), ContractNumber.of(2026, 9), EMPLOYEE_ID, type,
+                    new JobTitle("Developer"), Salary.ofPen(new BigDecimal("3000")), period, status, renewals,
+                    termination);
+        }
+
+        @Test
+        void shouldNotEmitEventsWhenContractIsRestored() {
+            // When
+            Contract contract = restore(ContractType.FIXED_TERM, ContractPeriod.fixedTerm(START, END),
+                    ContractStatus.ACTIVE, List.of(), null);
+
+            // Then
+            assertThat(contract.pullDomainEvents()).isEmpty();
+            assertThat(contract.status()).isEqualTo(ContractStatus.ACTIVE);
+        }
+
+        @Test
+        void shouldRestoreTerminatedContractWhenItHasTermination() {
+            // Given
+            Termination termination = new Termination(LocalDate.of(2026, 6, 30), "Mutual agreement");
+
+            // When
+            Contract contract = restore(ContractType.FIXED_TERM, ContractPeriod.fixedTerm(START, END),
+                    ContractStatus.TERMINATED, List.of(), termination);
+
+            // Then
+            assertThat(contract.termination()).contains(termination);
+        }
+
+        @Test
+        void shouldRestoreRenewedFixedTermContractWhenRenewalsAreConsistent() {
+            // Given
+            LocalDate newEnd = LocalDate.of(2027, 6, 30);
+            List<ContractRenewal> renewals = List.of(new ContractRenewal(END, newEnd));
+
+            // When
+            Contract contract = restore(ContractType.FIXED_TERM, ContractPeriod.fixedTerm(START, newEnd),
+                    ContractStatus.ACTIVE, renewals, null);
+
+            // Then
+            assertThat(contract.renewals()).isEqualTo(renewals);
+        }
+
+        @Test
+        void shouldRejectRestoreWhenPeriodDoesNotMatchType() {
+            assertThatThrownBy(() -> restore(ContractType.INDEFINITE, ContractPeriod.fixedTerm(START, END),
+                    ContractStatus.ACTIVE, List.of(), null))
+                    .isInstanceOf(InvalidContractPeriodException.class)
+                    .hasFieldOrPropertyWithValue("code", "CTR-001");
+        }
+
+        @Test
+        void shouldRejectRestoreWhenTerminatedContractHasNoTermination() {
+            assertThatThrownBy(() -> restore(ContractType.FIXED_TERM, ContractPeriod.fixedTerm(START, END),
+                    ContractStatus.TERMINATED, List.of(), null))
+                    .isInstanceOf(InconsistentContractStateException.class)
+                    .hasFieldOrPropertyWithValue("code", "CTR-009");
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = ContractStatus.class, names = {"DRAFT", "ACTIVE", "EXPIRED", "CANCELLED"})
+        void shouldRejectRestoreWhenContractHasTerminationButIsNotTerminated(ContractStatus status) {
+            Termination termination = new Termination(LocalDate.of(2026, 6, 30), "Mutual agreement");
+
+            assertThatThrownBy(() -> restore(ContractType.FIXED_TERM, ContractPeriod.fixedTerm(START, END),
+                    status, List.of(), termination))
+                    .isInstanceOf(InconsistentContractStateException.class)
+                    .hasFieldOrPropertyWithValue("code", "CTR-009");
+        }
+
+        @Test
+        void shouldRejectRestoreWhenNonRenewableContractHasRenewals() {
+            List<ContractRenewal> renewals = List.of(new ContractRenewal(END, LocalDate.of(2027, 6, 30)));
+
+            assertThatThrownBy(() -> restore(ContractType.INDEFINITE, ContractPeriod.indefinite(START),
+                    ContractStatus.ACTIVE, renewals, null))
+                    .isInstanceOf(InconsistentContractStateException.class)
+                    .hasFieldOrPropertyWithValue("code", "CTR-009");
+        }
     }
 }

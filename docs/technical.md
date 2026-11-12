@@ -21,7 +21,8 @@ Si este documento y el código no coinciden, manda el código; actualiza este do
 
 - El agregado `Contract` (estados, eventos, value objects y excepciones `CTR-*`) existe y está probado en `domain`, pero no tiene casos de uso, tablas ni endpoints.
 - La tabla `employees` no tiene columna de estado: todos los empleados se consideran `ACTIVE`.
-- La seguridad está en la **fase 1** del diseño 003: autenticación completa; autorización por permisos solo en `/api/v1/users` (ver §3.3).
+- La seguridad está en la **fase 1** del diseño 003: autenticación completa y autorización por permisos con `@PreAuthorize` en todos los endpoints de empleados y usuarios (§2.1). Pendiente: auditoría y endurecimiento (§3.3).
+- BR-USR-005 (revocar los refresh tokens al deshabilitar un usuario o cambiar su contraseña) está pendiente: todavía no existen esos casos de uso (`business-rules.md` §9).
 
 ## 2. API REST
 
@@ -36,10 +37,10 @@ URL base local: `http://localhost:8081`. Documentación interactiva (solo fuera 
 | `POST /api/v1/auth/logout` | `LogoutUseCase` | Autenticado | `204`, `400`, `401` |
 | `GET /api/v1/auth/me` | `GetCurrentUserUseCase` | Autenticado | `200`, `401`, `404` (AUTH-404) |
 | `POST /api/v1/users` | `CreateUserUseCase` | `user:manage` | `201` + `Location`, `400`, `401`, `403`, `404` (AUTH-009), `409` (AUTH-007), `422` (AUTH-008, VAL-001) |
-| `POST /api/v1/employees` | `RegisterEmployeeUseCase` | `employee:create` | `201` + `Location`, `400`, `403`, `409` (EMP-001), `422` (EMP-002, VAL-001) |
-| `GET /api/v1/employees/{id}` | `GetEmployeeUseCase` | `employee:read` | `200`, `400`, `403`, `404` (EMP-404) |
-| `PUT /api/v1/employees/{id}` | `UpdateEmployeeUseCase` | `employee:update` | `200`, `400`, `403`, `404` (EMP-404), `422` (VAL-001) |
-| `GET /api/v1/employees` | `ListEmployeesUseCase` | `employee:read` | `200`, `400`, `403` |
+| `POST /api/v1/employees` | `RegisterEmployeeUseCase` | `employee:create` | `201` + `Location`, `400`, `401`, `403`, `409` (EMP-001), `422` (EMP-002, VAL-001) |
+| `GET /api/v1/employees/{id}` | `GetEmployeeUseCase` | `employee:read` | `200`, `400`, `401`, `403`, `404` (EMP-404) |
+| `PUT /api/v1/employees/{id}` | `UpdateEmployeeUseCase` | `employee:update` | `200`, `400`, `401`, `403`, `404` (EMP-404), `422` (VAL-001) |
+| `GET /api/v1/employees` | `ListEmployeesUseCase` | `employee:read` | `200`, `400`, `401`, `403` |
 | `GET /actuator/health` | — | Público | `200` / `503` |
 | `GET /actuator/info`, `/actuator/metrics` | — | `system:monitor` | `200`, `401`, `403` |
 
@@ -148,6 +149,8 @@ Contraseñas: hash BCrypt de coste 12 con prefijo de algoritmo (`{bcrypt}...`). 
 ### 3.3 Pendiente (resto de las fases 2–4 del diseño 003)
 
 - Auditoría de eventos de seguridad y endurecimiento.
+- CORS por propiedades y perfil (paso 2.4 del diseño).
+- Revocación de refresh tokens al deshabilitar un usuario o cambiar su contraseña (BR-USR-005), cuando existan esos casos de uso.
 
 ## 4. Configuración
 

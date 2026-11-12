@@ -21,6 +21,7 @@ import pe.edu.galaxy.training.ia.ca.application.exception.NotFoundException;
 import pe.edu.galaxy.training.ia.ca.application.exception.UnauthenticatedException;
 import pe.edu.galaxy.training.ia.ca.domain.common.exception.DomainException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InvalidContractStatusTransitionException;
+import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InconsistentContractStateException;
 import pe.edu.galaxy.training.ia.ca.domain.identity.exception.InvalidRefreshTokenException;
 
 /** Traduce las excepciones a RFC 9457 Problem Details con el código de negocio en {@code code}. */
@@ -32,6 +33,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
     ResponseEntity<ProblemDetail> handleDomain(DomainException ex) {
+        if (ex instanceof InconsistentContractStateException) {
+            // CTR-009: dato persistido corrupto; es un error del servidor, no del cliente (business-rules.md §8).
+            return handleUnexpected(ex);
+        }
         HttpStatus status = ex instanceof InvalidContractStatusTransitionException
                 ? HttpStatus.CONFLICT
                 : HttpStatus.UNPROCESSABLE_ENTITY;

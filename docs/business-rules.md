@@ -71,7 +71,7 @@ Usa exactamente estos términos en el código y en la documentación.
 | `documentNumber` | `DocumentNumber` | Obligatorio y único (tipo + número). Inmutable (BR-EMP-003). |
 | `fullName` | `FullName` | Nombres y apellidos obligatorios. |
 | `email` | `Email` | Obligatorio, formato válido. |
-| `status` | `EmployeeStatus` | `ACTIVE` al registrar. Solo cambia al desactivar o reactivar (BR-EMP-005, 006, 008). |
+| `status` | `EmployeeStatus` | `ACTIVE` al registrar. Solo cambia al desactivar o reactivar (BR-EMP-005, 006, 008). *(Pendiente: llega con `DeactivateEmployeeUseCase`; hoy todos los empleados son `ACTIVE`, `technical.md` §1.)* |
 
 ### Agregado `User`
 
@@ -105,15 +105,15 @@ La relación `User` ↔ `Employee` está pendiente (§9) y es necesaria para BR-
 | BR-EMP-002 | El DNI tiene exactamente 8 dígitos. | domain | `EMP-002` |
 | BR-EMP-003 | Tras el registro solo se actualizan nombres y correo; el documento de identidad no se modifica. El estado solo cambia al desactivar o reactivar. | domain | — |
 | BR-EMP-004 | Hay dos formas de búsqueda de empleados, excluyentes: por documento, exacta (tipo + número; devuelve 0 o 1 empleado por BR-EMP-001), o por nombre, parcial y sin distinguir mayúsculas ni tildes (en nombres y apellidos). No se combinan. | application | `VAL-001` |
-| BR-EMP-005 ⚖️ | Un empleado no se elimina: se desactiva (`INACTIVE`) y puede reactivarse. Sus datos se conservan. | domain | — |
+| BR-EMP-005 ⚖️ | Un empleado no se elimina: se desactiva (`INACTIVE`) y puede reactivarse. Sus datos se conservan. *(Pendiente: llega con `DeactivateEmployeeUseCase`; hoy todos los empleados son `ACTIVE`, `technical.md` §1.)* | domain | — |
 | BR-EMP-006 | No se puede desactivar un empleado que tenga algún contrato `ACTIVE`. | application | `EMP-003` |
 | BR-EMP-007 | No se crean contratos para un empleado `INACTIVE` (complementa BR-CTR-001). | application | `EMP-004` |
-| BR-EMP-008 | Solo se desactiva un empleado `ACTIVE` y solo se reactiva uno `INACTIVE`. | domain | `EMP-005` |
+| BR-EMP-008 | Solo se desactiva un empleado `ACTIVE` y solo se reactiva uno `INACTIVE`. *(Pendiente: llega con `DeactivateEmployeeUseCase`; hoy todos los empleados son `ACTIVE`, `technical.md` §1.)* | domain | `EMP-005` |
 | BR-USR-001 | El nombre de usuario es único, sin distinguir mayúsculas. | application | `AUTH-007` |
 | BR-USR-002 | El nombre de usuario tiene 3–50 caracteres: letras minúsculas, dígitos, `.`, `_` o `-`. Se normaliza a minúsculas. | domain | `VAL-001` |
 | BR-USR-003 | La contraseña tiene entre 12 y 64 caracteres y no supera 72 bytes en UTF-8 (límite de BCrypt). Sin reglas de composición (NIST SP 800-63B). | domain | `AUTH-008` |
 | BR-USR-004 | Un usuario deshabilitado no puede iniciar sesión ni refrescar tokens. Externamente se responde como credenciales inválidas. | application | `AUTH-002` |
-| BR-USR-005 | Al deshabilitar un usuario o cambiar su contraseña se revocan todos sus refresh tokens. | application | — |
+| BR-USR-005 | Al deshabilitar un usuario o cambiar su contraseña se revocan todos sus refresh tokens. *(Pendiente: todavía no hay casos de uso para deshabilitar usuarios ni cambiar la contraseña; ver §9.)* | application | — |
 | BR-USR-006 | Un refresh token es de un solo uso: al usarlo se emite otro de la misma familia. Si se presenta uno ya usado, se revoca toda la familia. | domain / application | `AUTH-005` |
 | BR-USR-007 | Al arrancar, si no existe ningún usuario con rol `ADMIN`, se crea uno con las credenciales de las variables de entorno `SECURITY_BOOTSTRAP_ADMIN_USERNAME` y `SECURITY_BOOTSTRAP_ADMIN_PASSWORD`. Nunca con contraseña fija en una migración. Si faltan, solo se registra un aviso; si no puede crearse (username ocupado por un usuario no `ADMIN` o contraseña que incumple BR-USR-003), la aplicación no arranca. | application | — |
 
@@ -251,6 +251,7 @@ Todos los eventos incluyen además `eventId` (UUID), `occurredOn` (instante en q
 | `CTR-006` | `FixedTermLimitExceededException` | 422 | Se supera la duración máxima acumulada de contratos a plazo fijo. |
 | `CTR-007` | `InvalidTerminationException` | 422 | El motivo o la fecha de término no son válidos. |
 | `CTR-008` | `InvalidContractStatusTransitionException` | 409 | La operación no está permitida en el estado actual del contrato. |
+| `CTR-009` | `InconsistentContractStateException` | 500 | Un contrato persistido no cumple las invariantes estructurales del agregado (dato corrupto). Solo ocurre al reconstruirlo desde la base; la API responde 500 sin detalles. |
 | `CTR-404` | `ContractNotFoundException` | 404 | El contrato no existe. |
 | `EMP-001` | `DuplicateEmployeeDocumentException` | 409 | Ya existe un empleado con ese documento. |
 | `EMP-002` | `InvalidDocumentNumberException` | 422 | El documento de identidad no es válido. |
@@ -289,6 +290,7 @@ Reglas pendientes de confirmar. Claude no debe implementar suposiciones sobre es
 - [ ] ¿El rol `EMPLOYEE` puede consultar su propia ficha de empleado? Depende del vínculo `User` ↔ `Employee` (siguiente pregunta). (Mientras tanto, solo `employee:read`.)
 - [ ] ¿Un `User` se vincula como máximo a un `Employee`? ¿Es obligatorio para el rol `EMPLOYEE`? ¿Quién crea el vínculo? (Necesario para BR-CTR-012.)
 - [ ] ¿Solo `ADMIN` gestiona usuarios o `HR` puede crear usuarios `EMPLOYEE`? ¿Un usuario puede tener varios roles, o ninguno? (Mientras tanto, `user:manage` solo para `ADMIN` y se admiten varios roles.)
+- [ ] ¿Cómo se deshabilita un usuario y cómo cambia su contraseña (casos de uso, actor, permiso)? Necesario para aplicar BR-USR-005. (Mientras tanto, no hay casos de uso para ninguno de los dos.)
 - [ ] ¿Se bloquea la cuenta tras N intentos fallidos? ¿Con qué umbral y duración? (Mientras tanto, sin bloqueo.)
 - [ ] ¿Cuánto tiempo se retienen los registros de auditoría de seguridad? ¿Se purgan automáticamente?
 - [ ] ¿El refresh token de la SPA viaja en el body o en una cookie `HttpOnly`? (Mientras tanto, en el body.)

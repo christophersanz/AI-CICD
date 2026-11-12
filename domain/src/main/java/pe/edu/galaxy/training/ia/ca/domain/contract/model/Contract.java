@@ -16,6 +16,7 @@ import pe.edu.galaxy.training.ia.ca.domain.contract.event.ContractSigned;
 import pe.edu.galaxy.training.ia.ca.domain.contract.event.ContractTerminated;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.ContractNotEditableException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.ContractNotRenewableException;
+import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InconsistentContractStateException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InvalidContractPeriodException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InvalidContractStatusTransitionException;
 import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InvalidTerminationException;
@@ -78,14 +79,32 @@ public final class Contract extends AggregateRoot<ContractId> {
     }
 
     /**
-     * Reconstruye un contrato ya persistido, sin volver a emitir eventos ni validar reglas de negocio:
-     * se asume que el estado persistido ya las cumplía. Uso exclusivo de los adaptadores de persistencia.
+     * Reconstruye un contrato ya persistido, sin volver a emitir eventos. Uso exclusivo de los adaptadores de
+     * persistencia.
+     *
+     * <p>Valida las invariantes estructurales del agregado (periodo compatible con el tipo, término solo en
+     * {@code TERMINATED}, renovaciones solo en contratos renovables) para que un dato corrupto falle aquí y no
+     * más adelante. No revalida BR-CTR-004: la RMV vigente puede ser mayor que la de la fecha del contrato.
      *
      * @param termination {@code null} si el contrato no fue terminado
+     * @throws InvalidContractPeriodException     si el periodo no corresponde al tipo (CTR-001)
+     * @throws InconsistentContractStateException si el estado, el término o las renovaciones no concuerdan (CTR-009)
      */
     public static Contract restore(ContractId id, ContractNumber number, EmployeeId employeeId, ContractType type,
                                    JobTitle jobTitle, Salary salary, ContractPeriod period, ContractStatus status,
                                    List<ContractRenewal> renewals, Termination termination) {
+        Guard.notNull(number, "number");
+        Guard.notNull(status, "status");
+        Guard.notNull(renewals, "renewals");
+        ensurePeriodMatchesType(period, type);
+        if ((status == ContractStatus.TERMINATED) != (termination != null)) {
+            throw new InconsistentContractStateException(number.value(), termination == null
+                    ? "status TERMINATED without termination."
+                    : "termination present but status is " + status + ".");
+        }
+        if (!renewals.isEmpty() && !type.isRenewable()) {
+            throw new InconsistentContractStateException(number.value(), "renewals present on a " + type + " contract.");
+        }
         return new Contract(id, number, employeeId, type, jobTitle, salary, period, status, renewals, termination);
     }
 

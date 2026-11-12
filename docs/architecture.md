@@ -62,8 +62,8 @@ domain/
     exception/            # DomainException, InvalidValueException (VAL-001), Guard
   shared/                 # Shared kernel: conceptos de negocio transversales
     vo/                   # Money
-  <agregado>/             # Un paquete por agregado: contract, employee
-    model/                # Raíz del agregado (Contract, Employee)
+  <agregado>/             # Un paquete por agregado: contract, employee, identity
+    model/                # Raíz del agregado (Contract, Employee, User; en identity también RefreshToken y Role)
     vo/                   # Value objects e identificador del agregado; los enums también van aquí
     event/                # Interfaz sealed del agregado (p. ej. ContractEvent) y sus eventos
     exception/            # Excepciones del agregado (extienden DomainException)

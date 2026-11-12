@@ -27,6 +27,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import pe.edu.galaxy.training.ia.ca.domain.contract.exception.InconsistentContractStateException;
 import pe.edu.galaxy.training.ia.ca.application.dto.EmployeeResult;
 import pe.edu.galaxy.training.ia.ca.application.dto.UpdateEmployeeCommand;
 import pe.edu.galaxy.training.ia.ca.application.exception.DuplicateEmployeeDocumentException;
@@ -178,6 +179,19 @@ class EmployeeControllerTest {
         mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.detail").value("An unexpected error occurred."));
+    }
+
+    @Test
+    void shouldReturnInternalErrorWithoutDetailsWhenPersistedContractIsInconsistent() throws Exception {
+        // Given
+        when(registerEmployeeUseCase.register(any()))
+                .thenThrow(new InconsistentContractStateException("CTR-2026-000001", "status TERMINATED without termination."));
+
+        // When / Then
+        mockMvc.perform(post(URL).with(hr()).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.detail").value("An unexpected error occurred."))
+                .andExpect(jsonPath("$.code").doesNotExist());
     }
 
     @Test
