@@ -37,6 +37,10 @@ public class DbUserDetailsService implements UserDetailsService, UserDetailsPass
         return new UserAccountDetails(userRepository.save(user));
     }
 
+    // java:S5804 (enumeración de usuarios) revisado: este UsernameNotFoundException no llega al cliente.
+    // DaoAuthenticationProvider lo oculta como BadCredentialsException (hideUserNotFoundExceptions, con mitigación
+    // de tiempos) y CredentialsAuthenticatorAdapter responde AUTH-002 en todos los casos (BR-USR-004).
+    @SuppressWarnings("java:S5804")
     private User findUser(String username) {
         Username parsed;
         try {

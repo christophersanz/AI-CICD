@@ -20,6 +20,15 @@ jobs:
   - script: >
       pipelineJob('contract-api') {
         description('Build, pruebas, cobertura e imagen Docker de contract-api (Jenkinsfile del repositorio).')
+        // Mismo sondeo que el Jenkinsfile. JCasC recrea el job en cada arranque; sin esto el job
+        // quedaría sin disparador hasta el siguiente build manual.
+        properties {
+          pipelineTriggers {
+            triggers {
+              pollSCM { scmpoll_spec('H/5 * * * *') }
+            }
+          }
+        }
         definition {
           cpsScm {
             scm {

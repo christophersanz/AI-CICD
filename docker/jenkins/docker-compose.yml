@@ -16,6 +16,12 @@ services:
       REPO_URL: ${REPO_URL:-https://github.com/christophersanz/AI-CICD.git}
       REPO_BRANCH: ${REPO_BRANCH:-master}
       TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
+      # Despliegue local (ADR-0014): sin contraseña, la etapa se omite. La API queda en 127.0.0.1:DEPLOY_PORT.
+      DEPLOY_ADMIN_PASSWORD: ${DEPLOY_ADMIN_PASSWORD:-}
+      DEPLOY_PORT: ${DEPLOY_PORT:-8090}
+      # Análisis SonarQube (ADR-0015): sin contraseña, la etapa se omite. Jenkins llega a SonarQube por la red del compose.
+      SONAR_HOST_URL: http://sonarqube:9000
+      SONAR_ADMIN_PASSWORD: ${SONAR_ADMIN_PASSWORD:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -23,5 +29,24 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
+  # SonarQube local para la etapa "Análisis SonarQube" (ADR-0015). Base embebida H2: válida para práctica, no se
+  # puede actualizar de versión conservando los datos. En Docker Desktop no hace falta ajustar vm.max_map_count
+  # porque se desactivan las comprobaciones de arranque de Elasticsearch.
+  sonarqube:
+    image: sonarqube:26.10.0.133078-community
+    container_name: contract-api-sonarqube
+    ports:
+      - "127.0.0.1:9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-extensions:/opt/sonarqube/extensions
+      - sonarqube-logs:/opt/sonarqube/logs
+    restart: unless-stopped
+
 volumes:
   jenkins-home:
+  sonarqube-data:
+  sonarqube-extensions:
+  sonarqube-logs:

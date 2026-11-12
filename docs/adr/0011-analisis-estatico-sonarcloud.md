@@ -3,6 +3,8 @@
 - **Estado:** Aceptado
 - **Fecha:** 2026-10-24
 
+> El Jenkins local usa además un SonarQube propio con Quality Gate ([ADR-0015](0015-sonarqube-local-en-jenkins.md)).
+
 ## Contexto
 
 Los requisitos del proyecto final piden "análisis estático sin issues críticos" con un **reporte de Sonar** como evidencia, y medir los issues antes y después de los refactors asistidos por IA. El pipeline de ADR-0009 compila, prueba y mide cobertura, pero no analiza la calidad del código.
