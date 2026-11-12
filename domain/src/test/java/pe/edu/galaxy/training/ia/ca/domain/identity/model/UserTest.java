@@ -10,6 +10,7 @@ import pe.edu.galaxy.training.ia.ca.domain.common.exception.InvalidValueExceptio
 import pe.edu.galaxy.training.ia.ca.domain.identity.vo.PasswordHash;
 import pe.edu.galaxy.training.ia.ca.domain.identity.vo.Permission;
 import pe.edu.galaxy.training.ia.ca.domain.identity.vo.RoleName;
+import pe.edu.galaxy.training.ia.ca.domain.identity.vo.UserId;
 import pe.edu.galaxy.training.ia.ca.domain.identity.vo.Username;
 
 class UserTest {
@@ -75,5 +76,21 @@ class UserTest {
 
         // Then
         assertThat(role.permissions()).containsExactly(new Permission("contract:create"));
+    }
+
+    @Test
+    void shouldKeepPersistedStateWithoutEventsWhenDisabledUserIsRestored() {
+        // Given
+        UserId id = UserId.generate();
+
+        // When
+        User user = User.restore(id, new Username("ana"), HASH, Set.of(RoleName.HR), false);
+
+        // Then
+        assertThat(user.id()).isEqualTo(id);
+        assertThat(user.username()).isEqualTo(new Username("ana"));
+        assertThat(user.roles()).containsExactly(RoleName.HR);
+        assertThat(user.isEnabled()).isFalse();
+        assertThat(user.pullDomainEvents()).isEmpty();
     }
 }
