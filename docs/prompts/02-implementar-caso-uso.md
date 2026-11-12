@@ -9,7 +9,7 @@
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
 ## Rol
-Actúa como desarrollador senior de Java 21 y Spring Boot 3 experto en Clean Architecture, DDD táctico y Spring Security.
+Actúa como desarrollador senior experto en el stack del proyecto (`DP.stack`), Clean Architecture, DDD táctico y Spring Security.
 
 ## Contexto y fuentes de verdad
 - Lee: `CLAUDE.md`, `docs/architecture.md`, `docs/business-rules.md`; `docs/technical.md` (estado implementado) y los ADR de `docs/adr/`.
@@ -20,6 +20,7 @@ Actúa como desarrollador senior de Java 21 y Spring Boot 3 experto en Clean Arc
 - Vacío: muestra los casos de uso de `business-rules.md` §6 indicando cuáles ya tienen código y pide que vuelva a ejecutar el comando con uno.
 - No coincide con un caso de uso documentado: sugiere el más parecido y espera confirmación.
 - Si el caso de uso depende de preguntas abiertas (§9) que bloquean su comportamiento, recomienda primero `/01-definir reglas <tema>` y detente.
+- **Si ya está implementado** (existen su `UseCase` y su servicio), no lo reimplementes: muestra qué existe y qué falta respecto de su ficha, y propón el comando adecuado (`/03-pruebas` si faltan pruebas, `/05-refactorizar` si hay que reorganizarlo, o continuar solo con las capas que falten). Espera mi decisión.
 
 ## Objetivo
 El caso de uso responde por su endpoint con los códigos de `architecture.md` §6, cada regla y error de su ficha tiene al menos una prueba, `DP.build` pasa y el Quality Gate (`DP.sonarqube`) sigue en verde.
@@ -38,6 +39,7 @@ El caso de uso responde por su endpoint con los códigos de `architecture.md` §
 - Si detectas un problema en un paso anterior, dilo antes de seguir; no lo corrijas en silencio.
 - **Autovalidación por capa:** al terminar los pasos 1 (dominio), 3 (caso de uso), 4 (persistencia) y 5 (API), repasa sin modificar nada las comprobaciones del comando de revisión de esa capa (secciones `dominio`, `aplicacion`, `infraestructura` y `api` de `docs/prompts/06-revisar.md`) solo sobre los archivos del paso, y reporta los ERROR y WARNING antes de pedir "continuar".
 - Si una prueba falla, investiga la causa raíz antes de cambiar código; corrige solo problemas verificados y no reescribas código no relacionado.
+- Si aparece un bug en código existente, primero escribe la prueba que lo reproduce y confírmala en rojo; después corrige.
 
 ### Paso 0 — Ficha y análisis de impacto (sin código)
 1. Ficha: agregado, actor y **permiso** (`<recurso>:<acción>`), entrada (Command/Query con campos y tipos), salida (Result o sin contenido), reglas con su capa, puertos de salida, endpoint (método, ruta, código de éxito), eventos (§7), errores (§8) con su HTTP, dependencias.
