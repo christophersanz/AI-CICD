@@ -9,7 +9,7 @@
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
 ## Rol
-Actúa como ingeniero de QA y desarrollador senior de Java 21 experto en JUnit 5, AssertJ, Mockito, Testcontainers y `spring-security-test` (ajusta al stack de `CLAUDE.md`). Además de escribir pruebas, debes poder **explicar qué patrón usa cada una y por qué**.
+Actúa como ingeniero de QA y desarrollador senior experto en el stack y las librerías de prueba del proyecto (`DP.stack`). Además de escribir pruebas, debes poder **explicar qué patrón usa cada una y por qué**.
 
 ## Contexto y fuentes de verdad
 - `docs/architecture.md` §9 (estrategia por capa, nombres y cobertura) y `docs/business-rules.md` (reglas `BR-*` y errores).
@@ -24,10 +24,12 @@ Cada regla y cada error que toca `{ARGUMENTO}` tiene al menos una prueba que fal
 ## Restricciones
 - No cambies código de producción para que una prueba pase. Si una prueba revela un bug, detente, muéstralo con la prueba que falla y propón la corrección.
 - Pruebas de dominio sin Spring ni mocks; casos de uso mockeando solo puertos de salida; persistencia según `DP.pruebas-integracion`; web con `@WebMvcTest`.
+- **No debilites ni borres pruebas existentes** (aserciones menos estrictas, `@Disabled`, casos eliminados) para que algo pase. Si una prueba existente es incorrecta o frágil, muéstralo con evidencia y propón el cambio; lo decido yo.
 - No añadas librerías de pruebas sin justificarlo.
 
 ## Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-03-pruebas-<objetivo>.md` (docs/sessions/README.md).
+- Rama `test/<objetivo>` desde `DP.rama-principal` actualizado; al terminar, commit en español, push y PR. No integres el PR.
+- Crea o retoma `docs/sessions/AAAA-MM-DD-03-pruebas-<objetivo>.md` (docs/sessions/README.md).
 
 ### Paso 1 — Diagnóstico (sin escribir pruebas)
 1. **Matriz de trazabilidad** de lo que existe hoy:
@@ -63,4 +65,4 @@ Nombres `should<Resultado>When<Condición>`, AssertJ, sin lógica condicional de
 2. Mutación manual de comprobación: para 2–3 reglas críticas, explica qué cambio en el código de producción haría fallar cada prueba nueva.
 
 ## Informe final
-Matriz de trazabilidad actualizada, pruebas añadidas por patrón, cobertura antes/después, bugs encontrados (si hubo) y vacíos que quedan. Incluye un párrafo listo para la presentación: "qué patrones de prueba usé y por qué".
+Matriz de trazabilidad actualizada, pruebas añadidas por patrón, pruebas existentes modificadas (si las hubo, con su motivo), cobertura antes/después, bugs encontrados (si hubo) y vacíos que quedan. Incluye un párrafo listo para la presentación: "qué patrones de prueba usé y por qué".
