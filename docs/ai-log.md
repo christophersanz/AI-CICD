@@ -4,7 +4,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 
 - **Asistente principal:** Claude Code (con `CLAUDE.md`, `docs/architecture.md` y `docs/business-rules.md` como contexto).
 - **Flujo:** Explore → Plan → Code → Commit. Cada cambio se acepta solo con `./mvnw clean verify` en verde.
-- **Prompts versionados:** comandos de Claude Code en `.claude/commands/` (índice en `docs/prompts/prompts.md`); los prompts numerados `001`–`006` de `docs/prompts/` son el histórico del curso. El progreso de cada comando queda en `docs/sessions/`.
+- **Prompts versionados:** `docs/prompts/NN-nombre-VV.md` (orden y versión; índice en `docs/prompts/prompts.md`), cada uno con su comando de Claude Code en `.claude/commands/`. Los prompts `001`–`006` del curso están en `docs/prompts/historico/`. El progreso de cada prompt queda en `docs/sessions/`.
 - **Regla:** nunca se pegan secretos ni datos reales; las credenciales de los ejemplos son de prueba.
 
 > Los campos `[__]` son tiempos que solo el autor puede medir: complétalos con tus valores reales. El resto de los datos sale del repositorio (revisiones, diseño, historial y builds).
@@ -123,10 +123,12 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 ### #12 — Prompts v2
 
 - **Origen:** los prompts 001–005 eran copia de los del docente y estaban desfasados (ArchUnit, "seguridad no implementada", flujo de una sola rama); `006-cicd.md` tenía 911 líneas con un parche incrustado. Se combinaron las prácticas del docente (sesiones 01–05), la serie de revisión de los modelos del curso (`use-case-ca-v1/prompts` 01–07), los prompts de F1 y las presentaciones de Juan José, Ángel y Jairo (tabla en `docs/prompts/prompts.md` §3).
-- **Aceptado:** `docs/prompts/prompts.md` como índice corto con la estructura común (rol, fuentes de verdad, objetivo verificable, qué no hacer, plan con aprobación, pasos, verificación, informe final, archivo de sesión); 17 comandos en `.claude/commands/` numerados por orden de uso: desarrollo (`00-refinar-requisitos` a `05-revisar-pr`), ciclo de revisión en 9 pasos (`10-revisar-dominio` a `16-revisar-arquitectura`, `17-corregir-hallazgos` como único que modifica código y `18-revision-final` con `FINAL STATUS: READY`/`NOT READY`, con reglas comunes en `docs/prompts/review-rules.md`) y calidad y operación (`20-corregir-sonar`, `21-cambiar-pipeline`); archivos de sesión en `docs/sessions/`; prompts 001–006 conservados como histórico.
+- **Aceptado:** `docs/prompts/prompts.md` como índice corto con la estructura común (rol, fuentes de verdad, objetivo verificable, qué no hacer, plan con aprobación, pasos, verificación, informe final, archivo de sesión); 20 prompts en `docs/prompts/` con nombre `NN-nombre-VV.md` (orden y versión) y sin duplicados: desarrollo (`00-refinar-requisitos` a `06-refactorizar`), ciclo de revisión (`09-reglas-revision`, `10-revisar-dominio` a `16-revisar-arquitectura`, `17-corregir-hallazgos` como único que modifica código y `18-revision-final` con `FINAL STATUS: READY`/`NOT READY`) y calidad, operación y prompts (`20-corregir-sonar`, `21-cambiar-pipeline`, `22-crear-o-mejorar-prompt`); comandos de Claude Code de tres líneas que solo cargan el prompt vigente; archivos de sesión en `docs/sessions/`; prompts 001–006 movidos a `docs/prompts/historico/`.
 - **Corregido:**
   - La primera versión no revisó los prompts de los modelos del curso ni los de F1; se detectó al pedirle a la IA que verificara sus fuentes y se incorporaron (revisión por capa, corrección separada, revisión final con veredicto).
   - Un reemplazo masivo de nombres de comandos cambió también la ruta `docs/business-rules.md` en todos los comandos; se detectó al revisar el resultado y se revirtió.
+  - La segunda versión guardaba el contenido en `.claude/commands/` (carpeta oculta en el IDE) y no tenía versión en el nombre; el contenido pasó a `docs/prompts/NN-nombre-VV.md` y los comandos quedaron como lanzadores.
+  - Se revisaron los 60 archivos de prompts de CURS-000617 (18 distintos) y las transcripciones de las sesiones 01–05; se incorporó el prompt DevOps de `CURS-000617-CICD-v2`, que no se había leído.
   - El endpoint de *hotspots* de SonarQube usa `project`, no `projectKey`; se comprobó contra el SonarQube local.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 

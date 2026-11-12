@@ -1,6 +1,6 @@
 # Resultado de revisión 001-review-01
 
-- **Prompt:** `docs/prompts/001-review-01.md` (ejecutado tal como está, antes de corregirlo)
+- **Prompt:** `docs/prompts/historico/001-review-01.md` (ejecutado tal como está, antes de corregirlo)
 - **Alcance:** todo el repositorio (iteración 1: dominio completo + `RegisterEmployeeUseCase`)
 - **Fecha:** 2026-09-26
 - **Fuentes de verdad:** `CLAUDE.md`, `docs/architecture.md`, `docs/business-rules.md`, `docs/adr/0001–0003`
@@ -61,8 +61,8 @@ Ordenados por severidad. **Violación** = incumple una regla documentada; **Reco
 | # | Severidad | Dimensión | Tipo | Archivo:línea | Problema | Regla/principio | Corrección propuesta |
 |---|---|---|---|---|---|---|---|
 | H-01 | **Alta** | Operación | Violación | `infrastructure/src/main/resources/application.yml` (sin configuración de log de Hibernate) | Al violar la restricción única, `SqlExceptionHelper` registra en ERROR: `Key (document_type, document_number)=(DNI, 87654321) already exists`. El DNI es un dato personal. Evidencia: salida de `EmployeePersistenceAdapterTest`. | `architecture.md` §8: "nunca registrar datos personales" | Silenciar `org.hibernate.engine.jdbc.spi.SqlExceptionHelper`; el adaptador ya traduce la excepción a `EMP-001`. |
-| H-02 | Media | Arquitectura | Contradicción | `docs/prompts/001-review-01.md:28` | El prompt exige `ArchitectureTest` con ArchUnit; no existe porque ADR-0003 lo descartó y `CLAUDE.md` lo quitó del stack. | ADR-0003 | **Corregir el prompt**, no el código. |
-| H-03 | Media | Arquitectura | Contradicción | `docs/prompts/001-review-01.md:24` vs `application/pom.xml` (`spring-tx`), `RegisterEmployeeService.java:15` | El prompt prohíbe cualquier framework en `application`; el código usa `@Transactional`, que `architecture.md` regla 3 y §8 permiten. | `architecture.md` regla 3 | **Corregir el prompt**. Alternativa (requiere ADR): transacciones con `TransactionTemplate` desde `infrastructure/config`. |
+| H-02 | Media | Arquitectura | Contradicción | `docs/prompts/historico/001-review-01.md:28` | El prompt exige `ArchitectureTest` con ArchUnit; no existe porque ADR-0003 lo descartó y `CLAUDE.md` lo quitó del stack. | ADR-0003 | **Corregir el prompt**, no el código. |
+| H-03 | Media | Arquitectura | Contradicción | `docs/prompts/historico/001-review-01.md:24` vs `application/pom.xml` (`spring-tx`), `RegisterEmployeeService.java:15` | El prompt prohíbe cualquier framework en `application`; el código usa `@Transactional`, que `architecture.md` regla 3 y §8 permiten. | `architecture.md` regla 3 | **Corregir el prompt**. Alternativa (requiere ADR): transacciones con `TransactionTemplate` desde `infrastructure/config`. |
 | H-04 | Media | Negocio | Violación | `domain/.../model/Contract.java:82` | `update()` permite cambiar el `type` del contrato. Ninguna regla lo autoriza ni prohíbe. | `CLAUDE.md` §4: "No inventes reglas de negocio" | Confirmar con negocio; si no aplica, quitar `newType`. Registrar la pregunta en §9. |
 | H-05 | Media | Calidad | Violación | `domain/.../model/Contract.java:68` | `restore()` no verifica que `termination` exista solo si el estado es `TERMINATED`, ni que `renewals` sea vacío en `INDEFINITE`. | `business-rules.md` §3 (atributos de `Contract`) | Validar ambas invariantes en el constructor privado. |
 | H-06 | Media | Pruebas | Recomendación | `infrastructure/.../config/UseCaseConfig.java` (0 % cubierto según JaCoCo) | Ninguna prueba levanta el contexto completo: el registro del bean, el proxy `@Transactional` y el flujo controller → BD solo se verificaron manualmente. | `architecture.md` §9 | Añadir `@SpringBootTest` + Testcontainers para `POST /api/v1/employees`. |
@@ -143,7 +143,7 @@ logging:
 
 ## 6. Actualizaciones sugeridas a la documentación
 
-1. **`docs/prompts/001-review-01.md`:**
+1. **`docs/prompts/historico/001-review-01.md`:**
    - Línea 24: permitir `@Transactional` en `application`.
    - Línea 28: reemplazar el requisito de ArchUnit por "verificación manual de la sección 3 (ADR-0003)".
    - Fuentes de verdad: añadir `docs/adr/`.

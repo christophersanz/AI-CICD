@@ -1,6 +1,6 @@
-# Reglas comunes de revisión
+# 09 · Reglas comunes de revisión (v01)
 
-Las incluyen todos los comandos de revisión de `.claude/commands/` (`05-revisar-pr`, `10` a `16` y `18-revision-final`). Cambiarlas aquí cambia todas las revisiones.
+Las aplican todos los prompts de revisión (`05-revisar-pr`, `10` a `16` y `18-revision-final`); sus comandos de Claude Code incluyen este archivo. Cambiarlas aquí cambia todas las revisiones.
 
 > **Una revisión no modifica código, pruebas, configuración ni documentación.** El único archivo que crea es su informe. Las correcciones se hacen con `/17-corregir-hallazgos`.
 

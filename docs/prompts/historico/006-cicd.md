@@ -1,4 +1,4 @@
-> **Histórico.** Prompt tal como se ejecutó durante el curso; se conserva como evidencia (ver `docs/prompts/prompts.md` §5). Para trabajo nuevo usa `/21-cambiar-pipeline` (`.claude/commands/21-cambiar-pipeline.md`). Describe el flujo de una sola rama, reemplazado por GitHub Flow (ADR-0012), y trae un parche incrustado.
+> **Histórico.** Prompt tal como se ejecutó durante el curso; se conserva como evidencia (ver `docs/prompts/prompts.md` §5). Para trabajo nuevo usa `docs/prompts/21-cambiar-pipeline-02.md` (versión 02). Describe el flujo de una sola rama, reemplazado por GitHub Flow (ADR-0012), y trae un parche incrustado.
 
 Aplica en este repositorio (IA-CICD) los cambios de CI/CD y de arranque local que vienen en el parche de abajo. Sigue estos pasos en orden y detente a explicarme si alguno falla.
 

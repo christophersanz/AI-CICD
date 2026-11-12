@@ -1,8 +1,8 @@
 # Archivos de sesión
 
-Cada comando de `.claude/commands/` guarda aquí su progreso. Así una tarea larga se puede retomar en otra sesión de Claude Code (o después de compactar el contexto) sin volver a explicar todo ni repetir trabajo: al empezar, Claude lee el archivo y continúa desde el último paso.
+Cada prompt de `docs/prompts/` (o su comando de Claude Code) guarda aquí su progreso. Así una tarea larga se puede retomar en otra sesión de Claude Code (o después de compactar el contexto) sin volver a explicar todo ni repetir trabajo: al empezar, Claude lee el archivo y continúa desde el último paso.
 
-Los comandos de revisión (`05`, `10`–`16` y `18`) no crean archivo de sesión: no modifican nada y su informe en `docs/reviews/` cumple esa función.
+Los prompts de revisión (`05`, `10`–`16` y `18`) no crean archivo de sesión: no modifican nada y su informe en `docs/reviews/` cumple esa función.
 
 ## Nombre
 
