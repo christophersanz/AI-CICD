@@ -16,6 +16,9 @@ services:
       REPO_URL: ${REPO_URL:-https://github.com/christophersanz/AI-CICD.git}
       REPO_BRANCH: ${REPO_BRANCH:-master}
       TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
+      # Despliegue local (ADR-0014): sin contraseña, la etapa se omite. La API queda en 127.0.0.1:DEPLOY_PORT.
+      DEPLOY_ADMIN_PASSWORD: ${DEPLOY_ADMIN_PASSWORD:-}
+      DEPLOY_PORT: ${DEPLOY_PORT:-8090}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

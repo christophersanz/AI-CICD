@@ -1,10 +1,12 @@
 # Jenkins local de práctica (ADR-0010).
 # - JDK 21: lo necesita ./mvnw.
 # - Cliente de Docker con buildx: Testcontainers y docker build (el Dockerfile del proyecto usa BuildKit).
+# - jq: lo usa la prueba de humo (.github/scripts/smoke-test.sh) en la verificación y el despliegue local.
 # - Plugins y configuración como código (JCasC): sin asistente inicial; usuario y job se crean al arrancar.
 FROM jenkins/jenkins:lts-jdk21
 
 USER root
+RUN apt-get update && apt-get install -y --no-install-recommends jq && rm -rf /var/lib/apt/lists/*
 COPY --from=docker:27-cli /usr/local/bin/docker /usr/local/bin/docker
 COPY --from=docker/buildx-bin:0.19.3 /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Prueba de humo de contract-api (ADR-0012, ADR-0013). La usan los jobs de verificación y de despliegue.
+# Prueba de humo de contract-api (ADR-0012, ADR-0013, ADR-0014). La usan los jobs de verificación y de despliegue
+# de GitHub Actions y las etapas equivalentes del Jenkinsfile.
 #   Uso: smoke-test.sh <url-base> <título del resumen>
 #   Variables: ADMIN_USERNAME (por defecto admin), ADMIN_PASSWORD (obligatoria), IMAGE (informativa),
 #              HEALTH_TIMEOUT en segundos (por defecto 120; en Render más, por el arranque en frío).
@@ -31,7 +32,8 @@ if [ -z "$token" ] || [ "$token" = "null" ]; then
   echo "::error::El login de $username no devolvió un access token"
   exit 1
 fi
-echo "::add-mask::$token"
+# En GitHub Actions oculta el token en el log; en Jenkins no se imprime.
+[ "${GITHUB_ACTIONS:-}" = true ] && echo "::add-mask::$token"
 
 status() { curl -s -o /dev/null --max-time 30 -w '%{http_code}' "$@"; }
 me=$(status -H "Authorization: Bearer $token" "$base_url/api/v1/auth/me")
