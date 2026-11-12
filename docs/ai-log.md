@@ -25,6 +25,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 10 | 2026-11-11 | GitHub Flow, despliegue con aprobación y Render (PR #1, #2) | sesión Claude Code | [__ h] | [__ h] | 1 |
 | 11 | 2026-11-12 | Jenkins por etapas, despliegue local y SonarQube (PR #3–#5) | sesión Claude Code | [__ h] | [__ h] | 3 |
 | 12 | 2026-11-12 | Prompts v2: 9 prompts genéricos ordenados, kit reutilizable y archivos de sesión | sesión Claude Code | [__ h] | [__ h] | 3 |
+| 13 | 2026-11-12 | Ronda de revisión 002 con los prompts nuevos (`/06-revisar`, `/07-corregir`) | `06-revisar.md`, `07-corregir.md` | [__ h] | [__ h] | 3 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -135,12 +136,29 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - El endpoint de *hotspots* de SonarQube usa `project`, no `projectKey`; se comprobó contra el SonarQube local.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
+### #13 — Ronda de revisión 002 con los prompts nuevos
+
+- **Origen:** primera ejecución real de los prompts genéricos: `/06-revisar` en sus 7 modos por capa más `final`, y `/07-corregir ronda 002`. Informes en `docs/reviews/002-1-dominio.md` … `002-9-final.md`.
+- **Aceptado:**
+  - Revisión: 0 ERROR, 6 WARNING y 8 INFO. Uno de los WARNING detectó que el motivo del diferido de `@Version` de la ronda 001 ya no aplicaba.
+  - Corrección con pruebas primero: `Contract.restore` valida invariantes estructurales con el código nuevo `CTR-009` → 500. La documentación quedó alineada (pendientes de `EmployeeStatus` y BR-USR-005, alcance de la autorización y agregado `identity`). `@Version` se difirió con el motivo actualizado, por decisión del autor.
+  - Revisión final: `FINAL STATUS: READY`.
+- **Corregido:**
+  - Varias comprobaciones automáticas de la IA dieron falsos positivos y se descartaron al verificarlas: una prueba «faltante» que estaba en `LogoutAndCurrentUserServiceTest`, «claves privadas» en el historial que eran la descripción del formato PEM, y pruebas `@Nested` que Surefire reporta dentro de la clase externa.
+  - Un conteo erróneo en el informe de CI/CD (9 scripts en lugar de 7) se corrigió antes de subirlo.
+- **Medido:**
+  - 362 → 373 pruebas en verde.
+  - Cobertura de líneas de `domain` 95,3 % → 95,8 %.
+  - Quality Gate de SonarQube: cobertura 94,2 % → 94,4 %, 0 bugs y 0 vulnerabilidades.
+  - Jenkins #17 (rama) y #19 (`master`) en verde.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
 ## Métricas del proyecto
 
 | Métrica | Valor | Fuente |
 |---|---|---|
-| Pruebas | 362 ejecutadas, 0 fallos (163 domain, 46 application, 153 infrastructure) | `./mvnw clean verify`, 2026-11-12 |
-| Cobertura de líneas | 95,3 % / 96,7 % / 96,3 % (domain / application / infrastructure) | JaCoCo, 2026-11-12 |
+| Pruebas | 373 ejecutadas, 0 fallos (173 domain, 46 application, 154 infrastructure) | `./mvnw clean verify`, 2026-11-12 (ronda 002) |
+| Cobertura de líneas | 95,8 % / 96,7 % / 96,3 % (domain / application / infrastructure) | JaCoCo, 2026-11-12 (ronda 002) |
 | Cobertura en la primera revisión | 94,2 % / 90,0 % / 92,7 % | `docs/reviews/001-7-arquitectura.md` |
 | Duración del pipeline | 1 min 55 s – 3 min 11 s | GitHub Actions |
 | Issues de Sonar | 1 bug y 2 vulnerabilidades en el primer análisis → 0 y 0 (Quality Gate en verde) | SonarQube local, Jenkins #10 y #11 (2026-11-12) |
