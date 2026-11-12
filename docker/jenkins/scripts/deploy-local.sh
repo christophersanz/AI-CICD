@@ -19,7 +19,7 @@ db=contract-api-deploy-db
 app=contract-api-deploy
 self="${JENKINS_CONTAINER:-contract-api-jenkins}"
 state="${JENKINS_HOME:?}/contract-api-deploy"
-scripts_dir="$(cd "$(dirname "$0")/../.." && pwd)/.github/scripts"
+scripts_dir="$(cd "$(dirname "$0")/../../.." && pwd)/.github/scripts"
 
 # 1. Configuración persistente (solo la primera vez).
 mkdir -p "$state"

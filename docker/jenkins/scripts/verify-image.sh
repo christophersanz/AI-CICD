@@ -13,7 +13,7 @@ db="$id-db"
 app="$id-app"
 self="${JENKINS_CONTAINER:-contract-api-jenkins}"
 work=$(mktemp -d)
-scripts_dir="$(cd "$(dirname "$0")/../.." && pwd)/.github/scripts"
+scripts_dir="$(cd "$(dirname "$0")/../../.." && pwd)/.github/scripts"
 
 cleanup() {
   local rc=$?
