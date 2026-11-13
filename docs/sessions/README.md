@@ -6,7 +6,7 @@ Cada prompt de `docs/prompts/` (o su comando de Claude Code) guarda aquí su pro
 
 ## Nombre
 
-`AAAA-MM-DD-<comando>-<tema>.md`, por ejemplo `2026-11-12-02-implementar-caso-uso-DeactivateEmployeeUseCase.md`.
+`AAAA-MM-DD-<comando>-<tema>.md`, donde `AAAA-MM-DD` es la fecha en que empezó la tarea. Por ejemplo, `2026-11-12-02-implementar-caso-uso-DeactivateEmployeeUseCase.md`.
 
 ## Contenido
 
@@ -38,6 +38,7 @@ Cada prompt de `docs/prompts/` (o su comando de Claude Code) guarda aquí su pro
 ## Reglas
 
 - Se actualiza al terminar **cada** paso, no solo al final.
-- Al retomar: si existe un archivo con el mismo comando y tema en estado *en curso*, se lee primero y se continúa desde *Pendiente al retomar*.
+- Al retomar: si existe un archivo con el mismo comando y tema en estado *en curso*, **aunque su fecha sea de otro día**, se lee primero y se continúa desde *Pendiente al retomar*. La fecha del nombre es la del inicio, no la de hoy.
+- Se crea un archivo nuevo solo si no hay ninguno *en curso* para ese comando y tema, por ejemplo al repetir `/07-corregir sonar` después de terminar la vez anterior. La fecha evita pisar la sesión anterior y deja el historial en orden cronológico.
 - Solo hechos verificables: archivos, resultados de comandos, decisiones aprobadas. Nada de secretos, tokens ni datos personales.
 - Se versiona junto con el cambio (va en el mismo PR): es la evidencia de cómo se trabajó con IA y alimenta `docs/ai-log.md`.

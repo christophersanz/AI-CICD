@@ -29,7 +29,7 @@ La estructura queda como se aprobó y el **comportamiento observable no cambia**
 - No reescribas código que no está en el alcance.
 
 ## Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-05-refactorizar-<tema>.md` (`docs/sessions/README.md`).
+Crea o retoma `docs/sessions/AAAA-MM-DD-05-refactorizar-<tema>.md` (`docs/sessions/README.md`; `AAAA-MM-DD` es la fecha en que empezó la tarea. Si ya existe uno *en curso* con el mismo comando y tema, de cualquier fecha, retómalo en lugar de crear otro).
 
 ### Paso 1 — Diagnóstico (sin modificar nada)
 1. Estado actual confirmado contra el código (no asumas lo descrito en el argumento).

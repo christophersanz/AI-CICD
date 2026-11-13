@@ -29,7 +29,7 @@ Un prompt en `docs/prompts/NN-nombre.md` con las 10 partes de la estructura com�
 
 ## Forma de trabajo
 - Rama `docs/prompt-<nombre>` desde `DP.rama-principal` actualizado; al terminar, commit en español, push y PR. No integres el PR.
-- Crea o retoma `docs/sessions/AAAA-MM-DD-09-mejorar-prompt-<tema>.md` (`docs/sessions/README.md`).
+- Crea o retoma `docs/sessions/AAAA-MM-DD-09-mejorar-prompt-<tema>.md` (`docs/sessions/README.md`; `AAAA-MM-DD` es la fecha en que empezó la tarea. Si ya existe uno *en curso* con el mismo comando y tema, de cualquier fecha, retómalo en lugar de crear otro).
 
 ### Paso 1 — Análisis (sin escribir el prompt)
 1. Tarea, actor y resultado esperado.

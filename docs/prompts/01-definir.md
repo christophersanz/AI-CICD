@@ -44,7 +44,7 @@ Orden habitual: `requisitos` primero y después `reglas` por cada duda bloqueant
 - Evita la sobreingeniería: el MVP 1 debe poder implementarse con los módulos actuales.
 
 ## Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-01-definir-<modo>-<tema>.md` (`docs/sessions/README.md`) y actualízalo al terminar cada paso.
+Crea o retoma `docs/sessions/AAAA-MM-DD-01-definir-<modo>-<tema>.md` (`docs/sessions/README.md`; `AAAA-MM-DD` es la fecha en que empezó la tarea. Si ya existe uno *en curso* con el mismo comando y tema, de cualquier fecha, retómalo en lugar de crear otro) y actualízalo al terminar cada paso.
 
 ### Modo `requisitos`
 
