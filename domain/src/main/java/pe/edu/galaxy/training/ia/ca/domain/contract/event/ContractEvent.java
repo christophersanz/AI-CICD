@@ -7,6 +7,10 @@ import pe.edu.galaxy.training.ia.ca.domain.contract.vo.ContractId;
 public sealed interface ContractEvent extends DomainEvent
         permits ContractCreated, ContractSigned, ContractRenewed, ContractTerminated, ContractExpired {
 
+    /**
+     * Contrato al que se refiere el evento; también es su {@link #aggregateId()}.
+     * @return el identificador del contrato
+     */
     ContractId contractId();
 
     @Override

@@ -11,21 +11,32 @@ import java.util.Set;
  */
 public enum ContractStatus {
 
+    /** Borrador: se puede modificar, firmar o cancelar. */
     DRAFT,
+    /** Vigente: firmado; se puede renovar, terminar o vencer. */
     ACTIVE,
+    /** Terminado anticipadamente. Estado final. */
     TERMINATED,
+    /** Vencido al pasar su fecha de fin. Estado final. */
     EXPIRED,
+    /** Cancelado sin haberse firmado. Estado final. */
     CANCELLED;
 
+    /**
+     * Indica si el cambio de estado aparece en el diagrama de business-rules §5.
+     * @param target estado al que se quiere pasar
+     * @return {@code true} si la transición está permitida
+     */
     public boolean canTransitionTo(ContractStatus target) {
         return nextStatuses().contains(target);
     }
 
-    /** BR-CTR-006: solo los contratos en borrador pueden modificarse. */
+    /** {@return {@code true} solo en {@code DRAFT}, el único estado en que el contrato se modifica (BR-CTR-006)} */
     public boolean isEditable() {
         return this == DRAFT;
     }
 
+    /** {@return {@code true} si ya no admite ninguna transición} */
     public boolean isFinal() {
         return nextStatuses().isEmpty();
     }

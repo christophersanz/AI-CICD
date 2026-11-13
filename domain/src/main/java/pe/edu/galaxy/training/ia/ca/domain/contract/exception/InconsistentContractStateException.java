@@ -9,6 +9,12 @@ import pe.edu.galaxy.training.ia.ca.domain.common.exception.DomainException;
  */
 public class InconsistentContractStateException extends DomainException {
 
+    /**
+     * Crea el error con el código {@code CTR-009}.
+     *
+     * @param contractNumber número del contrato leído de la base
+     * @param detail qué invariante estructural no se cumple
+     */
     public InconsistentContractStateException(String contractNumber, String detail) {
         super("CTR-009", "Persisted contract %s is inconsistent: %s".formatted(contractNumber, detail));
     }

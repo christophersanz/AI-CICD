@@ -25,6 +25,15 @@ public class AuthenticateUserService implements AuthenticateUserUseCase {
     private final RefreshTokenRepositoryPort refreshTokenRepository;
     private final Clock clock;
 
+    /**
+     * Recibe sus puertos; el bean se registra en {@code infrastructure/config} (architecture §3, regla 3).
+     *
+     * @param credentialsAuthenticator verificación de usuario y contraseña
+     * @param roleRepository lectura de roles y permisos
+     * @param tokenIssuer emisión de tokens
+     * @param refreshTokenRepository persistencia de refresh tokens
+     * @param clock reloj con el que se fechan los tokens
+     */
     public AuthenticateUserService(CredentialsAuthenticatorPort credentialsAuthenticator,
                                    RoleRepositoryPort roleRepository, TokenIssuerPort tokenIssuer,
                                    RefreshTokenRepositoryPort refreshTokenRepository, Clock clock) {

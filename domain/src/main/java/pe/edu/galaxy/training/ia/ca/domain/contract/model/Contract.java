@@ -66,7 +66,25 @@ public final class Contract extends AggregateRoot<ContractId> {
         this.termination = termination;
     }
 
-    /** Crea un contrato en borrador validando BR-CTR-002, BR-CTR-003 y BR-CTR-004. */
+    /**
+     * Crea un contrato en {@code DRAFT} y emite {@code ContractCreated}. Valida la vigencia frente al tipo (BR-CTR-002,
+     * BR-CTR-003) y la remuneración frente a la RMV (BR-CTR-004). No comprueba que el empleado exista ni que no haya
+     * contratos superpuestos: eso lo hace el caso de uso (BR-CTR-001, BR-CTR-005).
+     *
+     * @param number número generado por el sistema (BR-CTR-010)
+     * @param employeeId empleado del contrato
+     * @param type tipo de contrato
+     * @param jobTitle cargo
+     * @param salary remuneración mensual
+     * @param period vigencia, que debe corresponder al tipo
+     * @param minimumWage RMV vigente, con la que se compara la remuneración
+     * @param clock reloj con el que se fecha el evento
+     * @return el contrato nuevo, con su evento pendiente de publicar
+     * @throws InvalidContractPeriodException si la vigencia no corresponde al tipo ({@code CTR-001})
+     * @throws SalaryBelowMinimumWageException si la remuneración es menor que la RMV ({@code CTR-002})
+     * @throws pe.edu.galaxy.training.ia.ca.domain.common.exception.InvalidValueException si falta algún dato
+     *         obligatorio ({@code VAL-001})
+     */
     public static Contract create(ContractNumber number, EmployeeId employeeId, ContractType type,
                                   JobTitle jobTitle, Salary salary, ContractPeriod period,
                                   MinimumWage minimumWage, Clock clock) {
@@ -86,7 +104,17 @@ public final class Contract extends AggregateRoot<ContractId> {
      * {@code TERMINATED}, renovaciones solo en contratos renovables) para que un dato corrupto falle aquí y no
      * más adelante. No revalida BR-CTR-004: la RMV vigente puede ser mayor que la de la fecha del contrato.
      *
+     * @param id identificador persistido
+     * @param number número del contrato
+     * @param employeeId empleado del contrato
+     * @param type tipo de contrato
+     * @param jobTitle cargo
+     * @param salary remuneración mensual
+     * @param period vigencia, con las renovaciones ya aplicadas
+     * @param status estado persistido
+     * @param renewals historial de renovaciones, en orden
      * @param termination {@code null} si el contrato no fue terminado
+     * @return el contrato reconstruido, sin eventos pendientes
      * @throws InvalidContractPeriodException     si el periodo no corresponde al tipo (CTR-001)
      * @throws InconsistentContractStateException si el estado, el término o las renovaciones no concuerdan (CTR-009)
      */
@@ -108,7 +136,19 @@ public final class Contract extends AggregateRoot<ContractId> {
         return new Contract(id, number, employeeId, type, jobTitle, salary, period, status, renewals, termination);
     }
 
-    /** Modifica los datos del contrato (BR-CTR-006, BR-CTR-003, BR-CTR-004). */
+    /**
+     * Reemplaza tipo, cargo, remuneración y vigencia de un contrato en {@code DRAFT} (BR-CTR-006), con las mismas
+     * validaciones que al crearlo (BR-CTR-003, BR-CTR-004). No emite eventos.
+     *
+     * @param newType tipo nuevo
+     * @param newJobTitle cargo nuevo
+     * @param newSalary remuneración nueva
+     * @param newPeriod vigencia nueva, que debe corresponder al tipo nuevo
+     * @param minimumWage RMV vigente
+     * @throws ContractNotEditableException si el contrato ya no está en {@code DRAFT} ({@code CTR-004})
+     * @throws InvalidContractPeriodException si la vigencia no corresponde al tipo ({@code CTR-001})
+     * @throws SalaryBelowMinimumWageException si la remuneración es menor que la RMV ({@code CTR-002})
+     */
     public void update(ContractType newType, JobTitle newJobTitle, Salary newSalary, ContractPeriod newPeriod,
                        MinimumWage minimumWage) {
         if (!status.isEditable()) {
@@ -122,16 +162,35 @@ public final class Contract extends AggregateRoot<ContractId> {
         this.period = newPeriod;
     }
 
+    /**
+     * Firma el contrato: pasa de {@code DRAFT} a {@code ACTIVE} y emite {@code ContractSigned}. La comprobación de que
+     * no haya otro contrato activo superpuesto la hace el caso de uso (BR-CTR-005).
+     * @param clock reloj con el que se fecha el evento
+     * @throws InvalidContractStatusTransitionException si el contrato no está en {@code DRAFT} ({@code CTR-008})
+     */
     public void sign(Clock clock) {
         transitionTo(ContractStatus.ACTIVE, "sign");
         registerEvent(new ContractSigned(newEventId(), now(clock), id(), period.startDate()));
     }
 
+    /**
+     * Cancela un contrato que nunca se firmó: pasa de {@code DRAFT} a {@code CANCELLED}. No emite eventos.
+     * @throws InvalidContractStatusTransitionException si el contrato no está en {@code DRAFT} ({@code CTR-008})
+     */
     public void cancel() {
         transitionTo(ContractStatus.CANCELLED, "cancel");
     }
 
-    /** Extiende la fecha de fin de un contrato a plazo fijo vigente (BR-CTR-007). */
+    /**
+     * Extiende la fecha de fin de un contrato {@code FIXED_TERM} en {@code ACTIVE}, registra la renovación en el
+     * historial y emite {@code ContractRenewed} (BR-CTR-007). El límite de 5 años acumulados (BR-CTR-008) lo comprueba
+     * el caso de uso.
+     *
+     * @param newEndDate fecha de fin nueva, posterior a la actual
+     * @param clock reloj con el que se fecha el evento
+     * @throws ContractNotRenewableException si el contrato no es {@code FIXED_TERM} en {@code ACTIVE}, o si la fecha
+     *         falta o no es posterior a la actual ({@code CTR-005})
+     */
     public void renew(LocalDate newEndDate, Clock clock) {
         if (!type.isRenewable() || status != ContractStatus.ACTIVE) {
             throw new ContractNotRenewableException(number.value(), "only ACTIVE FIXED_TERM contracts can be renewed.");
@@ -146,7 +205,17 @@ public final class Contract extends AggregateRoot<ContractId> {
         registerEvent(new ContractRenewed(newEventId(), now(clock), id(), currentEndDate, newEndDate));
     }
 
-    /** Termina anticipadamente un contrato vigente (BR-CTR-009). */
+    /**
+     * Termina anticipadamente un contrato {@code ACTIVE}: guarda el término, pasa a {@code TERMINATED} y emite
+     * {@code ContractTerminated} (BR-CTR-009).
+     *
+     * @param terminationDate fecha del término, dentro de la vigencia (ambos extremos incluidos)
+     * @param reason motivo, obligatorio
+     * @param clock reloj con el que se fecha el evento
+     * @throws InvalidContractStatusTransitionException si el contrato no está en {@code ACTIVE} ({@code CTR-008})
+     * @throws InvalidTerminationException si falta el motivo o la fecha, o la fecha está fuera de la vigencia
+     *         ({@code CTR-007})
+     */
     public void terminate(LocalDate terminationDate, String reason, Clock clock) {
         ensureCanTransitionTo(ContractStatus.TERMINATED, "terminate");
         Termination newTermination = new Termination(terminationDate, reason);
@@ -160,6 +229,12 @@ public final class Contract extends AggregateRoot<ContractId> {
                 newTermination.reason()));
     }
 
+    /**
+     * Indica si el contrato debe vencer en la fecha de corte: es {@code FIXED_TERM}, está {@code ACTIVE} y su fecha de
+     * fin es anterior a la de corte (business-rules §5). Lo usa el Sistema para elegir qué contratos vencer.
+     * @param cutoffDate fecha de corte del proceso de vencimiento
+     * @return {@code true} si {@link #expire(LocalDate, Clock)} lo aceptaría
+     */
     public boolean isExpirableAt(LocalDate cutoffDate) {
         Guard.notNull(cutoffDate, "cutoffDate");
         return type.isExpirable()
@@ -167,7 +242,15 @@ public final class Contract extends AggregateRoot<ContractId> {
                 && cutoffDate.isAfter(currentEndDate());
     }
 
-    /** Marca como vencido un contrato a plazo fijo cuya fecha de fin ya pasó. */
+    /**
+     * Marca como vencido un contrato a plazo fijo cuya fecha de fin ya pasó: pasa a {@code EXPIRED} y emite
+     * {@code ContractExpired}.
+     *
+     * @param cutoffDate fecha de corte; la fecha de fin debe ser anterior a ella
+     * @param clock reloj con el que se fecha el evento
+     * @throws InvalidContractStatusTransitionException si {@link #isExpirableAt(LocalDate)} es {@code false} ({@code
+     *         CTR-008})
+     */
     public void expire(LocalDate cutoffDate, Clock clock) {
         if (!isExpirableAt(cutoffDate)) {
             throw new InvalidContractStatusTransitionException(number.value(), status.name(), "expire");
@@ -217,38 +300,47 @@ public final class Contract extends AggregateRoot<ContractId> {
         return Guard.notNull(clock, "clock").instant();
     }
 
+    /** {@return el número legible del contrato, con formato {@code CTR-AAAA-NNNNNN}} */
     public ContractNumber number() {
         return number;
     }
 
+    /** {@return el empleado del contrato; no cambia} */
     public EmployeeId employeeId() {
         return employeeId;
     }
 
+    /** {@return el tipo de contrato} */
     public ContractType type() {
         return type;
     }
 
+    /** {@return el cargo} */
     public JobTitle jobTitle() {
         return jobTitle;
     }
 
+    /** {@return la remuneración mensual} */
     public Salary salary() {
         return salary;
     }
 
+    /** {@return la vigencia, con las renovaciones ya aplicadas} */
     public ContractPeriod period() {
         return period;
     }
 
+    /** {@return el estado actual} */
     public ContractStatus status() {
         return status;
     }
 
+    /** {@return una copia inmutable del historial de renovaciones, en orden} */
     public List<ContractRenewal> renewals() {
         return List.copyOf(renewals);
     }
 
+    /** {@return el término, presente solo si el estado es {@code TERMINATED}} */
     public Optional<Termination> termination() {
         return Optional.ofNullable(termination);
     }

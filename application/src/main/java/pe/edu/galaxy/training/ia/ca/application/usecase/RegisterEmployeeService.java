@@ -17,6 +17,11 @@ public class RegisterEmployeeService implements RegisterEmployeeUseCase {
 
     private final EmployeeRepositoryPort employeeRepository;
 
+    /**
+     * Recibe sus puertos; el bean se registra en {@code infrastructure/config} (architecture §3, regla 3).
+     *
+     * @param employeeRepository persistencia de empleados
+     */
     public RegisterEmployeeService(EmployeeRepositoryPort employeeRepository) {
         this.employeeRepository = employeeRepository;
     }

@@ -7,5 +7,6 @@ import java.util.UUID;
  * extender clases; cada ID declara sus fábricas {@code generate()} y {@code of(...)}.
  */
 public interface Identifier {
+    /** {@return el UUID que identifica a la entidad} */
     UUID value();
 }

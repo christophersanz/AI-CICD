@@ -7,6 +7,7 @@ import java.time.Instant;
  *
  * @param value valor que se entrega al cliente; nunca se persiste
  * @param hash  hash del valor; es lo único que se persiste
+ * @param expiresAt instante de expiración
  */
 public record IssuedRefreshToken(String value, String hash, Instant expiresAt) {
 
