@@ -10,9 +10,9 @@ El `Jenkinsfile` tenía dos etapas (`./mvnw clean verify` e imagen Docker), y el
 
 ## Decisión
 
-- El `Jenkinsfile` tiene una etapa por paso: **Compilar** (`install -DskipTests`, para que las etapas siguientes trabajen por módulo), **Pruebas unitarias** (`domain`, `application`), **Pruebas de integración** (`infrastructure`, con Testcontainers), **Cobertura** (`jacoco:report` y `jacoco:check`, mismo umbral del 80 %), **Imagen Docker**, **Verificación de la imagen** y **Despliegue local**.
+- El `Jenkinsfile` tiene una etapa por paso: **Compilar** (`install -DskipTests`, para que las etapas siguientes trabajen por módulo), **Pruebas unitarias** (`domain`, `application`), **Pruebas de integración** (`infrastructure`, con Testcontainers), **Cobertura** (`jacoco:report` y `jacoco:check`, mismo umbral del 80 %), **Imagen Docker**, **Verificación de la imagen** y **Despliegue local (Docker)**.
 - **Verificación de la imagen** (`docker/jenkins/scripts/verify-image.sh`): equivale al job del mismo nombre en GitHub Actions. Usa una red, un PostgreSQL y claves JWT temporales, y ejecuta la prueba de humo compartida (`.github/scripts/smoke-test.sh`). Al terminar, pase o falle, lo retira todo.
-- **Despliegue local** (`docker/jenkins/scripts/deploy-local.sh`): entorno persistente en el Docker del host. Lo forman la red `contract-api-deploy`, el contenedor `contract-api-deploy-db` (volumen `contract-api-deploy-data`) y la API `contract-api-deploy` en `127.0.0.1:${DEPLOY_PORT:-8090}`, todos con `--restart unless-stopped`.
+- **Despliegue local (Docker)** (`docker/jenkins/scripts/deploy-local.sh`): entorno persistente en el Docker del host. Lo forman la red `contract-api-deploy`, el contenedor `contract-api-deploy-db` (volumen `contract-api-deploy-data`) y la API `contract-api-deploy` en `127.0.0.1:${DEPLOY_PORT:-8090}`, todos con `--restart unless-stopped`.
   - Las claves JWT y la contraseña de la base se generan una sola vez en `$JENKINS_HOME/contract-api-deploy`, así que los tokens siguen valiendo entre despliegues.
   - La contraseña del administrador llega por `DEPLOY_ADMIN_PASSWORD` desde `docker/jenkins/.env`. Si no está definida, la etapa se omite.
   - Después de desplegar repite la prueba de humo. Si falla, vuelve a levantar la imagen anterior y el build falla.

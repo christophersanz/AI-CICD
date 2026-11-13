@@ -94,7 +94,7 @@ pipeline {
 
         // Entorno persistente en esta máquina (http://localhost:8090 por defecto). Se omite si
         // docker/jenkins/.env no define DEPLOY_ADMIN_PASSWORD.
-        stage('Despliegue local') {
+        stage('Despliegue local (Docker)') {
             when {
                 expression { env.DEPLOY_ADMIN_PASSWORD?.trim() }
             }
