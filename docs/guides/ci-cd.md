@@ -515,6 +515,8 @@ El arranque falla si no existe `docker/jenkins/.env`. Ese archivo define el usua
 
 Abre <http://localhost:8080>, entra con el usuario y la contraseña de `docker/jenkins/.env` y ejecuta el job **contract-api** con **Build Now** una vez. La primera ejecución tarda unos minutos porque descarga dependencias e imágenes. Jenkins construye solo, también tras cada reinicio: sondea `master` cada ~5 minutos (`pollSCM` en el `Jenkinsfile` y en el job de `casc.yaml`, porque GitHub no puede enviar webhooks a `localhost`) y lanza un build si hay commits nuevos. Los detalles (variables, fork, limpieza) están en su [README](../../docker/jenkins/README.md).
 
+Para probar una rama antes del merge se cambia `REPO_BRANCH` y se lanza el job. **Al terminar, se vuelve a `REPO_BRANCH=master` y se lanza un build sobre `master`:** el sondeo de un job de Pipeline sigue la rama del último build, y sin ese build los merges siguientes no se construyen (pasos en el [README](../../docker/jenkins/README.md#probar-una-rama-antes-de-integrarla)).
+
 Jenkins es solo de práctica: el CI oficial que valida cada push a `master` es GitHub Actions ([ADR-0010](../adr/0010-jenkins-local-de-practica.md)).
 
 ## 11. Problemas frecuentes
@@ -551,5 +553,6 @@ Jenkins es solo de práctica: el CI oficial que valida cada push a `master` es G
 | `docker build` falla en Jenkins con `--mount` | Falta BuildKit (`buildx`) | La imagen de `docker/jenkins` ya lo incluye; reconstruirla con `--build` |
 | *Análisis SonarQube* falla con `QUALITY GATE STATUS: FAILED` | El código tiene bugs, vulnerabilidades, hotspots sin revisar o la cobertura bajó del 80 % | El log de la etapa lista cada condición; el detalle está en <http://localhost:9000/dashboard?id=contract-api>. Corregir el código o, si el hallazgo no aplica, justificarlo con `@SuppressWarnings("java:Sxxxx")` y un comentario (ADR-0015) |
 | *Análisis SonarQube* falla con `SONAR_ADMIN_PASSWORD no coincide` | Se cambió la variable después del primer arranque | Volver al valor original o cambiar la contraseña de `admin` en SonarQube (*My Account → Security*) |
+| Jenkins no construye después de un merge; el **Git Polling Log** dice `No changes` | El último build fue el de otra rama (prueba de un PR): el sondeo de un job de Pipeline usa la rama del último build, aunque `REPO_BRANCH` ya sea `master` | Con `REPO_BRANCH=master`, pulsar **Build Now** una vez; desde ese build el sondeo vuelve a seguir `master` |
 | La etapa *Despliegue local (Docker)* aparece omitida | `docker/jenkins/.env` no define `DEPLOY_ADMIN_PASSWORD` | Añadirla y repetir el `up -d` de Jenkins |
 | *Despliegue local (Docker)* falla en el login y vuelve a la imagen anterior | Se cambió `DEPLOY_ADMIN_PASSWORD` después del primer despliegue: el `admin` ya existe con la contraseña original | Volver a la contraseña original, o borrar el entorno (`docker rm -f contract-api-deploy contract-api-deploy-db && docker volume rm contract-api-deploy-data`) |

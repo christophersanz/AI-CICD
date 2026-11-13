@@ -59,7 +59,7 @@ Tabla con la decisión de cada hallazgo:
 ### Paso 4 — Verificar
 1. `DP.build`: compilación, pruebas (ejecutadas, exitosas, fallidas, con error, omitidas) y cobertura por módulo.
 2. Regla de dependencia de nuevo en los archivos tocados y sin dependencias nuevas no permitidas.
-3. Si cambió código de producción, o en el modo `sonar`: build del CI local (`DP.ci-local`) contra la rama (cómo apuntarlo a otra rama: `DP.ci-local`; vuelve a la rama principal al terminar) y todas las condiciones del Quality Gate en `OK`.
+3. Si cambió código de producción, o en el modo `sonar`: build del CI local (`DP.ci-local`) contra la rama (cómo apuntarlo a otra rama: `DP.ci-local`). Al terminar, vuelve a la rama principal **y lanza un build sobre ella**: en Jenkins, el sondeo sigue la rama del último build y todas las condiciones del Quality Gate en `OK`.
 
 ### Paso 5 — Informe y PR
 - **`ronda`:** guarda `docs/reviews/NNN-8-correcciones.md`. **`sonar`:** el informe va en la descripción del PR.

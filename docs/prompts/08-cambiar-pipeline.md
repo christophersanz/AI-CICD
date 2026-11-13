@@ -46,7 +46,7 @@ Espera mi aprobación.
 
 ### Paso 3 — Verificar de punta a punta
 1. Push y PR: los checks del PR en verde (`gh pr checks`).
-2. Si toca el CI local: apúntalo temporalmente a la rama (cómo: `DP.ci-local`), lanza el job y revisa el resultado de cada etapa (en Jenkins, el *Stage View* o la API `wfapi/describe`). Vuelve a la rama principal al terminar.
+2. Si toca el CI local: apúntalo temporalmente a la rama (cómo: `DP.ci-local`), lanza el job y revisa el resultado de cada etapa (en Jenkins, el *Stage View* o la API `wfapi/describe`). Al terminar, vuelve a la rama principal **y lanza un build sobre ella**: en Jenkins, el sondeo sigue la rama del último build, y sin ese build los merges siguientes no se construyen.
 3. Si toca un despliegue: prueba de humo contra el entorno y, si hay rollback, pruébalo forzando un fallo.
 4. Si algo falla, diagnostica desde el log, corrige y repite; no reportes éxito sin la ejecución real.
 5. Elimina los contenedores, redes y volúmenes de prueba que hayas creado.
