@@ -24,7 +24,7 @@ Prompts genéricos para desarrollar con Claude Code una API Java con Clean Archi
 
 `dominio` → `aplicacion` → `infraestructura` → `api` → `seguridad` → `cicd` → `arquitectura` → **`/07-corregir ronda NNN`** → `final`
 
-Cada modo deja su informe en `docs/reviews/NNN-<paso>-<modo>.md` (`NNN` es la ronda) y dice cuál es el siguiente paso. `/06-revisar pr <n>` revisa un PR antes de integrarlo.
+Cada ronda tiene su carpeta `docs/reviews/AAAA-MM-DD-ronda-NNN/`, con un `README.md` que resume el estado de la ronda. Cada modo deja allí su informe con un nombre descriptivo (`01-revision-dominio.md` … `09-veredicto-final.md`) y dice cuál es el siguiente paso. `/06-revisar pr <n>` revisa un PR antes de integrarlo.
 
 ### Flujos típicos
 
@@ -109,7 +109,7 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 
 | Prompt del curso | Uso | Lo reemplaza |
 |---|---|---|
-| [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | Revisión integral (sesión 02); informe en `docs/reviews/001-7-arquitectura.md` | [`06-revisar.md`](06-revisar.md) (todos sus modos) |
+| [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | Revisión integral (sesión 02); informe en `docs/reviews/2026-09-26-ronda-001/07-revision-integral.md` | [`06-revisar.md`](06-revisar.md) (todos sus modos) |
 | [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) | Refactor del dominio por agregado (sesión 03) | [`05-refactorizar.md`](05-refactorizar.md) |
 | [`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md) | Diseño de la seguridad 3A (sesión 03) | `DP.seguridad` y [`06-revisar.md`](06-revisar.md) modo `seguridad` |
 | [`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md) | Caso de uso paso a paso (sesión 03) | [`02-implementar-caso-uso.md`](02-implementar-caso-uso.md) |

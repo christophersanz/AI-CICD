@@ -2,7 +2,7 @@
 
 - **Prompt:** `docs/prompts/06-revisar.md`, modo `arquitectura` (paso 7 de 9 de la ronda 002)
 - **Fecha:** 2026-11-12 · **Commit revisado:** `183d054` (`master`)
-- **Alcance:** todo el repositorio, apoyándose en los informes de los pasos 1 a 6 de la ronda (`002-1-dominio.md` … `002-6-cicd.md`)
+- **Alcance:** todo el repositorio, apoyándose en los informes de los pasos 1 a 6 de la ronda (`01-revision-dominio.md` … `06-revision-cicd.md`)
 
 ## 1. Resumen
 

@@ -2,7 +2,7 @@
 
 - **Prompt:** `docs/prompts/07-corregir.md`, modo `ronda 002` (paso 8 de 9)
 - **Fecha:** 2026-11-12 · **Rama:** `fix/revision-002` (sobre `183d054` + informes de los pasos 1–7)
-- **Informes de origen:** `002-1-dominio.md` … `002-7-arquitectura.md` (matriz consolidada en `002-7` §4)
+- **Informes de origen:** `01-revision-dominio.md` … `07-revision-integral.md` (matriz consolidada en `002-7` §4)
 - **Plan aprobado por el autor:** W-01 con el código nuevo `CTR-009`, W-04 diferido, I-01 e I-02 incluidos.
 
 ## 1. Decisión y resultado por hallazgo
@@ -48,7 +48,7 @@ Los demás INFO (I-03 a I-08) quedan fuera de esta corrección: el prompt corrig
 | W-04 · bloqueo optimista en `Employee` | **Riesgo aceptado** mientras haya pocas ediciones simultáneas de un mismo empleado. Hacerlo bien cambia el contrato REST (`If-Match` o un campo `version`), requiere una migración `V6` y un código de error `409` nuevo, y eso es una decisión del autor. Reemplaza al diferido de la ronda 001, cuyo motivo («`Employee` es inmutable») ya no aplicaba. | `/01-definir reglas concurrencia` y luego `/02-implementar-caso-uso` |
 | W-02 · `EmployeeStatus` (implementación) | Funcionalidad nueva; ya está documentada como pendiente | `/02-implementar-caso-uso DeactivateEmployeeUseCase` |
 | W-03 · casos de uso que disparan BR-USR-005 | Decisión de negocio; ya figura como pregunta abierta en §9 | `/01-definir reglas cambio-de-contraseña` |
-| I-03 a I-08 | INFO no incluidos por el autor | Ver `002-7-arquitectura.md` §4 |
+| I-03 a I-08 | INFO no incluidos por el autor | Ver `07-revision-integral.md` §4 |
 
 Falsos positivos: ninguno.
 
