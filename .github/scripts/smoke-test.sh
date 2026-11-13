@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Prueba de humo de contract-api (ADR-0012, ADR-0013, ADR-0014). La usan los jobs de verificación y de despliegue
-# de GitHub Actions y las etapas equivalentes del Jenkinsfile.
+# Prueba de humo de contract-api (ADR-0012, ADR-0014). La usan el job de verificación de GitHub Actions y las
+# etapas de verificación y de despliegue del Jenkinsfile.
 #   Uso: smoke-test.sh <url-base> <título del resumen>
 #   Variables: ADMIN_USERNAME (por defecto admin), ADMIN_PASSWORD (obligatoria), IMAGE (informativa),
-#              HEALTH_TIMEOUT en segundos (por defecto 120; en Render más, por el arranque en frío).
+#              HEALTH_TIMEOUT en segundos (por defecto 120).
 # Comprueba que la API responde UP (Flyway migró la base), que el administrador inicial inicia sesión
 # (BR-USR-007) y que la autenticación JWT y la autorización por permisos funcionan de extremo a extremo.
 set -euo pipefail

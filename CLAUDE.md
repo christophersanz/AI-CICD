@@ -11,7 +11,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | docs/technical.md | Estado implementado: endpoints, seguridad, variables de entorno, esquema de BD, build y CI/CD | Al cambiar endpoints, configuración, migraciones o el pipeline (actualizarlo en el mismo cambio) |
 | docs/api/contract/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
 | docs/guides/diagramas-arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
-| docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, despliegue con aprobación, versiones e imágenes | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
+| docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, versiones, imágenes y despliegue con Docker | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
 | @docs/prompts/README.md | Índice de los prompts `docs/prompts/NN-nombre.md` (por orden de uso), sus comandos de Claude Code, la estructura común, las fuentes y el kit reutilizable | Al iniciar una tarea recurrente (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión, pipeline) |
 | docs/design/seguridad.md | Diseño de la seguridad y sus fases | Al tocar autenticación, autorización o tokens |
 | docs/reviews/ | Informes de revisión por ronda (`NNN-<paso>-<modo>.md`) | Antes de corregir (`/07-corregir`) o al hacer la revisión final |
@@ -40,7 +40,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | Documentación API | springdoc-openapi (OpenAPI 3) |
 | Observabilidad | Micrometer + OpenTelemetry, logs estructurados en JSON |
 | Pruebas | JUnit 5, AssertJ, Mockito, Testcontainers, spring-security-test; cobertura con JaCoCo (≥ 80 % de líneas en `domain` y `application`) |
-| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional) (ADR-0009); GitHub Flow con checks obligatorios y despliegue con aprobación en el environment `production` (ADR-0012) a Render (`render.yaml`, ADR-0013); `Jenkinsfile` solo para Jenkins local de práctica, por etapas, con Quality Gate de SonarQube local y despliegue local en `localhost:8090` (ADR-0010, ADR-0014, ADR-0015) |
+| CI/CD | GitHub Actions (`.github/workflows/ci-cd.yml`), análisis estático en SonarCloud (ADR-0011), imagen Docker en GHCR y Docker Hub (opcional) (ADR-0009); GitHub Flow con checks obligatorios (ADR-0012); despliegue solo con Docker: el `Jenkinsfile`, para Jenkins local por etapas con Quality Gate de SonarQube local, termina con la API desplegada en `localhost:8090` (ADR-0010, ADR-0014, ADR-0015, ADR-0016) |
 
 ## 3. Comandos habituales
 
@@ -57,7 +57,7 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 
 - Nunca se hace push directo a `master`: todo cambio va en una rama corta (`feature/*`, `fix/*`, `docs/*`) y entra por Pull Request. Antes de cada push, `./mvnw clean verify` en verde.
 - El ruleset `master-protegida` exige los checks **Build, pruebas y cobertura** e **Imagen Docker** en verde, la rama al día con `master` e integración solo con **squash**; sin force push ni borrado. Claude no integra PRs: el *Squash and merge* lo decide el desarrollador.
-- Tras el merge, **Verificación de la imagen** prueba la imagen publicada en un entorno efímero y **Despliegue (production)** espera la aprobación del environment `production` para desplegarla en Render. Claude no aprueba despliegues.
+- Tras el merge, **Verificación de la imagen** prueba la imagen publicada en un entorno efímero, y el Jenkins local la despliega con Docker en `localhost:8090` (ADR-0016). No hay despliegue en la nube.
 - Los mensajes de commit van en español, en imperativo y describen el porqué.
 - Una versión se publica con un tag `vX.Y.Z` sobre `master`; el pipeline publica la imagen con esa etiqueta.
 
@@ -74,7 +74,7 @@ docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.y
 - Evita la sobreingeniería: no introduzcas CQRS, event sourcing ni nuevos módulos sin una necesidad justificada.
 - No añadas dependencias nuevas al `pom.xml` sin indicarlo y justificarlo.
 - Ejecuta `./mvnw clean verify` antes de dar una tarea por terminada: es lo mismo que ejecuta el CI, incluido el umbral de cobertura.
-- Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009/ADR-0012/ADR-0013/ADR-0014/ADR-0015 o registra uno nuevo.
+- Si cambias el pipeline, el `Dockerfile` o el flujo de ramas, actualiza ADR-0009/ADR-0012/ADR-0014/ADR-0015/ADR-0016 o registra uno nuevo.
 
 ## 5. Datos para los prompts (DP)
 
@@ -101,10 +101,10 @@ Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/k
 | `flujo-git` | GitHub Flow: rama corta + PR, ruleset `master-protegida` con checks requeridos, solo *squash* y rama al día (ADR-0012) |
 | `seguridad` | JWT RS256 propio + refresh token opaco de un solo uso; permisos con `@PreAuthorize` según `business-rules.md` §4.1; diseño en `docs/design/seguridad.md` (ADR-0005) |
 | `adr-arquitectura` | ADR-0003 (sin ArchUnit) y ADR-0004 (paquetes del dominio por agregado) |
-| `adr-cicd` | ADR-0009 a ADR-0015 |
+| `adr-cicd` | ADR-0009 a ADR-0016 (ADR-0013, Render, sustituido por ADR-0016) |
 | `ci` | GitHub Actions: `.github/workflows/ci-cd.yml`, scripts en `.github/scripts/` (prueba de humo compartida `smoke-test.sh`), ruleset versionado en `.github/ruleset/` |
 | `imagen` | `Dockerfile` multi-stage (JRE 21, usuario sin privilegios, perfil `prod`), publicada en GHCR y Docker Hub con etiquetas `latest`, `sha-<corto>` y versión |
-| `despliegue` | Verificación efímera de la imagen y despliegue en Render (`render.yaml`) tras la aprobación del environment `production` (ADR-0013); despliegue local de Jenkins en <http://localhost:8090> (ADR-0014) |
+| `despliegue` | Solo con Docker: verificación efímera de la imagen en GitHub Actions y despliegue del Jenkins local en <http://localhost:8090> con rollback a la imagen anterior (ADR-0014, ADR-0016). Sin despliegue en la nube |
 | `ci-local` | Jenkins en <http://localhost:8080>: `Jenkinsfile` y `docker/jenkins/` (compose, `casc.yaml`, `scripts/`, `.env` no versionado con `REPO_BRANCH`). Para probar una rama: `REPO_BRANCH=<rama>`, `up -d` del compose y **Build Now**; al terminar, `REPO_BRANCH=master`, `up -d` y **Build Now** sobre `master` (`docker/jenkins/README.md` → *Probar una rama*) |
 | `sonarqube` | SonarQube local en <http://localhost:9000>, proyecto y Quality Gate `contract-api`; credenciales `SONAR_ADMIN_PASSWORD` en `docker/jenkins/.env`; condiciones en `docker/jenkins/scripts/sonar-analysis.sh` (ADR-0015) |
 | `openapi` | `docs/api/contract/openapi.yaml` y `.json`, generados con springdoc; cómo regenerarlos en `docs/api/README.md` |
