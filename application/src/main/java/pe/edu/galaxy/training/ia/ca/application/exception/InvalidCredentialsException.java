@@ -6,6 +6,7 @@ package pe.edu.galaxy.training.ia.ca.application.exception;
  */
 public class InvalidCredentialsException extends UnauthenticatedException {
 
+    /** Crea el error sin datos del intento, para no revelar si el usuario existe. */
     public InvalidCredentialsException() {
         super("AUTH-002", "Invalid username or password.");
     }

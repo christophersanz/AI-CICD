@@ -19,6 +19,12 @@ public class BootstrapAdministratorService implements BootstrapAdministratorUseC
     private final UserRepositoryPort userRepository;
     private final PasswordHasherPort passwordHasher;
 
+    /**
+     * Recibe sus puertos; el bean se registra en {@code infrastructure/config} (architecture §3, regla 3).
+     *
+     * @param userRepository persistencia de usuarios
+     * @param passwordHasher hash de contraseñas
+     */
     public BootstrapAdministratorService(UserRepositoryPort userRepository, PasswordHasherPort passwordHasher) {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;

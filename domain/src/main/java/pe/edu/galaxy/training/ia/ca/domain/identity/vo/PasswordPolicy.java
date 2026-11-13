@@ -9,13 +9,22 @@ import pe.edu.galaxy.training.ia.ca.domain.identity.exception.WeakPasswordExcept
  */
 public final class PasswordPolicy {
 
+    /** Longitud mínima, en caracteres Unicode. */
     public static final int MIN_LENGTH = 12;
+    /** Longitud máxima, en caracteres Unicode. */
     public static final int MAX_LENGTH = 64;
+    /** Máximo de bytes en UTF-8: BCrypt ignora lo que pasa de 72. */
     public static final int MAX_BYTES = 72;
 
     private PasswordPolicy() {
     }
 
+    /**
+     * Comprueba una contraseña en claro antes de hashearla.
+     * @param rawPassword contraseña en claro; nunca se incluye en el mensaje de error
+     * @throws pe.edu.galaxy.training.ia.ca.domain.identity.exception.WeakPasswordException si falta, no tiene entre 12
+     *         y 64 caracteres o supera 72 bytes ({@code AUTH-008})
+     */
     public static void validate(CharSequence rawPassword) {
         if (rawPassword == null) {
             throw new WeakPasswordException("Password is required.");

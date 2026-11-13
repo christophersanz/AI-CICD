@@ -26,6 +26,13 @@ public class CreateUserService implements CreateUserUseCase {
     private final RoleRepositoryPort roleRepository;
     private final PasswordHasherPort passwordHasher;
 
+    /**
+     * Recibe sus puertos; el bean se registra en {@code infrastructure/config} (architecture §3, regla 3).
+     *
+     * @param userRepository persistencia de usuarios
+     * @param roleRepository lectura de roles y permisos
+     * @param passwordHasher hash de contraseñas
+     */
     public CreateUserService(UserRepositoryPort userRepository, RoleRepositoryPort roleRepository,
                              PasswordHasherPort passwordHasher) {
         this.userRepository = userRepository;

@@ -46,13 +46,36 @@ public final class RefreshToken extends AggregateRoot<RefreshTokenId> {
         this.revocationReason = revocationReason;
     }
 
-    /** Emite el primer token de una familia nueva (login). */
+    /**
+     * Emite el primer token de una familia nueva, al iniciar sesión.
+     *
+     * @param userId dueño del token
+     * @param tokenHash hash del valor que recibe el cliente; el valor nunca se guarda
+     * @param expiresAt expiración, posterior al instante de emisión
+     * @param clock reloj del que sale el instante de emisión
+     * @return el token nuevo, sin usar ni revocar
+     * @throws InvalidValueException si falta un dato o la expiración no es posterior a la emisión ({@code VAL-001})
+     */
     public static RefreshToken issue(UserId userId, String tokenHash, Instant expiresAt, Clock clock) {
         return new RefreshToken(RefreshTokenId.generate(), userId, UUID.randomUUID(), tokenHash, clock.instant(),
                 expiresAt, null, null, null, null);
     }
 
-    /** {@code usedAt}, {@code replacedBy}, {@code revokedAt} y {@code revocationReason} son {@code null} si no aplican. */
+    /**
+     * Reconstruye un token ya persistido. Uso exclusivo de los adaptadores de persistencia.
+     *
+     * @param id identificador persistido
+     * @param userId dueño del token
+     * @param familyId familia a la que pertenece
+     * @param tokenHash hash del valor entregado al cliente
+     * @param issuedAt instante de emisión
+     * @param expiresAt expiración
+     * @param usedAt instante en que se usó, o {@code null} si no se usó
+     * @param replacedBy sucesor emitido al usarlo, o {@code null}
+     * @param revokedAt instante de la revocación, o {@code null}
+     * @param revocationReason motivo de la revocación, o {@code null}
+     * @return el token reconstruido
+     */
     public static RefreshToken restore(RefreshTokenId id, UserId userId, UUID familyId, String tokenHash,
                                        Instant issuedAt, Instant expiresAt, Instant usedAt,
                                        RefreshTokenId replacedBy, Instant revokedAt,
@@ -62,8 +85,13 @@ public final class RefreshToken extends AggregateRoot<RefreshTokenId> {
     }
 
     /**
-     * Marca este token como usado y devuelve su sucesor en la misma familia.
+     * Marca este token como usado y devuelve su sucesor en la misma familia (BR-USR-006). Si el token ya se usó, quien
+     * llama debe revocar la familia: es una reutilización.
      *
+     * @param newTokenHash hash del valor del sucesor
+     * @param newExpiresAt expiración del sucesor
+     * @param clock reloj del instante de uso, que es también la emisión del sucesor
+     * @return el sucesor, sin usar
      * @throws InvalidRefreshTokenException si ya fue usado, está revocado o expiró
      */
     public RefreshToken rotate(String newTokenHash, Instant newExpiresAt, Clock clock) {
@@ -78,7 +106,14 @@ public final class RefreshToken extends AggregateRoot<RefreshTokenId> {
         return successor;
     }
 
-    /** Revoca el token; si ya estaba revocado conserva el motivo original. */
+    /**
+     * Revoca el token; si ya estaba revocado conserva el motivo y la fecha originales.
+     *
+     * @param reason motivo de la revocación
+     * @param clock reloj del instante de revocación
+     * @throws pe.edu.galaxy.training.ia.ca.domain.common.exception.InvalidValueException si falta el motivo ({@code
+     *         VAL-001})
+     */
     public void revoke(RevocationReason reason, Clock clock) {
         Guard.notNull(reason, "reason");
         if (revokedAt == null) {
@@ -87,50 +122,66 @@ public final class RefreshToken extends AggregateRoot<RefreshTokenId> {
         }
     }
 
+    /**
+     * Indica si el token puede rotarse: no se usó, no está revocado y no expiró.
+     * @param now instante de referencia
+     * @return {@code true} si se puede usar en ese instante
+     */
     public boolean isUsable(Instant now) {
         return !isUsed() && !isRevoked() && now.isBefore(expiresAt);
     }
 
+    /** {@return {@code true} si ya se usó para rotar} */
     public boolean isUsed() {
         return usedAt != null;
     }
 
+    /** {@return {@code true} si fue revocado} */
     public boolean isRevoked() {
         return revokedAt != null;
     }
 
+    /** {@return el dueño del token} */
     public UserId userId() {
         return userId;
     }
 
+    /** {@return la familia del token, compartida por los tokens de un mismo login} */
     public UUID familyId() {
         return familyId;
     }
 
+    /** {@return el hash del valor entregado al cliente} */
     public String tokenHash() {
         return tokenHash;
     }
 
+    /** {@return el instante de emisión} */
     public Instant issuedAt() {
         return issuedAt;
     }
 
+    /** {@return el instante de expiración} */
     public Instant expiresAt() {
         return expiresAt;
     }
 
+    /** {@return el instante en que se usó, o vacío si no se usó} */
     public Optional<Instant> usedAt() {
         return Optional.ofNullable(usedAt);
     }
 
+    /** {@return el sucesor emitido al usarlo, o vacío} */
     public Optional<RefreshTokenId> replacedBy() {
         return Optional.ofNullable(replacedBy);
     }
 
+    /** {@return el instante de la revocación, o vacío} */
     public Optional<Instant> revokedAt() {
         return Optional.ofNullable(revokedAt);
     }
 
+    /** {@return el motivo de la revocación, o vacío} */
     public Optional<RevocationReason> revocationReason() {
         return Optional.ofNullable(revocationReason);
     }

@@ -28,6 +28,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 13 | 2026-11-12 | Ronda de revisión 002 con los prompts nuevos (`/06-revisar`, `/07-corregir`) | `06-revisar.md`, `07-corregir.md` | [__ h] | [__ h] | 3 |
 | 14 | 2026-11-12 | Evaluación y corrección de los 9 prompts (confiabilidad, buenas prácticas, reutilización) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 3 |
 | 15 | 2026-11-12 | Pruebas de `ContractPeriod` con `/03-pruebas` (primera ejecución del prompt) | `03-pruebas.md` | [__ h] | [__ h] | 0 |
+| 16 | 2026-11-13 | JavaDoc de `domain` y `application` con `/04-documentar javadoc` (primera ejecución del prompt) | `04-documentar.md` | [__ h] | [__ h] | 3 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -188,6 +189,22 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - `ContractPeriod`: líneas 97,3 % → 100 %, ramas 85,4 % → 100 %.
   - Ramas de `domain`: 90,3 % → 93,2 %.
   - 4 mutaciones temporales del código (solapamiento con indefinidos, fin exclusivo, igualdad sin fecha de fin, extensión a la misma fecha): las 4 detectadas y revertidas.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
+### #16 — JavaDoc de `domain` y `application` con `/04-documentar javadoc`
+
+- **Origen:** primera ejecución de `/04-documentar`. Sin alcance, el prompt hizo el inventario de los 5 tipos de documentación: OpenAPI, diagramas y guías estaban al día. El autor eligió `javadoc`, el punto débil que había observado el docente.
+- **Aceptado:** el plan de 6 bloques (puertos de entrada, puertos de salida, excepciones, eventos, agregados y VO, DTO). Cada `@throws` indica su código del catálogo y su regla `BR-*`, y se escribió después de leer el código que lanza la excepción.
+- **Corregido (errores de la IA detectados antes del commit):**
+  1. «se redondea a 2 decimales» en `Salary` y `MinimumWage`: `Money` usa `RoundingMode.UNNECESSARY` y **rechaza** más de 2 decimales.
+  2. «historial sin modificar» en `Contract.renewals()`: devuelve una copia inmutable (`List.copyOf`).
+  3. Descripciones generadas por plantilla en los constructores de los servicios («puerto user (repositorio)»): se reescribieron a mano.
+  - También se ajustaron 16 `{@code …}` partidos al final de línea y 5 líneas de más de 120 caracteres.
+- **Medido:**
+  - Tipos públicos con JavaDoc: 53/108 (49 %) → **108/108**. Métodos públicos: 30/182 → **todos**.
+  - `javadoc -Xdoclint:all`: 353 comentarios faltantes → **0**, con 0 problemas de sintaxis, referencias o HTML.
+  - 108 archivos cambian **solo en comentarios**, demostrado comparando el código sin comentarios contra `master`.
+  - 409 pruebas en verde.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
 ## Métricas del proyecto

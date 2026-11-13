@@ -31,6 +31,15 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     private final TokenIssuerPort tokenIssuer;
     private final Clock clock;
 
+    /**
+     * Recibe sus puertos; el bean se registra en {@code infrastructure/config} (architecture §3, regla 3).
+     *
+     * @param refreshTokenRepository persistencia de refresh tokens
+     * @param userRepository persistencia de usuarios
+     * @param roleRepository lectura de roles y permisos
+     * @param tokenIssuer emisión de tokens
+     * @param clock reloj con el que se fechan los tokens
+     */
     public RefreshTokenService(RefreshTokenRepositoryPort refreshTokenRepository, UserRepositoryPort userRepository,
                                RoleRepositoryPort roleRepository, TokenIssuerPort tokenIssuer, Clock clock) {
         this.refreshTokenRepository = refreshTokenRepository;

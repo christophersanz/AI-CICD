@@ -17,6 +17,12 @@ public class GetCurrentUserService implements GetCurrentUserUseCase {
     private final UserRepositoryPort userRepository;
     private final RoleRepositoryPort roleRepository;
 
+    /**
+     * Recibe sus puertos; el bean se registra en {@code infrastructure/config} (architecture §3, regla 3).
+     *
+     * @param userRepository persistencia de usuarios
+     * @param roleRepository lectura de roles y permisos
+     */
     public GetCurrentUserService(UserRepositoryPort userRepository, RoleRepositoryPort roleRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
