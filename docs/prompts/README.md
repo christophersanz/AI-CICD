@@ -126,7 +126,7 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 
 **No sirve** para un proyecto Spring Boot por capas técnicas (`controller` / `service` / `repository`) sin dominio separado: los prompts revisan e implementan contra Clean Architecture, así que todo sería un incumplimiento.
 
-**Probado** en el modelo del curso `F4/01.-Modelos/use-case-ca-v1` (Sales Order). Es un solo módulo, con sus documentos en la raíz y reglas `RN-NNN`. El instalador detectó sus documentos y `verificar.sh` terminó con 0 errores después de completar `DP` (`ai-log.md` #19).
+**Probado** en el modelo del curso `F4/01.-Modelos/use-case-ca-v1` (Sales Order). Es un solo módulo, con sus documentos en la raíz y reglas `RN-NNN`. El instalador detectó sus documentos, y `verificar.sh` terminó con 0 errores después de completar `DP` (`ai-log.md` #19). Después, `/06-revisar dominio` se ejecutó completo en ese proyecto: encontró sus reglas `RN-NNN` con el mapa de `DP.secciones`, no reportó como defectos lo que el proyecto no exige (eventos, códigos de error) y no modificó código (`ai-log.md` #21).
 
 | Archivo del kit (`docs/prompts/kit/`) | Para qué |
 |---|---|
