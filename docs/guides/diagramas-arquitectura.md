@@ -97,7 +97,7 @@ flowchart LR
     DEP -.->|POST /deploys| RENDER
 
     subgraph JK[Jenkins local de práctica · docker/jenkins · :8080]
-        JF[Jenkinsfile<br/>Compilar → Pruebas → Cobertura → SonarQube<br/>→ Imagen → Verificación efímera → Despliegue local]
+        JF["Jenkinsfile<br/>Compilar → Pruebas → Cobertura → SonarQube<br/>→ Imagen → Verificación efímera → Despliegue local (Docker)"]
         JF <-->|Quality Gate| SQ[(SonarQube :9000)]
         JF --> LOC[(contract-api-deploy :8090<br/>+ contract-api-deploy-db)]
     end

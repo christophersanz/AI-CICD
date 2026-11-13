@@ -37,7 +37,7 @@ Variables en `docker/jenkins/.env`, creado a partir de la plantilla `docker/jenk
 | `JENKINS_ADMIN_PASSWORD` | `admin` | Contraseña del administrador |
 | `REPO_URL` | `https://github.com/christophersanz/AI-CICD.git` | Cambiarla si trabajas sobre tu propio fork |
 | `REPO_BRANCH` | `master` | Rama que construye el job |
-| `DEPLOY_ADMIN_PASSWORD` | *(vacía)* | Contraseña del `admin` del entorno desplegado (12–64 caracteres). Vacía, la etapa *Despliegue local* se omite. Solo se aplica en el primer despliegue |
+| `DEPLOY_ADMIN_PASSWORD` | *(vacía)* | Contraseña del `admin` del entorno desplegado (12–64 caracteres). Vacía, la etapa *Despliegue local (Docker)* se omite. Solo se aplica en el primer despliegue |
 | `DEPLOY_PORT` | `8090` | Puerto de `127.0.0.1` donde queda la API desplegada |
 | `SONAR_ADMIN_PASSWORD` | *(vacía)* | Contraseña de `admin` en SonarQube (12+ caracteres con mayúscula, minúscula, dígito y símbolo). En el primer análisis Jenkins cambia la de por defecto (`admin`) por esta. Vacía, la etapa *Análisis SonarQube* se omite |
 
@@ -78,7 +78,7 @@ Si el Quality Gate falla, el build se detiene antes de construir la imagen. El l
 
 SonarQube usa la base embebida H2, que sirve para practicar pero no permite actualizar de versión conservando los datos. Para cambiar la imagen, borra los volúmenes `contract-api-jenkins_sonarqube-*` (`down -v` borra también los de Jenkins); el siguiente build vuelve a prepararlo todo.
 
-## Despliegue local
+## Despliegue local (Docker)
 
 La última etapa ejecuta `scripts/deploy-local.sh` y deja corriendo, con `--restart unless-stopped`:
 

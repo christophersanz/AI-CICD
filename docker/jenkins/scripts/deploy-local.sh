@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Etapa "Despliegue local" del Jenkinsfile (ADR-0014): deja contract-api corriendo en esta máquina, como un
+# Etapa "Despliegue local (Docker)" del Jenkinsfile (ADR-0014): deja contract-api corriendo en esta máquina, como un
 # despliegue on-premise. A diferencia de la verificación, el entorno es persistente:
 #   - red contract-api-deploy, PostgreSQL contract-api-deploy-db (volumen contract-api-deploy-data) y la API
 #     contract-api-deploy, todos con --restart unless-stopped; la API publica 127.0.0.1:${DEPLOY_PORT:-8090}.
@@ -65,7 +65,7 @@ echo "Desplegando $image${previous:+ (reemplaza a $previous)}"
 run_api "$image"
 
 if ! ADMIN_PASSWORD="$DEPLOY_ADMIN_PASSWORD" IMAGE="$image" \
-     "$scripts_dir/smoke-test.sh" "http://$app:8081" "Despliegue local (Jenkins)"; then
+     "$scripts_dir/smoke-test.sh" "http://$app:8081" "Despliegue local (Docker)"; then
   echo "--- Logs de $app ---"
   docker logs "$app" 2>&1 | tail -n 150 || true
   if [ -n "$previous" ] && [ "$previous" != "$image" ] && docker image inspect "$previous" >/dev/null 2>&1; then
