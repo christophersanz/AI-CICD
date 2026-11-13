@@ -137,6 +137,13 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 
 Pasos:
 
+**Qué hace falta para instalarlo:** el repositorio de origen completo, o cualquier proyecto que ya tenga el kit instalado. **No basta con copiar `docs/prompts/kit/`:** ahí están solo las herramientas (instalador, verificador y plantillas). Los 9 prompts (`docs/prompts/NN-*.md`), sus comandos (`.claude/commands/`) y `docs/sessions/README.md` están fuera de esa carpeta, y `instalar.sh` los copia desde el repositorio que lo contiene. Por ejemplo:
+
+```bash
+git clone https://github.com/christophersanz/AI-CICD.git /tmp/kit-prompts
+/tmp/kit-prompts/docs/prompts/kit/instalar.sh /ruta/al/otro-proyecto
+```
+
 ```bash
 # 1. Desde la raíz de este repositorio (o de cualquier proyecto que ya tenga el kit)
 docs/prompts/kit/instalar.sh /ruta/al/otro-proyecto
