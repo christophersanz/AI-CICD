@@ -26,6 +26,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 11 | 2026-11-12 | Jenkins por etapas, despliegue local y SonarQube (PR #3–#5) | sesión Claude Code | [__ h] | [__ h] | 3 |
 | 12 | 2026-11-12 | Prompts v2: 9 prompts genéricos ordenados, kit reutilizable y archivos de sesión | sesión Claude Code | [__ h] | [__ h] | 3 |
 | 13 | 2026-11-12 | Ronda de revisión 002 con los prompts nuevos (`/06-revisar`, `/07-corregir`) | `06-revisar.md`, `07-corregir.md` | [__ h] | [__ h] | 3 |
+| 14 | 2026-11-12 | Evaluación y corrección de los 9 prompts (confiabilidad, buenas prácticas, reutilización) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 3 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -151,6 +152,26 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - Cobertura de líneas de `domain` 95,3 % → 95,8 %.
   - Quality Gate de SonarQube: cobertura 94,2 % → 94,4 %, 0 bugs y 0 vulnerabilidades.
   - Jenkins #17 (rama) y #19 (`master`) en verde.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
+### #14 — Evaluación de los 9 prompts
+
+- **Origen:** evaluación de los 9 prompts con cuatro criterios (confiables, con buenas prácticas, profesionales y reutilizables), a partir de una lectura completa, de chequeos objetivos de estructura y referencias, y de lo aprendido al ejecutar `/06-revisar` y `/07-corregir` en la ronda 002.
+- **Aceptado (11 correcciones, un commit por prompt):**
+  - Archivos de sesión con números viejos en `05` (`06-refactorizar`) y `08` (`21-cambiar-pipeline`).
+  - `09` se contradecía («nueva versión» frente a «un solo archivo») y su número de ejemplo chocaba con `07`.
+  - Sección *Objetivo* en `01` y `06`.
+  - `06` reutiliza el build dentro de una ronda y exige confirmar las coincidencias de búsquedas automáticas.
+  - `02` decide qué hacer si el caso de uso ya existe y pide la prueba primero ante un bug.
+  - `03` prohíbe debilitar pruebas existentes.
+  - Rama y PR en `03`, `04` y `09`.
+  - Clave `DP.stack` en lugar de «Java 21 / Spring Boot 3» en los roles.
+  - `verificar.sh` detecta comandos citados que no existen y archivos de sesión con otro número.
+- **Corregido:** los errores de referencias de `05` y `08` venían de la renumeración de 20 a 9 prompts. El `verificar.sh` anterior no los detectaba; el nuevo sí, y además se probó inyectándole un comando inexistente.
+- **Medido:**
+  - Las 10 partes de la estructura común están en los 9 prompts (`06` no crea archivo de sesión, por diseño).
+  - 0 roles con el stack fijo.
+  - `verificar.sh`: 0 errores en el proyecto y en una instalación limpia del kit.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
 ## Métricas del proyecto

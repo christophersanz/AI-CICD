@@ -83,6 +83,7 @@ Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/k
 | Clave | Valor en este proyecto |
 |---|---|
 | `nombre` | `contract-api` |
+| `stack` | Java 21, Spring Boot 3.5, Maven, JUnit 5, AssertJ, Mockito, Testcontainers y `spring-security-test` |
 | `dominio-negocio` | Gestión de contratos laborales de una organización en Perú (RR.HH.) |
 | `normativa` | Reglas con base en la normativa laboral peruana: se marcan con ⚖️ y se validan con RR.HH./asesoría legal; no citar artículos de ley sin verificarlos |
 | `paquete-base` | `pe.edu.galaxy.training.ia.ca` |

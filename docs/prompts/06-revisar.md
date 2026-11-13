@@ -16,6 +16,9 @@ Según el modo, actúa como el experto que indica su sección. En todos los caso
 ## Validación del argumento
 `{ARGUMENTO}` es `<modo> [ronda]`. Si falta el modo o no es uno de la tabla, muestra la tabla con una línea por modo, indica cuál toca según el orden y los informes que ya existen en `docs/reviews/`, y detente.
 
+## Objetivo
+Un informe por modo, guardado con el nombre de la tabla *Orden de la revisión*, en el que cada comprobación tiene su severidad y su evidencia verificada (`archivo:línea`, comando ejecutado o reporte), la trazabilidad de las reglas del alcance queda completa y no se modificó ningún otro archivo. En el modo `final`, además, una única línea `FINAL STATUS: READY` o `NOT READY` que cumple sus condiciones.
+
 ## Orden de la revisión
 
 | Paso | Modo | Revisa | Informe |
@@ -58,9 +61,13 @@ Se usan solo estas, **sin inflarlas**:
 - Respetar la capa de cada regla: **no marcar como error de `domain` una regla que `business-rules.md` asigna a `application`**, ni al revés.
 - No son hallazgos: lo que un ADR descartó (por ejemplo, los de `DP.adr-arquitectura`); lo pendiente por una pregunta abierta de §9 que el código resuelve de forma neutral con su TODO; los diferidos deliberadamente en un informe de correcciones (paso 8) anterior; una preferencia de estilo sin regla que la respalde. Si alguno contradice una regla obligatoria, sí se reporta con la evidencia exacta.
 - Lo que no se pueda evaluar va como **No evaluado**, con el motivo.
+- **Las búsquedas automáticas (`grep`, conteos, scripts) solo encuentran candidatos.** Cada coincidencia se confirma leyendo el código o el reporte antes de reportarla, y cada número que aparece en el informe (pruebas, archivos, scripts) se cuenta con un comando. Falsos positivos habituales:
+  - texto en comentarios o documentación, como la descripción del formato `-----BEGIN PRIVATE KEY-----` en un README;
+  - pruebas de clases `@Nested`, que Surefire reporta dentro del archivo de la clase externa;
+  - una clase de prueba que cubre varios servicios a la vez.
 
 ## Antes de revisar
-Ejecutar `DP.build` y anotar compilación y pruebas (ejecutadas, fallidas, con error y omitidas, por módulo) y la cobertura. Si el CI local (`DP.ci-local`) está activo, anotar el último Quality Gate (`DP.sonarqube`).
+Ejecutar `DP.build` y anotar compilación y pruebas (ejecutadas, fallidas, con error y omitidas, por módulo) y la cobertura. Dentro de una misma ronda, si el commit revisado es el mismo del build anterior y no hay cambios locales (`git rev-parse HEAD` igual y `git status` limpio), se reutiliza ese resultado, indicando en el informe de qué paso y de qué commit proviene. El modo `final` siempre vuelve a ejecutarlo. Si el CI local (`DP.ci-local`) está activo, anotar el último Quality Gate (`DP.sonarqube`).
 
 ## Formato del informe
 1. **Resumen** (3–5 líneas) y resultado del build.

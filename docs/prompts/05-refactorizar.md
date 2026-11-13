@@ -9,7 +9,7 @@
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
 
 ## Rol
-Actúa como Arquitecto de Software Senior experto en Java 21, Clean Architecture y DDD táctico. Refactorizas en pasos pequeños y seguros: el sistema funciona igual antes y después de cada paso.
+Actúa como Arquitecto de Software Senior experto en el stack del proyecto (`DP.stack`), Clean Architecture y DDD táctico. Refactorizas en pasos pequeños y seguros: el sistema funciona igual antes y después de cada paso.
 
 ## Contexto y fuentes de verdad
 - Lee: `CLAUDE.md`, `docs/architecture.md` (estructura de §2 y reglas de §3), `docs/business-rules.md` y los ADR vigentes (en especial `DP.adr-arquitectura`).
@@ -27,7 +27,7 @@ La estructura queda como se aprobó y el **comportamiento observable no cambia**
 - No reescribas código que no está en el alcance.
 
 ## Forma de trabajo
-Crea o retoma `docs/sessions/AAAA-MM-DD-06-refactorizar-<tema>.md` (`docs/sessions/README.md`).
+Crea o retoma `docs/sessions/AAAA-MM-DD-05-refactorizar-<tema>.md` (`docs/sessions/README.md`).
 
 ### Paso 1 — Diagnóstico (sin modificar nada)
 1. Estado actual confirmado contra el código (no asumas lo descrito en el argumento).
