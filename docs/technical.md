@@ -317,11 +317,13 @@ El `Dockerfile` tiene dos etapas:
 
 `.github/workflows/ci-cd.yml`, según [ADR-0009](adr/0009-ci-cd-github-actions.md). Uso paso a paso en la [guía de CI/CD](guides/ci-cd.md).
 
-| Evento | `build` | `image` | `verify` | `deploy` |
-|---|---|---|---|---|
-| Pull Request a `master` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Construye la imagen sin publicarla | — | — |
-| Push a `master` (merge del PR) | Igual | Publica `latest` y `sha-<corto>` | Prueba `sha-<corto>` en un entorno efímero | Tras aprobar `production`, despliega `sha-<corto>` en Render y repite la prueba de humo |
-| Tag `vX.Y.Z` | Igual | Publica `X.Y.Z` y `X.Y` | — | — |
+| Evento | `build` | `image` | `verify` |
+|---|---|---|---|
+| Pull Request a `master` | `clean verify`, análisis SonarCloud, resumen de cobertura e informes | Construye la imagen sin publicarla | — |
+| Push a `master` (merge del PR) | Igual | Publica `latest` y `sha-<corto>` | Prueba `sha-<corto>` en un entorno efímero |
+| Tag `vX.Y.Z` | Igual | Publica `X.Y.Z` y `X.Y` | — |
+
+El despliegue es **solo con Docker**: lo hace el Jenkins local en `http://localhost:8090` (§9.3), o se ejecuta la imagen publicada con `docker run` ([guía de CI/CD §8](guides/ci-cd.md#8-ejecutar-la-imagen-publicada)). No hay despliegue en la nube ([ADR-0016](adr/0016-despliegue-solo-con-docker.md)).
 
 - SonarCloud ([ADR-0011](adr/0011-analisis-estatico-sonarcloud.md)): se ejecuta solo si existe el secreto `SONAR_TOKEN`; el job falla si no se cumple el Quality Gate.
 - Registros: `ghcr.io/christophersanz/ai-cicd` siempre; Docker Hub solo si el repositorio define la variable `DOCKERHUB_USERNAME` y el secreto `DOCKERHUB_TOKEN`.
@@ -333,12 +335,6 @@ El `Dockerfile` tiene dos etapas:
   - `GET /auth/me` y `GET /employees`: 200 con token y 401 sin token.
 
   El resultado queda en el resumen de la ejecución.
-- `deploy` ([ADR-0013](adr/0013-despliegue-en-render.md)): environment `production` con revisor obligatorio. `.github/scripts/render-deploy.sh` pide a la API de Render el despliegue de `docker.io/<usuario>/ai-cicd:sha-<corto>` y espera a `live`; después ejecuta la misma prueba de humo contra `RENDER_URL`. Requiere:
-  - las variables de repositorio `RENDER_SERVICE_ID`, `RENDER_URL` y `DOCKERHUB_USERNAME`;
-  - los secretos del environment `RENDER_API_KEY` y `SMOKE_ADMIN_PASSWORD`.
-
-  Sin `RENDER_SERVICE_ID` el job se omite.
-- Render (`render.yaml`): servicio web `contract-api` (plan free, `runtime: image`, `autoDeploy: false`, health check `/actuator/health`, `PORT=8081`) y base `contract-db` (PostgreSQL 16, sin acceso externo). `DB_URL`, las claves JWT y la contraseña del administrador se definen en el panel de Render.
 
 ### 9.3 Jenkins local
 
