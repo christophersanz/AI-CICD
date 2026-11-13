@@ -109,7 +109,7 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 
 | Prompt del curso | Uso | Lo reemplaza |
 |---|---|---|
-| [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | Revisión integral (sesión 02); informe en `docs/reviews/2026-09-26-ronda-001/07-revision-integral.md` | [`06-revisar.md`](06-revisar.md) (todos sus modos) |
+| [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | Revisión integral (sesión 02); informe en [`ronda-001/07-revision-integral.md`](https://github.com/christophersanz/AI-CICD/blob/master/docs/reviews/2026-09-26-ronda-001/07-revision-integral.md) de `contract-api` | [`06-revisar.md`](06-revisar.md) (todos sus modos) |
 | [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) | Refactor del dominio por agregado (sesión 03) | [`05-refactorizar.md`](05-refactorizar.md) |
 | [`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md) | Diseño de la seguridad 3A (sesión 03) | `DP.seguridad` y [`06-revisar.md`](06-revisar.md) modo `seguridad` |
 | [`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md) | Caso de uso paso a paso (sesión 03) | [`02-implementar-caso-uso.md`](02-implementar-caso-uso.md) |
