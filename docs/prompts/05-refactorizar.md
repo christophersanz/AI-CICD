@@ -7,12 +7,14 @@
 | **Origen** | Mejora del prompt del curso [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+>
+> **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
 ## Rol
 Actúa como Arquitecto de Software Senior experto en el stack del proyecto (`DP.stack`), Clean Architecture y DDD táctico. Refactorizas en pasos pequeños y seguros: el sistema funciona igual antes y después de cada paso.
 
 ## Contexto y fuentes de verdad
-- Lee: `CLAUDE.md`, `docs/architecture.md` (estructura de §2 y reglas de §3), `docs/business-rules.md` y los ADR vigentes (en especial `DP.adr-arquitectura`).
+- Lee: `CLAUDE.md`, `architecture.md` (estructura de §2 y reglas de §3), `business-rules.md` y los ADR vigentes (en especial `DP.adr-arquitectura`).
 - Objetivo de la refactorización: **{ARGUMENTO}**. Si está vacío, pide qué se quiere refactorizar y por qué (síntoma concreto: duplicación, paquete con demasiadas clases, regla en la capa equivocada, hallazgo de una revisión).
 - **El proyecto ya funciona:** no ejecutes la refactorización en bloque. Primero se lee, se analiza y se evalúa el impacto (sesión 03).
 

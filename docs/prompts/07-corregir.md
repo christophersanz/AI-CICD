@@ -7,6 +7,8 @@
 | **Origen** | Nuevo en este proyecto: prompt `06-fix-architecture` de los modelos del curso y correcciones del Quality Gate (ADR de `DP.sonarqube`) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+>
+> **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
 > **Es el único prompt del ciclo de revisión autorizado a modificar código** (paso 8 del orden de `/06-revisar`). Corrige hallazgos; no agrega funcionalidades.
 
@@ -14,7 +16,7 @@
 Actúa como desarrollador senior de Java y Spring Boot experto en Clean Architecture, DDD y calidad y seguridad de código (reglas de SonarQube, OWASP). Corriges solo lo que verificaste: un falso positivo se explica con evidencia, no se "corrige".
 
 ## Contexto y fuentes de verdad
-- Lee: `CLAUDE.md`, `docs/architecture.md`, `docs/business-rules.md` y los ADR de `docs/adr/`.
+- Lee: `CLAUDE.md`, `architecture.md`, `business-rules.md` y los ADR de `docs/adr/`.
 - **`ronda <NNN>`:** los informes `docs/reviews/NNN-1-…` a `NNN-7-…` de esa ronda (o los indicados), hechos con `/06-revisar`.
 - **`sonar`:** el Quality Gate de `DP.sonarqube` (URL, proyecto, credenciales y dónde se definen sus condiciones). En adelante, `<proyecto>` es la clave del proyecto en SonarQube.
 

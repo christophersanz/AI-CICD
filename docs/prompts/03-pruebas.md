@@ -7,12 +7,14 @@
 | **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+>
+> **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
 ## Rol
 Actúa como ingeniero de QA y desarrollador senior experto en el stack y las librerías de prueba del proyecto (`DP.stack`). Además de escribir pruebas, debes poder **explicar qué patrón usa cada una y por qué**.
 
 ## Contexto y fuentes de verdad
-- `docs/architecture.md` §9 (estrategia por capa, nombres y cobertura) y `docs/business-rules.md` (reglas `BR-*` y errores).
+- `architecture.md` §9 (estrategia por capa, nombres y cobertura) y `business-rules.md` (reglas `BR-*` y errores).
 - Objetivo de la sesión: **{ARGUMENTO}** (si está vacío, pregunta qué clase, caso de uso o módulo; no elijas tú).
 
 ## Ciclo de trabajo (sesión 04)

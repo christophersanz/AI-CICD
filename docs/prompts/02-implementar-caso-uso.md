@@ -7,12 +7,14 @@
 | **Origen** | Mejora del prompt del curso [`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+>
+> **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
 ## Rol
 Actúa como desarrollador senior experto en el stack del proyecto (`DP.stack`), Clean Architecture, DDD táctico y Spring Security.
 
 ## Contexto y fuentes de verdad
-- Lee: `CLAUDE.md`, `docs/architecture.md`, `docs/business-rules.md`; `docs/technical.md` (estado implementado) y los ADR de `docs/adr/`.
+- Lee: `CLAUDE.md`, `architecture.md`, `business-rules.md`; `technical.md` (estado implementado) y los ADR de `docs/adr/`.
 - Seguridad y autorización: `DP.seguridad`. `domain` y `application` no dependen de Spring Security.
 - Caso de uso: **{ARGUMENTO}**
 
@@ -57,7 +59,7 @@ Comportamiento en el agregado con nombres del lenguaje ubicuo; value objects, en
 `<Verbo><Entidad>UseCase` en `port/in`; `Command`/`Query`/`Result` como records; métodos de `port/out` expresados en términos del dominio, sin tipos técnicos.
 
 ### Paso 3 — Caso de uso
-`<Verbo><Entidad>Service` sin anotaciones de Spring salvo `@Transactional`, registrado como bean en `infrastructure/config`. Pruebas con Mockito (solo puertos de salida): camino feliz y una por regla y por error de la ficha.
+`<Verbo><Entidad>Service` sin anotaciones de Spring salvo `@Transactional`, registrado como bean en la configuración de la capa de infraestructura (`DP.modulos`). Pruebas con Mockito (solo puertos de salida): camino feliz y una por regla y por error de la ficha.
 
 ### Paso 4 — Persistencia
 Entidad JPA, repositorio, mapper y adaptador; migración (`DP.migraciones`) con índices para las consultas de las reglas. Prueba de integración según `DP.pruebas-integracion`.

@@ -7,12 +7,14 @@
 | **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3: MVPs de Jairo y reglas preguntadas por la IA de Ángel) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+>
+> **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
 ## Rol
 Actúa como analista funcional y de negocio, product owner técnico y arquitecto DDD con experiencia en el negocio del proyecto (`DP.dominio-negocio`). Tu trabajo es **preguntar** hasta que el alcance y las reglas queden claros, no suponerlos.
 
 ## Contexto y fuentes de verdad
-- Lee: `docs/business-rules.md` (alcance y **fuera de alcance** de §1, glosario, reglas `BR-*`, estados, casos de uso de §6, eventos, errores y **preguntas abiertas de §9**), `docs/architecture.md` (§3 y §7) y `CLAUDE.md`.
+- Lee: `business-rules.md` (alcance y **fuera de alcance** de §1, glosario, reglas `BR-*`, estados, casos de uso de §6, eventos, errores y **preguntas abiertas de §9**), `architecture.md` (§3 y §7) y `CLAUDE.md`.
 - El código manda sobre lo implementado: confirma cada regla contra `domain` y `application` antes de proponer cambios.
 
 ## Validación del argumento
