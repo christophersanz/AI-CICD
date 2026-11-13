@@ -27,6 +27,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 12 | 2026-11-12 | Prompts v2: 9 prompts genéricos ordenados, kit reutilizable y archivos de sesión | sesión Claude Code | [__ h] | [__ h] | 3 |
 | 13 | 2026-11-12 | Ronda de revisión 002 con los prompts nuevos (`/06-revisar`, `/07-corregir`) | `06-revisar.md`, `07-corregir.md` | [__ h] | [__ h] | 3 |
 | 14 | 2026-11-12 | Evaluación y corrección de los 9 prompts (confiabilidad, buenas prácticas, reutilización) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 3 |
+| 15 | 2026-11-12 | Pruebas de `ContractPeriod` con `/03-pruebas` (primera ejecución del prompt) | `03-pruebas.md` | [__ h] | [__ h] | 0 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -174,12 +175,27 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - `verificar.sh`: 0 errores en el proyecto y en una instalación limpia del kit.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
+### #15 — Pruebas de `ContractPeriod` con `/03-pruebas`
+
+- **Origen:** primera ejecución de `/03-pruebas`. El objetivo (`ContractPeriod`) lo eligió el autor entre las clases con más ramas sin cubrir según JaCoCo.
+- **Aceptado:**
+  - Diagnóstico: 6 pruebas de rechazo no verificaban el código de error; 3 pruebas tenían varias razones de fallo; el solapamiento con contratos indefinidos (BR-CTR-005), `extendTo(null)` y `equals`/`hashCode` no tenían cobertura.
+  - Plan de 9 puntos aprobado: pruebas parametrizadas, un `@MethodSource` con pares de vigencias comprobados en ambos sentidos, `@Nested` por comportamiento y el contrato de igualdad.
+  - Las 13 pruebas anteriores se conservaron con su intención y no se tocó el código de producción.
+- **Corregido:** nada. El prompt se siguió sin desvíos.
+- **Medido:**
+  - 13 → 49 ejecuciones en `ContractPeriodTest`; total del proyecto 373 → 409.
+  - `ContractPeriod`: líneas 97,3 % → 100 %, ramas 85,4 % → 100 %.
+  - Ramas de `domain`: 90,3 % → 93,2 %.
+  - 4 mutaciones temporales del código (solapamiento con indefinidos, fin exclusivo, igualdad sin fecha de fin, extensión a la misma fecha): las 4 detectadas y revertidas.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
 ## Métricas del proyecto
 
 | Métrica | Valor | Fuente |
 |---|---|---|
-| Pruebas | 373 ejecutadas, 0 fallos (173 domain, 46 application, 154 infrastructure) | `./mvnw clean verify`, 2026-11-12 (ronda 002) |
-| Cobertura de líneas | 95,8 % / 96,7 % / 96,3 % (domain / application / infrastructure) | JaCoCo, 2026-11-12 (ronda 002) |
+| Pruebas | 409 ejecutadas, 0 fallos (209 domain, 46 application, 154 infrastructure) | `./mvnw clean verify`, 2026-11-12 |
+| Cobertura de líneas | 96,0 % / 96,7 % / 96,3 % (domain / application / infrastructure) | JaCoCo, 2026-11-12 |
 | Cobertura en la primera revisión | 94,2 % / 90,0 % / 92,7 % | `docs/reviews/001-7-arquitectura.md` |
 | Duración del pipeline | 1 min 55 s – 3 min 11 s | GitHub Actions |
 | Issues de Sonar | 1 bug y 2 vulnerabilidades en el primer análisis → 0 y 0 (Quality Gate en verde) | SonarQube local, Jenkins #10 y #11 (2026-11-12) |
