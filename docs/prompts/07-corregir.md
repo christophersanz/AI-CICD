@@ -17,11 +17,11 @@ Actúa como desarrollador senior de Java y Spring Boot experto en Clean Architec
 
 ## Contexto y fuentes de verdad
 - Lee: `CLAUDE.md`, `architecture.md`, `business-rules.md` y los ADR de `docs/adr/`.
-- **`ronda <NNN>`:** los informes `docs/reviews/NNN-1-…` a `NNN-7-…` de esa ronda (o los indicados), hechos con `/06-revisar`.
+- **`ronda <NNN>`:** los informes `01-revision-…` a `07-revision-integral.md` de la carpeta de esa ronda (`docs/reviews/AAAA-MM-DD-ronda-NNN/`), o los indicados, hechos con `/06-revisar`.
 - **`sonar`:** el Quality Gate de `DP.sonarqube` (URL, proyecto, credenciales y dónde se definen sus condiciones). En adelante, `<proyecto>` es la clave del proyecto en SonarQube.
 
 ## Validación del argumento
-Si `{ARGUMENTO}` está vacío, lista las rondas de `docs/reviews/` con ERROR o WARNING y sin informe `NNN-8-correcciones.md`, y el estado del Quality Gate si está disponible; pide que elija y detente.
+Si `{ARGUMENTO}` está vacío, lista las rondas de `docs/reviews/` con ERROR o WARNING y sin `08-correcciones-aplicadas.md`, y el estado del Quality Gate si está disponible; pide que elija y detente.
 
 ## Objetivo
 Cada hallazgo seleccionado queda **corregido y verificado** (con una prueba si es un bug), **justificado** en el código, **descartado** como falso positivo con su evidencia o **diferido** con su motivo; `DP.build` en verde y el Quality Gate sin empeorar (en el modo `sonar`, en verde).
@@ -64,7 +64,7 @@ Tabla con la decisión de cada hallazgo:
 3. Si cambió código de producción, o en el modo `sonar`: build del CI local (`DP.ci-local`) contra la rama (cómo apuntarlo a otra rama: `DP.ci-local`). Al terminar, vuelve a la rama principal **y lanza un build sobre ella**: en Jenkins, el sondeo sigue la rama del último build y todas las condiciones del Quality Gate en `OK`.
 
 ### Paso 5 — Informe y PR
-- **`ronda`:** guarda `docs/reviews/NNN-8-correcciones.md`. **`sonar`:** el informe va en la descripción del PR.
+- **`ronda`:** guarda `08-correcciones-aplicadas.md` en la carpeta de la ronda y marca el paso 8 en su `README.md`. **`sonar`:** el informe va en la descripción del PR.
 - Contenido:
   1. Tabla `Hallazgo | Decisión | Archivos modificados | Prueba o justificación | Verificado (sí/no)`.
   2. Archivos creados, modificados, movidos y eliminados, cada uno con su hallazgo.

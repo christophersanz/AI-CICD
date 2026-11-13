@@ -2,7 +2,7 @@
 
 - **Prompt:** `docs/prompts/06-revisar.md`, modo `final` (paso 9 de 9)
 - **Fecha:** 2026-11-12 · **Commit revisado:** `26fdf64` (`master`, tras integrar el PR #11)
-- **Informes de la ronda:** `002-1-dominio.md` … `002-7-arquitectura.md` y `002-8-correcciones.md`
+- **Informes de la ronda:** `01-revision-dominio.md` … `07-revision-integral.md` y `08-correcciones-aplicadas.md`
 
 ## 1. Resumen ejecutivo
 
@@ -47,7 +47,7 @@ Cumple `architecture.md` §3.1.
 
 ## 5. Trazabilidad de reglas de negocio
 
-Igual que en `002-7-arquitectura.md` §3, con estos cambios: el detalle de las reglas pendientes ahora está documentado en `business-rules.md`, y W-01 refuerza la integridad del agregado `Contract`.
+Igual que en `07-revision-integral.md` §3, con estos cambios: el detalle de las reglas pendientes ahora está documentado en `business-rules.md`, y W-01 refuerza la integridad del agregado `Contract`.
 
 | Regla | Estado |
 |---|---|
@@ -79,11 +79,11 @@ Ninguno.
 Solo los diferidos deliberadamente (§8). No contradicen ninguna regla obligatoria: los tres están documentados como pendientes o como riesgo aceptado.
 
 ### INFO
-I-03 a I-08 de `002-7-arquitectura.md` §4 (CORS, contraseñas de prueba en el historial, escaneo de CVE, acciones por SHA, `hadolint DL3008`, despliegue en Render no ejecutado). No se incluyeron en el paso 8.
+I-03 a I-08 de `07-revision-integral.md` §4 (CORS, contraseñas de prueba en el historial, escaneo de CVE, acciones por SHA, `hadolint DL3008`, despliegue en Render no ejecutado). No se incluyeron en el paso 8.
 
 ## 8. Diferidos deliberadamente
 
-| Hallazgo | Motivo (de `002-8-correcciones.md` §3) | Siguiente acción |
+| Hallazgo | Motivo (de `08-correcciones-aplicadas.md` §3) | Siguiente acción |
 |---|---|---|
 | W-04 · bloqueo optimista en `Employee` | Riesgo aceptado mientras haya pocas ediciones simultáneas; cambia el contrato REST y requiere un código de error nuevo | `/01-definir reglas concurrencia` |
 | W-02 · implementación de `EmployeeStatus` | Funcionalidad nueva | `/02-implementar-caso-uso DeactivateEmployeeUseCase` |

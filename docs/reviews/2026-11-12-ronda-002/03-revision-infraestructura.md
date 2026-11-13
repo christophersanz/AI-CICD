@@ -50,7 +50,7 @@ Ninguno.
 **W-04 · Sin bloqueo optimista; el motivo por el que se difirió ya no se cumple**
 - **Archivos:** `infrastructure/src/main/java/pe/edu/galaxy/training/ia/ca/infrastructure/persistence/entity/EmployeeJpaEntity.java` (sin `@Version`); `application/.../usecase/UpdateEmployeeService.java`.
 - **Regla:** `architecture.md` §6 define `409` para «conflicto de estado o concurrencia», pero no hay ningún mecanismo que detecte ese conflicto.
-- **Evidencia:** `docs/reviews/001-7-arquitectura.md`, tabla de diferidos: «Riesgo de carrera en BR-CTR-005 y generación de `ContractNumber`; `@Version` — Los casos de uso de contrato no están implementados; `Employee` es inmutable». Hoy `Employee` tiene `update(...)` y está expuesto con `PUT /api/v1/employees/{id}`.
+- **Evidencia:** `docs/reviews/2026-09-26-ronda-001/07-revision-integral.md`, tabla de diferidos: «Riesgo de carrera en BR-CTR-005 y generación de `ContractNumber`; `@Version` — Los casos de uso de contrato no están implementados; `Employee` es inmutable». Hoy `Employee` tiene `update(...)` y está expuesto con `PUT /api/v1/employees/{id}`.
 - **Explicación:** dos usuarios de RR.HH. que editan el mismo empleado a la vez se pisan: el último sobrescribe al primero sin error (*lost update*). El riesgo es bajo con el volumen actual, pero la justificación del diferido quedó obsoleta.
 - **Corrección propuesta:**
   1. Migración `V6` con `version BIGINT NOT NULL DEFAULT 0` en `employees` y `@Version` en `EmployeeJpaEntity`.

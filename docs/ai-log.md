@@ -46,7 +46,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 
 ### #2 — Revisión integral ([`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md))
 
-- **Resultado:** `docs/reviews/001-7-arquitectura.md`. 20 hallazgos: 1 alto, 6 medios, 13 bajos. Build en verde (dominio 94,2 % de líneas).
+- **Resultado:** `docs/reviews/2026-09-26-ronda-001/07-revision-integral.md`. 20 hallazgos: 1 alto, 6 medios, 13 bajos. Build en verde (dominio 94,2 % de líneas).
 - **Aceptado:** trazabilidad de reglas de negocio contra el código y las pruebas, plan de acción priorizado.
 - **Corregido:**
   - El prompt de revisión contradecía dos ADRs vigentes: se corrigió el prompt, no el código.
@@ -145,7 +145,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 
 ### #13 — Ronda de revisión 002 con los prompts nuevos
 
-- **Origen:** primera ejecución real de los prompts genéricos: `/06-revisar` en sus 7 modos por capa más `final`, y `/07-corregir ronda 002`. Informes en `docs/reviews/002-1-dominio.md` … `002-9-final.md`.
+- **Origen:** primera ejecución real de los prompts genéricos: `/06-revisar` en sus 7 modos por capa más `final`, y `/07-corregir ronda 002`. Informes en `docs/reviews/2026-11-12-ronda-002/01-revision-dominio.md` … `2026-11-12-ronda-002/09-veredicto-final.md`.
 - **Aceptado:**
   - Revisión: 0 ERROR, 6 WARNING y 8 INFO. Uno de los WARNING detectó que el motivo del diferido de `@Version` de la ronda 001 ya no aplicaba.
   - Corrección con pruebas primero: `Contract.restore` valida invariantes estructurales con el código nuevo `CTR-009` → 500. La documentación quedó alineada (pendientes de `EmployeeStatus` y BR-USR-005, alcance de la autorización y agregado `identity`). `@Version` se difirió con el motivo actualizado, por decisión del autor.
@@ -286,7 +286,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 |---|---|---|
 | Pruebas | 409 ejecutadas, 0 fallos (209 domain, 46 application, 154 infrastructure) | `./mvnw clean verify`, 2026-11-12 |
 | Cobertura de líneas | 96,0 % / 96,7 % / 96,3 % (domain / application / infrastructure) | JaCoCo, 2026-11-12 |
-| Cobertura en la primera revisión | 94,2 % / 90,0 % / 92,7 % | `docs/reviews/001-7-arquitectura.md` |
+| Cobertura en la primera revisión | 94,2 % / 90,0 % / 92,7 % | `docs/reviews/2026-09-26-ronda-001/07-revision-integral.md` |
 | Duración del pipeline | 1 min 55 s – 3 min 11 s | GitHub Actions |
 | Issues de Sonar | 1 bug y 2 vulnerabilidades en el primer análisis → 0 y 0 (Quality Gate en verde) | SonarQube local, Jenkins #10 y #11 (2026-11-12) |
 | Hallazgos de la revisión con IA | 20 (1 alto, 6 medios, 13 bajos) | revisión 001 |

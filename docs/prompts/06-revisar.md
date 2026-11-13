@@ -10,7 +10,7 @@
 >
 > **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
-> **Este prompt es de revisión: no modifica código, pruebas, configuración ni documentación.** El único archivo que crea es su informe. Las correcciones se hacen con `/07-corregir`.
+> **Este prompt es de revisión: no modifica código, pruebas, configuración ni documentación.** Solo escribe su informe y actualiza los índices de `docs/reviews/` (el `README.md` de la ronda y el general). Las correcciones se hacen con `/07-corregir`.
 
 ## Rol
 Según el modo, actúa como el experto que indica su sección. En todos los casos buscas evidencia en el código; no confirmas lo que ya se cree ni inventas problemas.
@@ -19,24 +19,31 @@ Según el modo, actúa como el experto que indica su sección. En todos los caso
 `{ARGUMENTO}` es `<modo> [ronda]`. Si falta el modo o no es uno de la tabla, muestra la tabla con una línea por modo, indica cuál toca según el orden y los informes que ya existen en `docs/reviews/`, y detente.
 
 ## Objetivo
-Un informe por modo, guardado con el nombre de la tabla *Orden de la revisión*, en el que cada comprobación tiene su severidad y su evidencia verificada (`archivo:línea`, comando ejecutado o reporte), la trazabilidad de las reglas del alcance queda completa y no se modificó ningún otro archivo. En el modo `final`, además, una única línea `FINAL STATUS: READY` o `NOT READY` que cumple sus condiciones.
+Un informe por modo, guardado con el nombre de la tabla *Orden de la revisión*, en el que cada comprobación tiene su severidad y su evidencia verificada (`archivo:línea`, comando ejecutado o reporte), la trazabilidad de las reglas del alcance queda completa y no se modificó ningún otro archivo salvo los índices de `docs/reviews/`. En el modo `final`, además, una única línea `FINAL STATUS: READY` o `NOT READY` que cumple sus condiciones.
 
 ## Orden de la revisión
 
-| Paso | Modo | Revisa | Informe |
-|:-:|---|---|---|
-| 1 | `dominio` | Capa `domain` | `docs/reviews/NNN-1-dominio.md` |
-| 2 | `aplicacion` | Capa `application` | `NNN-2-aplicacion.md` |
-| 3 | `infraestructura` | Persistencia, adaptadores y configuración (sin la API) | `NNN-3-infraestructura.md` |
-| 4 | `api` | API REST | `NNN-4-api.md` |
-| 5 | `seguridad` | Seguridad transversal | `NNN-5-seguridad.md` |
-| 6 | `cicd` | Pipeline, imagen, CI local y despliegues | `NNN-6-cicd.md` |
-| 7 | `arquitectura` | Integral, consolidando los pasos 1–6 | `NNN-7-arquitectura.md` |
-| 8 | — | `/07-corregir ronda NNN`: corrige los ERROR y WARNING confirmados (el único que modifica código) | `NNN-8-correcciones.md` |
-| 9 | `final` | Verifica las correcciones y decide `READY` / `NOT READY` | `NNN-9-final.md` |
-| — | `pr <n>` | El diff de un PR, antes de integrarlo | `docs/reviews/pr-<n>.md` |
+Cada ronda tiene su carpeta, **`docs/reviews/AAAA-MM-DD-ronda-NNN/`**. `NNN` es el número de la ronda (001, 002…) y `AAAA-MM-DD` es la fecha en que empieza.
 
-`NNN` es la **ronda** de revisión (001, 002…; la 001 fue `docs/reviews/001-7-arquitectura.md`, así que la siguiente es 002). Si `[ronda]` se omite, usa la ronda en curso (la última con informes y sin su paso 9) o, si no hay, la siguiente. Se puede ejecutar solo una parte (por ejemplo, `dominio` → `/07-corregir` → `final` tras cambiar el dominio), pero siempre en este orden: de adentro hacia afuera y de lo particular a lo integral. Revisar por partes enfoca la revisión y consume menos contexto. Al terminar, indica el siguiente paso.
+| Paso | Modo | Revisa | Informe (en la carpeta de la ronda) |
+|:-:|---|---|---|
+| 1 | `dominio` | Capa `domain` | `01-revision-dominio.md` |
+| 2 | `aplicacion` | Capa `application` | `02-revision-aplicacion.md` |
+| 3 | `infraestructura` | Persistencia, adaptadores y configuración (sin la API) | `03-revision-infraestructura.md` |
+| 4 | `api` | API REST | `04-revision-api.md` |
+| 5 | `seguridad` | Seguridad transversal | `05-revision-seguridad.md` |
+| 6 | `cicd` | Pipeline, imagen, CI local y despliegues | `06-revision-cicd.md` |
+| 7 | `arquitectura` | Integral, consolidando los pasos 1–6 | `07-revision-integral.md` |
+| 8 | — | `/07-corregir ronda NNN`: corrige los ERROR y WARNING confirmados (el único que modifica código) | `08-correcciones-aplicadas.md` |
+| 9 | `final` | Verifica las correcciones y decide `READY` / `NOT READY` | `09-veredicto-final.md` |
+| — | `pr <n>` | El diff de un PR, antes de integrarlo | `docs/reviews/pr/pr-<n>.md` |
+
+**Qué ronda usar:** si `[ronda]` se omite, la ronda en curso es la última carpeta que todavía no tiene `09-veredicto-final.md`. Si no hay ninguna en curso, se crea la siguiente con la fecha de hoy.
+
+**Índices:**
+- Al crear la carpeta, crea su `README.md` con el alcance y la tabla `Paso | Informe | Estado | Resultado`, y agrega la ronda a `docs/reviews/README.md`.
+- Cada modo marca su fila al terminar.
+- `final` escribe el `FINAL STATUS` en el README de la ronda y en el general. Se puede ejecutar solo una parte (por ejemplo, `dominio` → `/07-corregir` → `final` tras cambiar el dominio), pero siempre en este orden: de adentro hacia afuera y de lo particular a lo integral. Revisar por partes enfoca la revisión y consume menos contexto. Al terminar, indica el siguiente paso.
 
 
 ## Fuentes de verdad
@@ -214,7 +221,7 @@ Cada modo revisa **solo** su alcance; lo que veas fuera de él va como INFO con 
 5. Checks del PR en verde (`gh pr checks`) y checklist de la plantilla de PR completa y veraz.
 6. Riesgos de integración: migraciones, compatibilidad de la API, configuración o secretos nuevos.
 
-**En el informe:** `docs/reviews/pr-<número o rama>.md`, en la misma rama del PR, con una línea final `Veredicto: APROBAR | CAMBIOS REQUERIDOS` (CAMBIOS REQUERIDOS si hay algún ERROR). Si hay cambios requeridos, se corrigen en la misma rama y se vuelve a ejecutar `/06-revisar pr <n>`; si se aprueba, el autor decide el merge.
+**En el informe:** `docs/reviews/pr/pr-<número o rama>.md`, en la misma rama del PR, con una línea final `Veredicto: APROBAR | CAMBIOS REQUERIDOS` (CAMBIOS REQUERIDOS si hay algún ERROR). Si hay cambios requeridos, se corrigen en la misma rama y se vuelve a ejecutar `/06-revisar pr <n>`; si se aprueba, el autor decide el merge.
 
 ### Paso 9 · `final` — Revisión final
 **Rol:** Arquitecto de Software Senior responsable de aprobar la entrega. Tu decisión se basa en evidencia verificada hoy, no en lo que dicen los informes anteriores.
@@ -234,7 +241,7 @@ Cada modo revisa **solo** su alcance; lo que veas fuera de él va como INFO con 
 6. **Quality Gate** (`DP.sonarqube`), si está disponible.
 7. **Diferidos deliberadamente:** los hallazgos que el informe de correcciones marcó como diferidos y los pendientes de §9. No se reportan como defectos, salvo que contradigan una regla obligatoria; en ese caso, con la evidencia exacta.
 
-**Entrega:** informe `docs/reviews/NNN-9-final.md` con esta estructura:
+**Entrega:** informe `09-veredicto-final.md` en la carpeta de la ronda, con esta estructura:
 
 ```text
 # Revisión final — ronda NNN

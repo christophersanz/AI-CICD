@@ -27,7 +27,7 @@ Los nombres de los tres documentos base (`architecture.md`, `business-rules.md`,
 | [docs/api/postman/](docs/api/postman/) | Colección Postman (login y endpoints, con aserciones de códigos HTTP) y entorno local, junto al contrato OpenAPI |
 | **Trabajo con IA** | |
 | [docs/prompts/](docs/prompts/README.md) | 9 prompts genéricos por orden de uso (`NN-nombre.md`), cada uno con su comando de Claude Code en `.claude/commands/`, y el kit para reutilizarlos en otros proyectos (`docs/prompts/kit/`) |
-| [docs/reviews/](docs/reviews/) | Informes de revisión, `NNN-<paso>-<modo>.md` por ronda |
+| [docs/reviews/](docs/reviews/README.md) | Informes de revisión: una carpeta por ronda con su resumen, y su índice |
 | [docs/sessions/](docs/sessions/README.md) | Archivos de sesión: progreso de cada prompt para retomarlo sin perder contexto |
 | [docs/ai-log.md](docs/ai-log.md) | Bitácora de IA: tareas, lo aceptado, lo corregido, tiempos y métricas |
 | **Infraestructura local** | |
