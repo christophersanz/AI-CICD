@@ -1,9 +1,9 @@
-# CI/CD de contract-api (ADR-0009, ADR-0011, ADR-0012, ADR-0013).
+# CI/CD de contract-api (ADR-0009, ADR-0011, ADR-0012, ADR-0016).
 # - Pull Request a master: build, pruebas (Testcontainers), cobertura, análisis SonarCloud (si hay SONAR_TOKEN)
 #   y build de la imagen sin publicarla. Sus dos checks son obligatorios para integrar (ruleset master-protegida).
 # - Push a master (merge del PR): lo anterior y publicación de la imagen en GHCR (latest + sha) y, si está
 #   configurado, en Docker Hub (variable DOCKERHUB_USERNAME y secreto DOCKERHUB_TOKEN). Después se verifica la
-#   imagen en un entorno efímero y el despliegue en Render espera la aprobación del environment "production".
+#   imagen en un entorno efímero. El despliegue es con Docker, desde el Jenkins local (ADR-0014, ADR-0016).
 # - Tag vX.Y.Z: publicación con las etiquetas de versión.
 name: CI/CD
 
@@ -154,9 +154,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Verificación automática de la imagen publicada (ADR-0012), sin aprobación: la levanta por su sha (no
-  # "latest") en un entorno efímero del runner con PostgreSQL y claves JWT temporales, y pasa la prueba de
-  # humo. Así la aprobación de production se decide sobre una imagen que ya se sabe que arranca.
+  # Verificación automática de la imagen publicada (ADR-0012): la levanta por su sha (no "latest") en un
+  # entorno efímero del runner con PostgreSQL y claves JWT temporales, y pasa la prueba de humo. Así cada
+  # imagen publicada de master se sabe que arranca y responde (el despliegue es con Docker, ADR-0016).
   verify:
     name: Verificación de la imagen
     needs: image
@@ -229,42 +229,3 @@ jobs:
         run: |
           docker rm -f contract-api || true
           rm -f prod.env
-
-  # CD con aprobación humana (ADR-0012) a Render (ADR-0013). Espera a que un revisor del environment
-  # "production" lo apruebe; después despliega en el servicio de Render la imagen de Docker Hub por su sha
-  # (pública, Render la descarga sin credenciales), espera a que quede en vivo y repite la prueba de humo
-  # contra la URL pública. Solo se ejecuta si el repositorio define RENDER_SERVICE_ID (en un fork se omite).
-  deploy:
-    name: Despliegue (production)
-    needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && vars.RENDER_SERVICE_ID != '' && vars.DOCKERHUB_USERNAME != ''
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    environment:
-      name: production
-      url: ${{ vars.RENDER_URL }}
-    concurrency:
-      group: deploy-production
-      cancel-in-progress: false
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Desplegar en Render
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
-        run: |
-          image="docker.io/${{ vars.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:sha-${GITHUB_SHA::7}"
-          echo "IMAGE=$image" >> "$GITHUB_ENV"
-          .github/scripts/render-deploy.sh "$image"
-
-      # El plan gratuito de Render duerme el servicio tras 15 min sin tráfico: se da margen al arranque.
-      - name: Prueba de humo en production
-        env:
-          ADMIN_USERNAME: ${{ vars.SMOKE_ADMIN_USERNAME || 'admin' }}
-          ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
-          HEALTH_TIMEOUT: '300'
-        run: .github/scripts/smoke-test.sh "${{ vars.RENDER_URL }}" "Despliegue verificado en Render (production)"

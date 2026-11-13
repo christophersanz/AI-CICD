@@ -1,6 +1,6 @@
 # ADR-0013: Despliegue persistente en Render
 
-- **Estado:** Aceptado
+- **Estado:** Sustituido por [ADR-0016](0016-despliegue-solo-con-docker.md) el 2026-11-13: el despliegue es solo con Docker y se eliminaron `render.yaml`, `render-deploy.sh` y el job `deploy`.
 - **Fecha:** 2026-11-11
 - **Amplía:** [ADR-0012](0012-github-flow-y-despliegue-con-aprobacion.md). El entorno efímero deja de ser el despliegue y pasa a ser la verificación previa a la aprobación.
 

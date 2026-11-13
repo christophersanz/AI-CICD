@@ -32,6 +32,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 17 | 2026-11-13 | Volver Jenkins a `master` con un build tras probar una rama (guía, README y prompts 07/08) | — | [__ h] | [__ h] | 1 |
 | 18 | 2026-11-13 | Eliminar el parseo de texto sin uso de `ContractId` y `EmployeeId` con `/05-refactorizar` (primera ejecución del prompt) | `05-refactorizar.md` | [__ h] | [__ h] | 2 |
 | 19 | 2026-11-13 | Kit reutilizable en proyectos con documentos propios (prueba sobre el modelo del curso) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 4 |
+| 20 | 2026-11-13 | Quitar Render: el despliegue es solo con Docker (ADR-0016) | — | [__ h] | [__ h] | 0 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -257,6 +258,26 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - 4 casos negativos (documento faltante, plantilla, plantilla sobrante, wrapper faltante), todos detectados;
   - `--actualizar` conserva el `DP` del proyecto destino.
 - **Pendiente:** ejecutar un prompt completo en el proyecto del profe; hasta ahora solo se probó la instalación y la verificación.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
+### #20 — Despliegue solo con Docker (sin Render)
+
+- **Origen:** el autor pidió eliminar todo lo relacionado con Render, porque el despliegue es con Docker.
+- **Hallado antes de borrar:** en GitHub nunca se configuraron `RENDER_API_KEY`, `RENDER_SERVICE_ID` ni `RENDER_URL`. Por eso el job `Despliegue (production)` terminó siempre en *skipped*, y el único despliegue real era el de Jenkins (ADR-0014).
+- **Hecho:**
+  - se eliminaron `render.yaml`, `.github/scripts/render-deploy.sh` y el job `deploy` del workflow;
+  - en la guía de CI/CD se quitaron §3.5, §4.1, §5.4 y 5 filas de *Problemas frecuentes*, se renumeraron 5.5 → 5.4 y 5.6 → 5.5 y se corrigieron sus referencias;
+  - se actualizaron el diagrama de la guía y el de arquitectura, `technical.md` §9.2, `CLAUDE.md` (stack, flujo y `DP.despliegue`), el README y el script de humo.
+- **ADR:**
+  - ADR-0013 pasa a **Sustituido por ADR-0016**: no se borra, porque es un registro histórico;
+  - ADR-0012 conserva GitHub Flow, y su despliegue con aprobación queda sustituido;
+  - ADR-0016 nuevo: *Despliegue solo con Docker*.
+- **Verificado:**
+  - `actionlint` OK;
+  - los 23 diagramas Mermaid de las dos guías se renderizan;
+  - 0 enlaces a archivos o secciones eliminados;
+  - `verificar.sh` da 0 errores.
+- **Fuera del repositorio:** queda el environment `production`, vacío y ya sin uso; borrarlo lo decide el autor.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
 ## Métricas del proyecto

@@ -1,6 +1,6 @@
 # ADR-0012: GitHub Flow con checks obligatorios y despliegue con aprobación
 
-- **Estado:** Aceptado; el despliegue persistente se añadió en [ADR-0013](0013-despliegue-en-render.md) (Render), y el entorno efímero quedó como el job `verify`, previo a la aprobación
+- **Estado:** Aceptado en lo que respecta a GitHub Flow, el ruleset y los checks obligatorios. El despliegue con aprobación (environment `production`, ADR-0013) quedó **sustituido por [ADR-0016](0016-despliegue-solo-con-docker.md)**: el despliegue es solo con Docker. El job `verify` (entorno efímero) sigue vigente.
 - **Fecha:** 2026-11-11
 - **Reemplaza:** el flujo de una sola rama con push directo de [ADR-0009](0009-ci-cd-github-actions.md) (revisión del 2026-10-24). El resto de ADR-0009 (repositorio, jobs `build` e `image`, cobertura, registros) sigue vigente.
 
