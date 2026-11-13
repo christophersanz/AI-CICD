@@ -88,6 +88,10 @@ Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/k
 | `normativa` | Reglas con base en la normativa laboral peruana: se marcan con ⚖️ y se validan con RR.HH./asesoría legal; no citar artículos de ley sin verificarlos |
 | `paquete-base` | `pe.edu.galaxy.training.ia.ca` |
 | `modulos` | `domain`, `application`, `infrastructure` (la API REST está en `infrastructure/api`) |
+| `doc-arquitectura` | `docs/architecture.md` |
+| `doc-reglas` | `docs/business-rules.md` |
+| `doc-tecnico` | `docs/technical.md` |
+| `secciones` | Estándar del kit (las de `docs/prompts/kit/*.plantilla.md`); reglas con ID `BR-<CTX>-NNN` |
 | `build` | `./mvnw clean verify` (compila, ejecuta todas las pruebas y verifica la cobertura; requiere Docker para Testcontainers) |
 | `base-datos` | PostgreSQL 16 |
 | `migraciones` | Flyway en `infrastructure/src/main/resources/db/migration` |

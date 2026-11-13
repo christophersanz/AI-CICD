@@ -7,13 +7,15 @@
 | **Origen** | Nuevo en este proyecto (fuentes en `docs/prompts/README.md` §3) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+>
+> **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
 ## Rol
 Actúa como arquitecto de software y redactor técnico. Documentas lo que el código **hace**, verificado contra el código, para tres lectores: quien mantiene el código, quien consume la API y quien evalúa la arquitectura.
 
 ## Contexto y fuentes de verdad
-- Lee: `CLAUDE.md` (tabla de documentación), `docs/architecture.md`, `docs/business-rules.md`.
-- Documentos existentes: `docs/technical.md`, el contrato OpenAPI (`DP.openapi`), las guías (`DP.guias`), `docs/adr/`, `docs/design/` y `README.md`.
+- Lee: `CLAUDE.md` (tabla de documentación), `architecture.md`, `business-rules.md`.
+- Documentos existentes: `technical.md`, el contrato OpenAPI (`DP.openapi`), las guías (`DP.guias`), `docs/adr/`, `docs/design/` y `README.md`.
 - Alcance: **{ARGUMENTO}** (vacío = muestra qué documentación falta o está desfasada y pide que elija).
 
 ## Objetivo

@@ -31,6 +31,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 16 | 2026-11-13 | JavaDoc de `domain` y `application` con `/04-documentar javadoc` (primera ejecución del prompt) | `04-documentar.md` | [__ h] | [__ h] | 3 |
 | 17 | 2026-11-13 | Volver Jenkins a `master` con un build tras probar una rama (guía, README y prompts 07/08) | — | [__ h] | [__ h] | 1 |
 | 18 | 2026-11-13 | Eliminar el parseo de texto sin uso de `ContractId` y `EmployeeId` con `/05-refactorizar` (primera ejecución del prompt) | `05-refactorizar.md` | [__ h] | [__ h] | 2 |
+| 19 | 2026-11-13 | Kit reutilizable en proyectos con documentos propios (prueba sobre el modelo del curso) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 4 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -231,6 +232,31 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - 0 usos restantes de `of(String)`;
   - regla de dependencia cumplida.
 - **Pendiente:** 94 bloques JavaDoc de #16 sin línea en blanco antes de los tags.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
+### #19 — Prueba de reutilización del kit en el modelo del curso
+
+- **Origen:** el autor preguntó si los prompts servían en cualquier proyecto Spring Boot. Se probó instalando el kit en una **copia** de `F4/01.-Modelos/use-case-ca-v1` (Sales Order). Ese proyecto tiene un solo módulo, sus documentos están en la raíz, sus reglas usan IDs `RN-NNN` y tiene sus propias secciones.
+- **Encontrado:** `verificar.sh` daba 0 errores, pero el kit no habría funcionado:
+  - el instalador creó plantillas vacías en `docs/`, y los prompts las habrían leído en lugar de los documentos reales;
+  - las secciones citadas (§4, §8) no correspondían a las del proyecto;
+  - 7 líneas asumían módulos separados;
+  - 4 prompts citaban un `technical.md` que no existe.
+- **Corregido:**
+  - claves `DP.doc-arquitectura`, `doc-reglas`, `doc-tecnico` y `secciones`;
+  - nota común en los 9 prompts y las líneas de módulos apoyadas en `DP.modulos`;
+  - un instalador que detecta los documentos existentes;
+  - un verificador que marca como error un documento inexistente, una plantilla sin completar o un wrapper de build que falta.
+- **Errores de la IA corregidos:**
+  1. Se afirmó antes que el kit servía «para cualquier proyecto Spring Boot» sin haberlo probado fuera de `contract-api`.
+  2. El primer arreglo del instalador fallaba en el bash 3.2 de macOS (comillas invertidas y `[…]` dentro de `${x//…}`); se cambió a `awk`.
+  3. Al completar los datos de prueba se escribió `./mvnw` en un proyecto sin wrapper; eso motivó la comprobación nueva.
+  4. La mención «`DP.doc-*`» del README se leía como una clave inexistente.
+- **Medido:**
+  - modelo del curso, con `DP` completado: **0 errores y 0 avisos**; `contract-api`, también;
+  - 4 casos negativos (documento faltante, plantilla, plantilla sobrante, wrapper faltante), todos detectados;
+  - `--actualizar` conserva el `DP` del proyecto destino.
+- **Pendiente:** ejecutar un prompt completo en el proyecto del profe; hasta ahora solo se probó la instalación y la verificación.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
 ## Métricas del proyecto

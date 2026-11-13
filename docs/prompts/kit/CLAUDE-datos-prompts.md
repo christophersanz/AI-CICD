@@ -9,7 +9,11 @@ Los prompts de `docs/prompts/` son genéricos. Cuando un prompt dice `DP.<clave>
 | `dominio-negocio` | Negocio y país o contexto, en una línea (define el rol de los prompts de requisitos y reglas) | [Gestión de pedidos de una tienda en línea] |
 | `normativa` | Cómo se tratan las reglas con base legal o normativa | [Se marcan con ⚖️ y se validan con el área legal / No aplica] |
 | `paquete-base` | Paquete raíz de Java | `[com.empresa.servicio]` |
-| `modulos` | Módulos y dónde está la API | [`domain`, `application`, `infrastructure` (API en `infrastructure/api`)] |
+| `modulos` | Módulos (o paquetes, si es un solo módulo) y dónde está la API | [`domain`, `application`, `infrastructure` (API en `infrastructure/api`) / un módulo con los paquetes `domain`, `application`, `infrastructure` y `api`] |
+| `doc-arquitectura` | Documento de arquitectura (capas, reglas, convenciones, API, errores, pruebas) | `[docs/architecture.md]` |
+| `doc-reglas` | Documento de reglas de negocio (glosario, entidades, reglas, estados, casos de uso, errores) | `[docs/business-rules.md]` |
+| `doc-tecnico` | Documento del estado implementado (endpoints, configuración, esquema, build) | `[docs/technical.md]` / No aplica |
+| `secciones` | Dónde está cada sección que citan los prompts y formato de los ID de reglas. Si los documentos se crearon con las plantillas del kit, escribe «Estándar del kit». Si no, indica la sección real de cada concepto: `architecture.md` §2 estructura, §3 reglas de arquitectura, §5 convenciones, §6 API, §7 errores, §9 pruebas; `business-rules.md` §1 alcance, §2 glosario, §3 entidades, §4 reglas (con capa y error), §4.1 permisos, §5 estados, §6 casos de uso, §7 eventos, §8 catálogo de errores, §9 preguntas abiertas. Lo que no exista se marca «no existe» | [Estándar del kit; reglas con ID `BR-<CTX>-NNN`] |
 | `build` | Comando que compila, prueba y verifica la cobertura (el mismo que el CI) | `[./mvnw clean verify]` |
 | `base-datos` | Motor y versión | [PostgreSQL 16] |
 | `migraciones` | Herramienta y carpeta | [Flyway en `infrastructure/src/main/resources/db/migration`] |

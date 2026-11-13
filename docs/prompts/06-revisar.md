@@ -7,6 +7,8 @@
 | **Origen** | Mejora del prompt del curso [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) y de la serie `01`–`07` de los modelos del curso |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+>
+> **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
 > **Este prompt es de revisión: no modifica código, pruebas, configuración ni documentación.** El único archivo que crea es su informe. Las correcciones se hacen con `/07-corregir`.
 
@@ -40,9 +42,9 @@ Un informe por modo, guardado con el nombre de la tabla *Orden de la revisión*,
 ## Fuentes de verdad
 Leer completas, en este orden:
 1. `CLAUDE.md`: stack, flujo de Git y forma de trabajar.
-2. `docs/architecture.md`: capas, reglas de arquitectura (§3), nombres, API, errores y pruebas.
-3. `docs/business-rules.md`: reglas `BR-*` con la **capa** que las valida, estados, casos de uso, errores y preguntas abiertas (§9).
-4. `docs/technical.md` y los ADR de `docs/adr/`: decisiones vigentes.
+2. `architecture.md`: capas, reglas de arquitectura (§3), nombres, API, errores y pruebas.
+3. `business-rules.md`: reglas `BR-*` con la **capa** que las valida, estados, casos de uso, errores y preguntas abiertas (§9).
+4. `technical.md` y los ADR de `docs/adr/`: decisiones vigentes.
 
 Los informes anteriores de `docs/reviews/` dan contexto y trazabilidad, pero **no mandan sobre los documentos**. Si el código contradice un documento, se reporta e indica cuál debería corregirse.
 
@@ -88,7 +90,7 @@ Cada modo revisa **solo** su alcance; lo que veas fuera de él va como INFO con 
 **Alcance:** Paquete `<DP.paquete-base>.domain` y sus pruebas (módulo `domain` de `DP.modulos`).
 
 **Comprobaciones:**
-1. Java puro: sin Spring, JPA, Jakarta, Lombok, Jackson, HTTP ni imports de `application` o `infrastructure` (revisa los imports y `domain/pom.xml`).
+1. Java puro: sin Spring, JPA, Jakarta, Lombok, Jackson, HTTP ni imports de `application` o `infrastructure` (revisa los imports y, si el dominio es un módulo propio en `DP.modulos`, su `pom.xml` o `build.gradle`; en un solo módulo, la regla se comprueba por paquete).
 2. Cada agregado de `business-rules.md` §3 protege las invariantes que `business-rules.md` §4 asigna a `domain`; sin setters públicos ni fábricas (`restore`, `reconstitute`) que permitan saltarse invariantes sin advertirlo.
 3. Value objects (`record`) validados en el constructor con excepciones de dominio (o un `Guard` común), nunca `NullPointerException` ni `IllegalArgumentException`; normalización al crear; importes con `BigDecimal` y escala fija, nunca `float`/`double`.
 4. Transiciones de estado según §5: las no dibujadas lanzan el código de transición inválida del catálogo (§8), con las excepciones que documente §5.
@@ -104,10 +106,10 @@ Cada modo revisa **solo** su alcance; lo que veas fuera de él va como INFO con 
 **Alcance:** Paquete `<DP.paquete-base>.application` y sus pruebas (módulo `application` de `DP.modulos`).
 
 **Comprobaciones:**
-1. Depende solo de `domain` y, como máximo, de `@Transactional` (`application/pom.xml` y imports); sin JPA, REST, Spring Security ni `infrastructure`.
+1. Depende solo de `domain` y, como máximo, de `@Transactional` (imports y, si es un módulo propio en `DP.modulos`, su `pom.xml` o `build.gradle`); sin JPA, REST, Spring Security ni `infrastructure`.
 2. Puertos de entrada en `port/in` con el patrón `<Verbo><Entidad>UseCase`; puertos de salida en `port/out` (`<Entidad>RepositoryPort`, `<Sistema>ClientPort`, puertos de identidad) con métodos en términos del dominio y sin tipos técnicos.
 3. `Command`/`Query`/`Result` como records inmutables en `dto`, con validación mínima de presencia (no reglas de negocio).
-4. Un servicio por caso de uso (`<Verbo><Entidad>Service`), sin `@Service`, registrado como bean en `infrastructure/config`.
+4. Un servicio por caso de uso (`<Verbo><Entidad>Service`), sin `@Service`, registrado como bean en la configuración de la capa de infraestructura (`DP.modulos`).
 5. Los servicios orquestan (cargar → delegar al dominio → validar reglas de `application` → persistir) sin absorber reglas que §4 asigna a `domain`.
 6. Reglas que §4 asigna a `application` implementadas (típicamente existencia, unicidad, reglas entre agregados, límites acumulados y autorización por alcance), según lo implementado.
 7. Límites transaccionales: un `@Transactional` por caso de uso, sin llamadas externas dentro de la transacción que no lo requieran.
@@ -117,14 +119,14 @@ Cada modo revisa **solo** su alcance; lo que veas fuera de él va como INFO con 
 ### Paso 3 · `infraestructura` — Infraestructura
 **Rol:** arquitecto experto en Spring Boot, Spring Data JPA, migraciones y Spring Security.
 
-**Alcance:** `infrastructure` **excepto** `infrastructure/api`: `persistence`, `client`, `security`, `config`, migraciones (`DP.migraciones`), `application*.yml` y sus pruebas.
+**Alcance:** la capa de infraestructura **excepto** la API (ubicaciones en `DP.modulos`): `persistence`, `client`, `security`, `config`, migraciones (`DP.migraciones`), `application*.yml` y sus pruebas.
 
 **Comprobaciones:**
 1. Cada puerto de salida tiene un adaptador que lo implementa; los adaptadores dependen de los puertos y no al revés; `persistence`, `client` y `security` no dependen de `api`.
 2. Entidades JPA (`<Entidad>JpaEntity`) separadas del dominio; mappers dominio ↔ JPA sin lógica de negocio; el dominio y los puertos no se adaptaron a JPA.
 3. Repositorios Spring Data como mecanismo técnico, no como puertos; sin entidades JPA fuera de `persistence`.
 4. Migraciones coherentes con las entidades: `NOT NULL`, los únicos que exige `business-rules.md`, claves foráneas e índices para las consultas de las reglas; migraciones aplicadas que no se editaron.
-5. Adaptadores de seguridad (`infrastructure/security`): implementan los puertos de identidad de `application` y no tienen reglas de negocio; el análisis de seguridad en sí (tokens, autorización, secretos) es de ``/06-revisar seguridad``.
+5. Adaptadores de seguridad (paquete `security` de la infraestructura): implementan los puertos de identidad de `application` y no tienen reglas de negocio; el análisis de seguridad en sí (tokens, autorización, secretos) es de ``/06-revisar seguridad``.
 6. Configuración: perfiles `local`/`dev`/`prod`, secretos solo por variables de entorno, `open-in-view` desactivado, logs JSON sin datos sensibles.
 7. Rendimiento: N+1, `FetchType.EAGER` innecesario, consultas sin paginar.
 8. Pruebas de integración según `DP.pruebas-integracion` para los adaptadores y las restricciones de la base.
@@ -132,7 +134,7 @@ Cada modo revisa **solo** su alcance; lo que veas fuera de él va como INFO con 
 ### Paso 4 · `api` — API REST
 **Rol:** arquitecto experto en diseño de APIs REST, Spring Web y OpenAPI.
 
-**Alcance:** `infrastructure/api` (controllers, `dto`, mappers, `rest/error`), el contrato OpenAPI (`DP.openapi`) y las pruebas `@WebMvcTest`.
+**Alcance:** la API REST, en la ubicación que indica `DP.modulos` (controllers, `dto`, mappers, manejo de errores), el contrato OpenAPI (`DP.openapi`) y las pruebas `@WebMvcTest`.
 
 **Comprobaciones:**
 1. Controllers como adaptadores de entrada: solo usan puertos `port.in`; no inyectan repositorios, adaptadores ni clases de `security`; sin lógica de negocio.
@@ -148,7 +150,7 @@ Cada modo revisa **solo** su alcance; lo que veas fuera de él va como INFO con 
 ### Paso 5 · `seguridad` — Seguridad
 **Rol:** especialista en seguridad de aplicaciones (OWASP ASVS y API Security Top 10) y Spring Security.
 
-**Alcance:** Seguridad en todas las capas: `infrastructure/security`, `@PreAuthorize` de la API, reglas de identidad de `business-rules.md`, configuración, dependencias y pipeline. Diseño de referencia: `DP.seguridad`.
+**Alcance:** Seguridad en todas las capas: el paquete `security` de la infraestructura, `@PreAuthorize` de la API, reglas de identidad de `business-rules.md`, configuración, dependencias y pipeline. Diseño de referencia: `DP.seguridad`.
 
 **Comprobaciones:**
 1. Autenticación: login sin enumeración de usuarios (un único error para credenciales inválidas), política de contraseñas y usuarios deshabilitados según `business-rules.md`.

@@ -7,12 +7,14 @@
 | **Origen** | Mejora del prompt del curso [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) |
 
 > `{ARGUMENTO}` es lo que se escribe después del comando. `DP.<clave>` es un dato del proyecto: está en `CLAUDE.md` → *Datos para los prompts*. Sin Claude Code, copia este prompt y reemplaza `{ARGUMENTO}` a mano.
+>
+> **Documentos y secciones:** `architecture.md`, `business-rules.md` y `technical.md` son los archivos que indican `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`. Si uno es «No aplica», omite lo que este prompt diga de él. `§N` es la numeración de las plantillas del kit (`docs/prompts/kit/*.plantilla.md`); si el proyecto organiza sus documentos de otra forma, `DP.secciones` dice dónde está cada sección y qué formato tienen los ID de las reglas (`BR-*` en la plantilla). Las capas y la ubicación de la API salen de `DP.modulos`.
 
 ## Rol
 Actúa como ingeniero DevOps senior experto en las herramientas de `DP.ci` y `DP.ci-local`, Docker, análisis estático y despliegue de aplicaciones Spring Boot.
 
 ## Contexto y fuentes de verdad
-- Lee: `CLAUDE.md` (flujo de Git y *Datos para los prompts*), la guía de CI/CD de `DP.guias`, `docs/technical.md` y los ADR de `DP.adr-cicd`.
+- Lee: `CLAUDE.md` (flujo de Git y *Datos para los prompts*), la guía de CI/CD de `DP.guias`, `technical.md` y los ADR de `DP.adr-cicd`.
 - Archivos: los que describen `DP.ci`, `DP.imagen`, `DP.despliegue`, `DP.ci-local` y `DP.sonarqube`.
 - Cambio pedido: **{ARGUMENTO}** (si está vacío, pregunta qué se quiere cambiar).
 
@@ -53,7 +55,7 @@ Espera mi aprobación.
 6. Tabla final `Comprobación | Resultado (✅ / ❌ / ⚠️ no probado) | Evidencia`.
 
 ### Paso 4 — Documentar
-ADR nuevo o actualizado de `DP.adr-cicd`, la guía de CI/CD y los diagramas de `DP.guias` (incluida su sección de problemas frecuentes, si existe), `docs/technical.md` y la documentación de `DP.ci-local`. Si cambian los datos del pipeline, actualiza también `CLAUDE.md` → *Datos para los prompts*.
+ADR nuevo o actualizado de `DP.adr-cicd`, la guía de CI/CD y los diagramas de `DP.guias` (incluida su sección de problemas frecuentes, si existe), `technical.md` y la documentación de `DP.ci-local`. Si cambian los datos del pipeline, actualiza también `CLAUDE.md` → *Datos para los prompts*.
 
 ## Informe final
 Qué cambió por evento, evidencia de cada verificación (IDs de ejecución, número de build, resultado por etapa), lo que el autor debe hacer (secretos, merge, aprobaciones) y riesgos pendientes.

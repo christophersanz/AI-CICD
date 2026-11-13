@@ -118,12 +118,20 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 
 ## 6. Usar el kit en otro proyecto
 
-**Requisitos del proyecto destino:** API Java con Spring Boot, Clean Architecture y DDD en módulos (`domain`, `application`, `infrastructure`), repositorio git y Claude Code. Las herramientas concretas (Maven o Gradle, base de datos, CI, SonarQube, despliegue) se declaran en `DP.*`. Si alguna no existe, se marca "No aplica".
+**Requisitos del proyecto destino:** API Java con Spring Boot, Clean Architecture y DDD, repositorio git y Claude Code.
+- **Capas:** en módulos (`domain`, `application`, `infrastructure`) o como paquetes de un solo módulo, según `DP.modulos`.
+- **Documentos:** donde estén (`DP.doc-arquitectura`, `DP.doc-reglas`, `DP.doc-tecnico`).
+- **Estructura de los documentos:** la de las plantillas del kit, o una propia descrita en `DP.secciones`, que indica en qué sección está cada concepto que citan los prompts (reglas, estados, catálogo de errores…) y el formato de los ID de las reglas.
+- **Herramientas:** Maven o Gradle, base de datos, CI, SonarQube y despliegue se declaran en `DP.*`; si alguna no existe, se marca «No aplica».
+
+**No sirve** para un proyecto Spring Boot por capas técnicas (`controller` / `service` / `repository`) sin dominio separado: los prompts revisan e implementan contra Clean Architecture, así que todo sería un incumplimiento.
+
+**Probado** en el modelo del curso `F4/01.-Modelos/use-case-ca-v1` (Sales Order). Es un solo módulo, con sus documentos en la raíz y reglas `RN-NNN`. El instalador detectó sus documentos y `verificar.sh` terminó con 0 errores después de completar `DP` (`ai-log.md` #19).
 
 | Archivo del kit (`docs/prompts/kit/`) | Para qué |
 |---|---|
-| `instalar.sh` | Copia los prompts, los comandos, el kit y `docs/sessions/README.md`, y crea los documentos que falten. **Nunca sobrescribe** `CLAUDE.md`, `architecture.md` ni `business-rules.md`. |
-| `verificar.sh` | Comprueba que el proyecto tiene todo lo que usan los prompts: documentos, claves `DP.*` (y cuáles faltan completar), secciones numeradas, comandos y un solo archivo por prompt. También detecta referencias obsoletas: comandos `/NN-nombre` citados que no existen y archivos de sesión con otro número. Ejecútalo después de cambiar cualquier prompt. |
+| `instalar.sh` | Copia los prompts, los comandos, el kit y `docs/sessions/README.md`. Busca `architecture.md`, `business-rules.md` y `technical.md` en todo el proyecto y deja sus rutas en `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico`; solo crea desde la plantilla los que no existan. **Nunca sobrescribe** `CLAUDE.md` ni los documentos. |
+| `verificar.sh` | Comprueba que el proyecto tiene todo lo que usan los prompts: que los documentos de `DP.doc-arquitectura`, `DP.doc-reglas` y `DP.doc-tecnico` existan y no sean la plantilla sin completar; las claves `DP.*` y cuáles faltan completar; las secciones numeradas, si `DP.secciones` es «Estándar del kit»; que exista el wrapper de `DP.build`; los comandos y un solo archivo por prompt. También detecta referencias obsoletas: comandos `/NN-nombre` citados que no existen y archivos de sesión con otro número. Ejecútalo después de cambiar cualquier prompt. |
 | `CLAUDE-datos-prompts.md` | Plantilla de la sección *Datos para los prompts*, con qué poner en cada clave. |
 | `CLAUDE.plantilla.md`, `architecture.plantilla.md`, `business-rules.plantilla.md` | Documentos base con las secciones que citan los prompts (`architecture.md` §2–§9, `business-rules.md` §1–§9 y §4.1). |
 
@@ -134,6 +142,7 @@ Pasos:
 docs/prompts/kit/instalar.sh /ruta/al/otro-proyecto
 
 # 2. En el otro proyecto: completar CLAUDE.md → "Datos para los prompts" (cada [...])
+#    (si los documentos no siguen las plantillas del kit, DP.secciones con el mapa de sus secciones)
 #    y los documentos de arquitectura y negocio (o usar /01-definir requisitos y /01-definir reglas)
 
 # 3. Comprobar
