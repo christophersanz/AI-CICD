@@ -61,14 +61,12 @@ class EmployeeValueObjectsTest {
     @Test
     void shouldCreateEmployeeIdWhenValueIsValid() {
         UUID uuid = UUID.randomUUID();
-        assertThat(EmployeeId.of(uuid.toString())).isEqualTo(EmployeeId.of(uuid));
+        assertThat(new EmployeeId(uuid)).isEqualTo(EmployeeId.of(uuid));
         assertThat(EmployeeId.generate()).isNotEqualTo(EmployeeId.generate());
     }
 
     @Test
     void shouldRejectEmployeeIdWhenValueIsMissingOrMalformed() {
         assertThatThrownBy(() -> EmployeeId.of((UUID) null)).isInstanceOf(InvalidValueException.class);
-        assertThatThrownBy(() -> EmployeeId.of((String) null)).isInstanceOf(InvalidValueException.class);
-        assertThatThrownBy(() -> EmployeeId.of("123")).isInstanceOf(InvalidValueException.class);
     }
 }

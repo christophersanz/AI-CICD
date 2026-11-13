@@ -30,15 +30,13 @@ class ContractValueObjectsTest {
         UUID uuid = UUID.randomUUID();
 
         assertThat(ContractId.of(uuid).value()).isEqualTo(uuid);
-        assertThat(ContractId.of(" " + uuid + " ")).isEqualTo(ContractId.of(uuid));
+        assertThat(new ContractId(uuid)).isEqualTo(ContractId.of(uuid));
         assertThat(ContractId.generate()).isNotEqualTo(ContractId.generate());
     }
 
     @Test
     void shouldRejectContractIdWhenValueIsMissingOrMalformed() {
         assertThatThrownBy(() -> ContractId.of((UUID) null)).isInstanceOf(InvalidValueException.class);
-        assertThatThrownBy(() -> ContractId.of((String) null)).isInstanceOf(InvalidValueException.class);
-        assertThatThrownBy(() -> ContractId.of("not-a-uuid")).isInstanceOf(InvalidValueException.class);
     }
 
     @ParameterizedTest

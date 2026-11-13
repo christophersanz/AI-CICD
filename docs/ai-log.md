@@ -30,6 +30,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 15 | 2026-11-12 | Pruebas de `ContractPeriod` con `/03-pruebas` (primera ejecución del prompt) | `03-pruebas.md` | [__ h] | [__ h] | 0 |
 | 16 | 2026-11-13 | JavaDoc de `domain` y `application` con `/04-documentar javadoc` (primera ejecución del prompt) | `04-documentar.md` | [__ h] | [__ h] | 3 |
 | 17 | 2026-11-13 | Volver Jenkins a `master` con un build tras probar una rama (guía, README y prompts 07/08) | — | [__ h] | [__ h] | 1 |
+| 18 | 2026-11-13 | Eliminar el parseo de texto sin uso de `ContractId` y `EmployeeId` con `/05-refactorizar` (primera ejecución del prompt) | `05-refactorizar.md` | [__ h] | [__ h] | 2 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -215,6 +216,21 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Corregido:**
   - Build #24 lanzado a mano sobre `82d1e38`: las 9 etapas en SUCCESS y `contract-api:jenkins-24` desplegado en `localhost:8090`.
   - El procedimiento ahora exige un build sobre `master` al terminar. Está en el README de Jenkins (*Probar una rama antes de integrarla*), en la guía de CI/CD (con una fila nueva en *Problemas frecuentes*), en `DP.ci-local` y en los prompts `07-corregir` y `08-cambiar-pipeline`.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
+### #18 — Parseo duplicado de IDs con `/05-refactorizar`
+
+- **Origen:** primera ejecución de `/05-refactorizar`. Sin objetivo, el prompt buscó síntomas reales antes de preguntar: SonarQube daba 0 % de duplicación y 2 *code smells*. El autor eligió el parseo duplicado de `ContractId` y `EmployeeId`.
+- **Diagnóstico que cambió la propuesta:** `of(String)` no tenía ningún uso en producción desde el primer commit. La API recibe `@PathVariable UUID` y Spring convierte el texto. Extraerlo a un helper habría sido sobreingeniería, así que se propuso **eliminarlo** y el autor lo aprobó.
+- **Corregido (errores de la IA):**
+  1. El JavaDoc escrito en #16 decía que `of(String)` servía «por ejemplo, para el ID de una ruta de la API»: era falso, y desapareció con el método.
+  2. El diagnóstico omitió un uso en `ContractValueObjectsTest:33`. Se detectó antes de compilar.
+- **Medido:**
+  - −36 líneas de producción, contando el JavaDoc;
+  - 409 pruebas antes y después, todas en verde;
+  - 0 usos restantes de `of(String)`;
+  - regla de dependencia cumplida.
+- **Pendiente:** 94 bloques JavaDoc de #16 sin línea en blanco antes de los tags.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
 ## Métricas del proyecto
