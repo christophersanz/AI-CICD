@@ -48,6 +48,16 @@ $env:REPO_URL = "https://github.com/<tu-usuario>/AI-CICD.git"
 docker compose --env-file docker/jenkins/.env -f docker/jenkins/docker-compose.yml up -d
 ```
 
+## Probar una rama antes de integrarla
+
+Para ver un PR en el *Stage View* antes del merge:
+
+1. En `docker/jenkins/.env`, pon `REPO_BRANCH=<rama>` y ejecuta el `up -d` del compose (JCasC recrea el job con esa rama).
+2. Lanza el job con **Build Now** y revisa cada etapa.
+3. **Al terminar, vuelve a `master` y lanza un build sobre ella:** pon `REPO_BRANCH=master`, repite el `up -d` y pulsa **Build Now** una vez.
+
+El paso 3 no es opcional. En un job de Pipeline, el sondeo usa la configuración Git **del último build**. Si el último build fue el de la rama, Jenkins sigue sondeando esa rama aunque el job ya apunte a `master`. Cuando la rama se borra al integrar el PR, el **Git Polling Log** dice `No changes` y los merges siguientes no se construyen. Un build sobre `master` lo devuelve a la normalidad.
+
 ## Cómo funciona
 
 - La imagen (`Dockerfile`) parte de `jenkins/jenkins:lts-jdk21` y añade el cliente de Docker con `buildx` y `jq` (para la prueba de humo).

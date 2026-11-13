@@ -101,7 +101,7 @@ Los prompts de `docs/prompts/` son genéricos (kit reutilizable, `docs/prompts/k
 | `ci` | GitHub Actions: `.github/workflows/ci-cd.yml`, scripts en `.github/scripts/` (prueba de humo compartida `smoke-test.sh`), ruleset versionado en `.github/ruleset/` |
 | `imagen` | `Dockerfile` multi-stage (JRE 21, usuario sin privilegios, perfil `prod`), publicada en GHCR y Docker Hub con etiquetas `latest`, `sha-<corto>` y versión |
 | `despliegue` | Verificación efímera de la imagen y despliegue en Render (`render.yaml`) tras la aprobación del environment `production` (ADR-0013); despliegue local de Jenkins en <http://localhost:8090> (ADR-0014) |
-| `ci-local` | Jenkins en <http://localhost:8080>: `Jenkinsfile` y `docker/jenkins/` (compose, `casc.yaml`, `scripts/`, `.env` no versionado con `REPO_BRANCH`) |
+| `ci-local` | Jenkins en <http://localhost:8080>: `Jenkinsfile` y `docker/jenkins/` (compose, `casc.yaml`, `scripts/`, `.env` no versionado con `REPO_BRANCH`). Para probar una rama: `REPO_BRANCH=<rama>`, `up -d` del compose y **Build Now**; al terminar, `REPO_BRANCH=master`, `up -d` y **Build Now** sobre `master` (`docker/jenkins/README.md` → *Probar una rama*) |
 | `sonarqube` | SonarQube local en <http://localhost:9000>, proyecto y Quality Gate `contract-api`; credenciales `SONAR_ADMIN_PASSWORD` en `docker/jenkins/.env`; condiciones en `docker/jenkins/scripts/sonar-analysis.sh` (ADR-0015) |
 | `openapi` | `docs/api/contract/openapi.yaml` y `.json`, generados con springdoc; cómo regenerarlos en `docs/api/README.md` |
 | `postman` | Colección y entorno local en `docs/api/postman/` (se ejecutan con `newman` o el Postman CLI) |

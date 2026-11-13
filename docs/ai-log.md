@@ -29,6 +29,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 14 | 2026-11-12 | Evaluación y corrección de los 9 prompts (confiabilidad, buenas prácticas, reutilización) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 3 |
 | 15 | 2026-11-12 | Pruebas de `ContractPeriod` con `/03-pruebas` (primera ejecución del prompt) | `03-pruebas.md` | [__ h] | [__ h] | 0 |
 | 16 | 2026-11-13 | JavaDoc de `domain` y `application` con `/04-documentar javadoc` (primera ejecución del prompt) | `04-documentar.md` | [__ h] | [__ h] | 3 |
+| 17 | 2026-11-13 | Volver Jenkins a `master` con un build tras probar una rama (guía, README y prompts 07/08) | — | [__ h] | [__ h] | 1 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -205,6 +206,15 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - `javadoc -Xdoclint:all`: 353 comentarios faltantes → **0**, con 0 problemas de sintaxis, referencias o HTML.
   - 108 archivos cambian **solo en comentarios**, demostrado comparando el código sin comentarios contra `master`.
   - 409 pruebas en verde.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
+### #17 — Jenkins dejaba de construir `master` después de probar una rama
+
+- **Origen:** tras integrar los PR #15 y #16, Jenkins no construyó `master` en más de 10 minutos. El **Git Polling Log** decía `No changes`.
+- **Causa raíz (error de la IA):** para probar el PR #15, la IA apuntó Jenkins a la rama del PR (build #23) y al terminar solo restauró `REPO_BRANCH=master`. En un job de Pipeline, el sondeo usa la configuración Git **del último build**, así que siguió sondeando la rama, ya borrada al integrar el PR.
+- **Corregido:**
+  - Build #24 lanzado a mano sobre `82d1e38`: las 9 etapas en SUCCESS y `contract-api:jenkins-24` desplegado en `localhost:8090`.
+  - El procedimiento ahora exige un build sobre `master` al terminar. Está en el README de Jenkins (*Probar una rama antes de integrarla*), en la guía de CI/CD (con una fila nueva en *Problemas frecuentes*), en `DP.ci-local` y en los prompts `07-corregir` y `08-cambiar-pipeline`.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
 ## Métricas del proyecto
