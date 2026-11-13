@@ -36,7 +36,7 @@ Cada hallazgo seleccionado queda **corregido y verificado** (con una prueba si e
 7. Las credenciales se leen en una variable de shell, nunca se imprimen ni se escriben en archivos versionados. No integres el PR.
 
 ## Forma de trabajo
-Rama `fix/revision-NNN` o `fix/sonar-<tema>` desde `DP.rama-principal` actualizado. Crea o retoma `docs/sessions/AAAA-MM-DD-07-corregir-<modo>-<tema>.md` (`docs/sessions/README.md`).
+Rama `fix/revision-NNN` o `fix/sonar-<tema>` desde `DP.rama-principal` actualizado. Crea o retoma `docs/sessions/AAAA-MM-DD-07-corregir-<modo>-<tema>.md` (`docs/sessions/README.md`; `AAAA-MM-DD` es la fecha en que empezó la tarea. Si ya existe uno *en curso* con el mismo comando y tema, de cualquier fecha, retómalo en lugar de crear otro).
 
 ### Paso 1 — Leer y verificar (sin modificar)
 - **`ronda`:** vuelve a comprobar **contra el código actual** cada ERROR y WARNING de los informes.

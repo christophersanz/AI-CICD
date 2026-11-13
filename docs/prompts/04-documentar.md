@@ -29,7 +29,7 @@ Que la documentación del alcance coincida con el código actual y responda, sin
 
 ## Forma de trabajo
 - Rama `docs/<alcance>` desde `DP.rama-principal` actualizado; al terminar, commit en español, push y PR. No integres el PR.
-- Crea o retoma `docs/sessions/AAAA-MM-DD-04-documentar-<alcance>.md` (docs/sessions/README.md).
+- Crea o retoma `docs/sessions/AAAA-MM-DD-04-documentar-<alcance>.md` (`docs/sessions/README.md`; `AAAA-MM-DD` es la fecha en que empezó la tarea. Si ya existe uno *en curso* con el mismo comando y tema, de cualquier fecha, retómalo en lugar de crear otro).
 
 ### Paso 1 — Inventario (sin escribir)
 Tabla `Elemento | Estado (falta / desfasado / correcto) | Evidencia` según el alcance:

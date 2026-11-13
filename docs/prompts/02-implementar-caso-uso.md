@@ -36,7 +36,7 @@ El caso de uso responde por su endpoint con los códigos de `architecture.md` §
 
 ## Forma de trabajo
 - Trabaja en una rama `feature/<caso-de-uso-en-kebab-case>` creada desde `DP.rama-principal` actualizado.
-- Crea o retoma `docs/sessions/AAAA-MM-DD-02-implementar-caso-uso-{ARGUMENTO}.md` (docs/sessions/README.md).
+- Crea o retoma `docs/sessions/AAAA-MM-DD-02-implementar-caso-uso-{ARGUMENTO}.md` (`docs/sessions/README.md`; `AAAA-MM-DD` es la fecha en que empezó la tarea. Si ya existe uno *en curso* con el mismo comando y tema, de cualquier fecha, retómalo en lugar de crear otro).
 - **Un paso a la vez.** Al terminar cada paso: archivos creados o modificados (ruta completa), resumen de 3–5 líneas con las decisiones, si compila y si pasan las pruebas del paso; actualiza el archivo de sesión y **espera mi "continuar"**.
 - Si detectas un problema en un paso anterior, dilo antes de seguir; no lo corrijas en silencio.
 - **Autovalidación por capa:** al terminar los pasos 1 (dominio), 3 (caso de uso), 4 (persistencia) y 5 (API), repasa sin modificar nada las comprobaciones del comando de revisión de esa capa (secciones `dominio`, `aplicacion`, `infraestructura` y `api` de `docs/prompts/06-revisar.md`) solo sobre los archivos del paso, y reporta los ERROR y WARNING antes de pedir "continuar".

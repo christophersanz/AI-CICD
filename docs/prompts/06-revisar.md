@@ -41,7 +41,7 @@ Cada ronda tiene su carpeta, **`docs/reviews/AAAA-MM-DD-ronda-NNN/`**. `NNN` es 
 **Qué ronda usar:** si `[ronda]` se omite, la ronda en curso es la última carpeta que todavía no tiene `09-veredicto-final.md`. Si no hay ninguna en curso, se crea la siguiente con la fecha de hoy.
 
 **Índices:**
-- Al crear la carpeta, crea su `README.md` con el alcance y la tabla `Paso | Informe | Estado | Resultado`, y agrega la ronda a `docs/reviews/README.md`.
+- Al crear la carpeta, crea su `README.md` con el alcance y la tabla `Paso | Informe | Estado | Resultado`, y agrega la ronda a `docs/reviews/README.md`. Si ese índice no existe, por ejemplo en la primera ronda de un proyecto, créalo con la tabla `Ronda | Fecha | Alcance | Resultado`.
 - Cada modo marca su fila al terminar.
 - `final` escribe el `FINAL STATUS` en el README de la ronda y en el general. Se puede ejecutar solo una parte (por ejemplo, `dominio` → `/07-corregir` → `final` tras cambiar el dominio), pero siempre en este orden: de adentro hacia afuera y de lo particular a lo integral. Revisar por partes enfoca la revisión y consume menos contexto. Al terminar, indica el siguiente paso.
 

@@ -31,7 +31,7 @@ Cada regla y cada error que toca `{ARGUMENTO}` tiene al menos una prueba que fal
 
 ## Forma de trabajo
 - Rama `test/<objetivo>` desde `DP.rama-principal` actualizado; al terminar, commit en español, push y PR. No integres el PR.
-- Crea o retoma `docs/sessions/AAAA-MM-DD-03-pruebas-<objetivo>.md` (docs/sessions/README.md).
+- Crea o retoma `docs/sessions/AAAA-MM-DD-03-pruebas-<objetivo>.md` (`docs/sessions/README.md`; `AAAA-MM-DD` es la fecha en que empezó la tarea. Si ya existe uno *en curso* con el mismo comando y tema, de cualquier fecha, retómalo en lugar de crear otro).
 
 ### Paso 1 — Diagnóstico (sin escribir pruebas)
 1. **Matriz de trazabilidad** de lo que existe hoy:
