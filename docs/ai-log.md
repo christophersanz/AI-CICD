@@ -33,6 +33,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 18 | 2026-11-13 | Eliminar el parseo de texto sin uso de `ContractId` y `EmployeeId` con `/05-refactorizar` (primera ejecución del prompt) | `05-refactorizar.md` | [__ h] | [__ h] | 2 |
 | 19 | 2026-11-13 | Kit reutilizable en proyectos con documentos propios (prueba sobre el modelo del curso) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 4 |
 | 20 | 2026-11-13 | Quitar Render: el despliegue es solo con Docker (ADR-0016) | — | [__ h] | [__ h] | 0 |
+| 21 | 2026-11-13 | `/06-revisar dominio` completo en el modelo del curso (segundo proyecto) | `06-revisar.md` | [__ h] | [__ h] | 1 |
 | | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
 
 ## Entradas
@@ -278,6 +279,24 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - 0 enlaces a archivos o secciones eliminados;
   - `verificar.sh` da 0 errores.
 - **Fuera del repositorio:** queda el environment `production`, vacío y ya sin uso; borrarlo lo decide el autor.
+- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+
+### #21 — `/06-revisar dominio` en el modelo del curso
+
+- **Origen:** completar la validación del kit (#19), que solo había probado la instalación y la verificación. El modo `dominio` se ejecutó completo en la copia de `F4/01.-Modelos/use-case-ca-v1` (Sales Order). El original no se tocó y la copia no se sube.
+- **Resultado en ese proyecto:**
+  - `mvn clean verify` en verde, con 46 pruebas y Java 25;
+  - las 9 comprobaciones en OK, sin ERROR ni WARNING;
+  - trazabilidad de las 15 reglas de dominio `RN-NNN`;
+  - 4 INFO; el más útil: RN-008, el precio conservado, no tiene prueba.
+- **Cómo se adaptó el prompt:**
+  - encontró las reglas en §2–§5 y su capa en §6 con `DP.secciones`;
+  - con un catálogo sin códigos, comparó los mensajes;
+  - con *Domain Events* fuera del alcance, verificó que no existieran;
+  - en un solo módulo, revisó la regla de dependencia por paquete;
+  - creó la carpeta de la ronda, su README y el índice, que no existía.
+- **Mejorado en el prompt:** tres frases de `06-revisar` dominio que suponían el estilo de `contract-api` (escala fija de los importes, paquetes `common`/`shared` y el `code` del catálogo) ahora dependen de lo que defina el proyecto.
+- **Error de la IA corregido:** se afirmó que la máquina no tenía Java 25 porque `java_home` no lo listaba; estaba en el `PATH`. El build lo demostró antes de escribir el informe.
 - **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
 
 ## Métricas del proyecto

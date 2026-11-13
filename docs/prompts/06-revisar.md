@@ -99,11 +99,11 @@ Cada modo revisa **solo** su alcance; lo que veas fuera de él va como INFO con 
 **Comprobaciones:**
 1. Java puro: sin Spring, JPA, Jakarta, Lombok, Jackson, HTTP ni imports de `application` o `infrastructure` (revisa los imports y, si el dominio es un módulo propio en `DP.modulos`, su `pom.xml` o `build.gradle`; en un solo módulo, la regla se comprueba por paquete).
 2. Cada agregado de `business-rules.md` §3 protege las invariantes que `business-rules.md` §4 asigna a `domain`; sin setters públicos ni fábricas (`restore`, `reconstitute`) que permitan saltarse invariantes sin advertirlo.
-3. Value objects (`record`) validados en el constructor con excepciones de dominio (o un `Guard` común), nunca `NullPointerException` ni `IllegalArgumentException`; normalización al crear; importes con `BigDecimal` y escala fija, nunca `float`/`double`.
-4. Transiciones de estado según §5: las no dibujadas lanzan el código de transición inválida del catálogo (§8), con las excepciones que documente §5.
+3. Value objects (`record`) validados en el constructor con excepciones de dominio (o un `Guard` común), nunca `NullPointerException` ni `IllegalArgumentException`; normalización al crear; importes con `BigDecimal`, nunca `float`/`double`, y con la escala o el redondeo que fijen las reglas del proyecto (si no fijan ninguna, no es un hallazgo).
+4. Transiciones de estado según §5: las no dibujadas lanzan el error de transición inválida del catálogo (§8): su código, si el catálogo define códigos, o su mensaje, si no. Se respetan las excepciones que documente §5.
 5. Eventos de §7 emitidos por el agregado dentro de sus métodos, con `eventId`, `occurredOn` desde un `Clock` y `aggregateId`; ningún `now()` en el dominio; no hay eventos que §7 no documente.
-6. Dependencias entre paquetes según `architecture.md` §2 y `DP.adr-arquitectura`: `common` y `shared` no importan agregados; un agregado solo usa el identificador de otro.
-7. `DomainException` y subclases con el `code` del catálogo (§8), sin conceptos HTTP, JPA ni SQL.
+6. Dependencias entre paquetes según `architecture.md` §2 y `DP.adr-arquitectura`: los paquetes comunes, si existen (por ejemplo `common` o `shared`), no importan agregados; un agregado solo usa el identificador de otro.
+7. `DomainException` y subclases que corresponden al catálogo (§8): con su código, si el catálogo define códigos, o con su mensaje, si no. Sin conceptos HTTP, JPA ni SQL.
 8. Sin abstracciones ni patrones fuera del alcance.
 9. Pruebas de dominio sin Spring ni mocks para cada invariante, transición y caso límite.
 

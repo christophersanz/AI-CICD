@@ -126,7 +126,7 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 
 **No sirve** para un proyecto Spring Boot por capas técnicas (`controller` / `service` / `repository`) sin dominio separado: los prompts revisan e implementan contra Clean Architecture, así que todo sería un incumplimiento.
 
-**Probado** en el modelo del curso `F4/01.-Modelos/use-case-ca-v1` (Sales Order). Es un solo módulo, con sus documentos en la raíz y reglas `RN-NNN`. El instalador detectó sus documentos y `verificar.sh` terminó con 0 errores después de completar `DP` (`ai-log.md` #19).
+**Probado** en el modelo del curso `F4/01.-Modelos/use-case-ca-v1` (Sales Order). Es un solo módulo, con sus documentos en la raíz y reglas `RN-NNN`. El instalador detectó sus documentos, y `verificar.sh` terminó con 0 errores después de completar `DP` (`ai-log.md` #19). Después, `/06-revisar dominio` se ejecutó completo en ese proyecto: encontró sus reglas `RN-NNN` con el mapa de `DP.secciones`, no reportó como defectos lo que el proyecto no exige (eventos, códigos de error) y no modificó código (`ai-log.md` #21).
 
 | Archivo del kit (`docs/prompts/kit/`) | Para qué |
 |---|---|
@@ -136,6 +136,13 @@ Los prompts que se usaron durante el curso no se conservan como copias: están e
 | `CLAUDE.plantilla.md`, `architecture.plantilla.md`, `business-rules.plantilla.md` | Documentos base con las secciones que citan los prompts (`architecture.md` §2–§9, `business-rules.md` §1–§9 y §4.1). |
 
 Pasos:
+
+**Qué hace falta para instalarlo:** el repositorio de origen completo, o cualquier proyecto que ya tenga el kit instalado. **No basta con copiar `docs/prompts/kit/`:** ahí están solo las herramientas (instalador, verificador y plantillas). Los 9 prompts (`docs/prompts/NN-*.md`), sus comandos (`.claude/commands/`) y `docs/sessions/README.md` están fuera de esa carpeta, y `instalar.sh` los copia desde el repositorio que lo contiene. Por ejemplo:
+
+```bash
+git clone https://github.com/christophersanz/AI-CICD.git /tmp/kit-prompts
+/tmp/kit-prompts/docs/prompts/kit/instalar.sh /ruta/al/otro-proyecto
+```
 
 ```bash
 # 1. Desde la raíz de este repositorio (o de cualquier proyecto que ya tenga el kit)

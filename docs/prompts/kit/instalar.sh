@@ -18,6 +18,15 @@ dest="$(cd "$dest" && pwd)"
 kit="$(cd "$(dirname "$0")" && pwd)"
 src="$(cd "$kit/../../.." && pwd)"
 [ "$src" != "$dest" ] || { echo "El destino es el mismo proyecto de origen." >&2; exit 1; }
+# El kit no viaja solo: los prompts y los comandos están fuera de kit/, en el repositorio que lo contiene.
+for need in docs/prompts/01-definir.md docs/prompts/README.md .claude/commands docs/sessions/README.md; do
+  if [ ! -e "$src/$need" ]; then
+    echo "No se encuentra $need en $src." >&2
+    echo "instalar.sh se ejecuta desde un repositorio que tenga el kit completo (docs/prompts/, .claude/commands/ y" >&2
+    echo "docs/sessions/README.md): no basta con copiar la carpeta kit/. Clona el repositorio de origen y ejecútalo desde allí." >&2
+    exit 1
+  fi
+done
 
 copied=0 skipped=0 created=0
 copy_kit_file() {               # copy_kit_file <origen> <destino>
