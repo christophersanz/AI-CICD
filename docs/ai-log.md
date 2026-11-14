@@ -7,34 +7,38 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Prompts versionados en git:** `docs/prompts/NN-nombre.md` (un archivo por prompt; índice en `docs/prompts/README.md`), cada uno con su comando de Claude Code en `.claude/commands/`. Los prompts `001`–`006` que se usaron en el curso se consultan en el commit [`33f74fc`](https://github.com/christophersanz/AI-CICD/tree/33f74fc/docs/prompts). El progreso de cada prompt queda en `docs/sessions/`.
 - **Regla:** nunca se pegan secretos ni datos reales; las credenciales de los ejemplos son de prueba.
 
-> Los campos `[__]` son tiempos que solo el autor puede medir: complétalos con tus valores reales. El resto de los datos sale del repositorio (revisiones, diseño, historial y builds).
+> **Tiempos (≈): son estimaciones, no mediciones.** Las calculó Claude el 2026-11-14, a pedido del autor, y el autor puede ajustarlas.
+> - **Con IA:** duración aproximada de cada tarea, según los registros de las sesiones de Claude Code (desde el 2026-10-16) y el historial de git. Las #1 a #5 son anteriores a esos registros y se estimaron por su alcance. Los registros no permiten medir con exactitud: anotan los eventos en bloques y no separan el trabajo de la IA del tiempo de lectura y aprobación del autor.
+> - **Sin IA:** estimación del tiempo que habría tomado hacer lo mismo a mano, según el alcance verificable de cada entrada (archivos, pruebas e informes).
+>
+> Los conteos de errores que siguen en `[__]` (#1 y #3 a #6) no se pueden estimar sin el registro de esas sesiones.
 
 ## Resumen
 
 | # | Fecha | Tarea | Prompt | Con IA | Sin IA (est.) | Errores de la IA corregidos |
 |---|---|---|---|---|---|---|
-| 1 | [__] | Diseño de arquitectura y modelo de dominio | `docs/prompts/README.md` (antes `README.md`) §1, primera versión | [__ h] | [__ h] | [__] |
-| 2 | 2026-09-26 | Revisión integral del repositorio | [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | [__ h] | [__ h] | 3 |
-| 3 | 2026-10-03 | Refactor del dominio por agregado | [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) | [__ h] | [__ h] | [__] |
-| 4 | 2026-10-03 | Diseño de la seguridad (3A) | [`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md) | [__ h] | [__ h] | [__] |
-| 5 | [__] | Casos de uso de empleados | [`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md) | [__ h] | [__ h] | [__] |
-| 6 | 2026-10-16 | Seguridad fase 1: tokens, login, `AuthController` | [`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md) | [__ h] | [__ h] | 3 |
-| 7 | 2026-10-24 | CI/CD, Docker y SonarCloud | [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) | [__ h] | [__ h] | 3 |
-| 8 | 2026-10-24 | Autorización con `@PreAuthorize` y colección Postman | sesión Claude Code | [__ h] | [__ h] | 3 |
-| 9 | 2026-10-24 | Presentación final | sesión Claude Code | [__ h] | [__ h] | 2 |
-| 10 | 2026-11-11 | GitHub Flow, despliegue con aprobación y Render (PR #1, #2) | sesión Claude Code | [__ h] | [__ h] | 1 |
-| 11 | 2026-11-12 | Jenkins por etapas, despliegue local y SonarQube (PR #3–#5) | sesión Claude Code | [__ h] | [__ h] | 3 |
-| 12 | 2026-11-12 | Prompts v2: 9 prompts genéricos ordenados, kit reutilizable y archivos de sesión | sesión Claude Code | [__ h] | [__ h] | 3 |
-| 13 | 2026-11-12 | Ronda de revisión 002 con los prompts nuevos (`/06-revisar`, `/07-corregir`) | `06-revisar.md`, `07-corregir.md` | [__ h] | [__ h] | 3 |
-| 14 | 2026-11-12 | Evaluación y corrección de los 9 prompts (confiabilidad, buenas prácticas, reutilización) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 3 |
-| 15 | 2026-11-12 | Pruebas de `ContractPeriod` con `/03-pruebas` (primera ejecución del prompt) | `03-pruebas.md` | [__ h] | [__ h] | 0 |
-| 16 | 2026-11-13 | JavaDoc de `domain` y `application` con `/04-documentar javadoc` (primera ejecución del prompt) | `04-documentar.md` | [__ h] | [__ h] | 3 |
-| 17 | 2026-11-13 | Volver Jenkins a `master` con un build tras probar una rama (guía, README y prompts 07/08) | — | [__ h] | [__ h] | 1 |
-| 18 | 2026-11-13 | Eliminar el parseo de texto sin uso de `ContractId` y `EmployeeId` con `/05-refactorizar` (primera ejecución del prompt) | `05-refactorizar.md` | [__ h] | [__ h] | 2 |
-| 19 | 2026-11-13 | Kit reutilizable en proyectos con documentos propios (prueba sobre el modelo del curso) | `09-mejorar-prompt.md` | [__ h] | [__ h] | 4 |
-| 20 | 2026-11-13 | Quitar Render: el despliegue es solo con Docker (ADR-0016) | — | [__ h] | [__ h] | 0 |
-| 21 | 2026-11-13 | `/06-revisar dominio` completo en el modelo del curso (segundo proyecto) | `06-revisar.md` | [__ h] | [__ h] | 1 |
-| | | **Total** | | **[__ h]** | **[__ h]** | **[__]** |
+| 1 | [__] | Diseño de arquitectura y modelo de dominio | `docs/prompts/README.md` (antes `README.md`) §1, primera versión | ≈2 h | ≈8 h | [__] |
+| 2 | 2026-09-26 | Revisión integral del repositorio | [`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md) | ≈1 h | ≈6 h | 3 |
+| 3 | 2026-10-03 | Refactor del dominio por agregado | [`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md) | ≈1,5 h | ≈6 h | [__] |
+| 4 | 2026-10-03 | Diseño de la seguridad (3A) | [`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md) | ≈1,5 h | ≈8 h | [__] |
+| 5 | [__] | Casos de uso de empleados | [`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md) | ≈3 h | ≈12 h | [__] |
+| 6 | 2026-10-16 | Seguridad fase 1: tokens, login, `AuthController` | [`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md) | ≈1,5 h | ≈10 h | 3 |
+| 7 | 2026-10-24 | CI/CD, Docker y SonarCloud | [`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md) | ≈2,5 h | ≈10 h | 3 |
+| 8 | 2026-10-24 | Autorización con `@PreAuthorize` y colección Postman | sesión Claude Code | ≈1,5 h | ≈6 h | 3 |
+| 9 | 2026-10-24 | Presentación final | sesión Claude Code | ≈1 h | ≈4 h | 2 |
+| 10 | 2026-11-11 | GitHub Flow, despliegue con aprobación y Render (PR #1, #2) | sesión Claude Code | ≈2 h | ≈6 h | 1 |
+| 11 | 2026-11-12 | Jenkins por etapas, despliegue local y SonarQube (PR #3–#5) | sesión Claude Code | ≈2 h | ≈6 h | 3 |
+| 12 | 2026-11-12 | Prompts v2: 9 prompts genéricos ordenados, kit reutilizable y archivos de sesión | sesión Claude Code | ≈2,5 h | ≈10 h | 3 |
+| 13 | 2026-11-12 | Ronda de revisión 002 con los prompts nuevos (`/06-revisar`, `/07-corregir`) | `06-revisar.md`, `07-corregir.md` | ≈1 h | ≈8 h | 3 |
+| 14 | 2026-11-12 | Evaluación y corrección de los 9 prompts (confiabilidad, buenas prácticas, reutilización) | `09-mejorar-prompt.md` | ≈1 h | ≈4 h | 3 |
+| 15 | 2026-11-12 | Pruebas de `ContractPeriod` con `/03-pruebas` (primera ejecución del prompt) | `03-pruebas.md` | ≈1 h | ≈3 h | 0 |
+| 16 | 2026-11-13 | JavaDoc de `domain` y `application` con `/04-documentar javadoc` (primera ejecución del prompt) | `04-documentar.md` | ≈1 h | ≈6 h | 3 |
+| 17 | 2026-11-13 | Volver Jenkins a `master` con un build tras probar una rama (guía, README y prompts 07/08) | — | ≈0,5 h | ≈1,5 h | 1 |
+| 18 | 2026-11-13 | Eliminar el parseo de texto sin uso de `ContractId` y `EmployeeId` con `/05-refactorizar` (primera ejecución del prompt) | `05-refactorizar.md` | ≈1 h | ≈2 h | 2 |
+| 19 | 2026-11-13 | Kit reutilizable en proyectos con documentos propios (prueba sobre el modelo del curso) | `09-mejorar-prompt.md` | ≈1 h | ≈4 h | 4 |
+| 20 | 2026-11-13 | Quitar Render: el despliegue es solo con Docker (ADR-0016) | — | ≈0,5 h | ≈2 h | 0 |
+| 21 | 2026-11-13 | `/06-revisar dominio` completo en el modelo del curso (segundo proyecto) | `06-revisar.md` | ≈1 h | ≈3 h | 1 |
+| | | **Total** | | **≈30 h** | **≈125,5 h** | **≥ 35** (sin contar #1 y #3–#6) |
 
 ## Entradas
 
@@ -43,7 +47,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Prompt:** plantilla "Diseño de arquitectura" de la primera versión de `docs/prompts/README.md` §1 (rol de arquitecto, contexto de negocio, entregables); se puede ver en el historial de git.
 - **Aceptado:** módulos `domain` / `application` / `infrastructure`, agregados `Contract` y `Employee`, catálogo de reglas `BR-XXX-NNN` y de errores, ADR-0001 a ADR-0003.
 - **Corregido:** [__]
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈2 h · **sin IA (est.):** ≈8 h
 
 ### #2 — Revisión integral ([`001-review-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/001-review-01.md))
 
@@ -53,25 +57,25 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - El prompt de revisión contradecía dos ADRs vigentes: se corrigió el prompt, no el código.
   - La documentación exigía 80 % de cobertura, pero JaCoCo no estaba en el `pom.xml`: se añadió el plugin con el umbral.
   - Hallazgo alto H-01: Hibernate registra el DNI al violar la clave única. **Pendiente** de corregir.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈6 h
 
 ### #3 — Refactor del dominio ([`002.-refactoring-v1.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/002.-refactoring-v1.md))
 
 - **Aceptado:** paquetes por agregado con `common` y `shared` (ADR-0004), `Guard` y excepciones de dominio en lugar de `NullPointerException`, `Clock` como parámetro en vez de `now()`.
 - **Corregido:** [__]
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1,5 h · **sin IA (est.):** ≈6 h
 
 ### #4 — Diseño de la seguridad ([`003-security-01.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/003-security-01.md))
 
 - **Aceptado:** `docs/design/seguridad.md` y ADR-0005: JWT RS256 propio, refresh token opaco con rotación y detección de reutilización, RBAC por permisos, implementación por fases.
 - **Corregido:** [__]
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1,5 h · **sin IA (est.):** ≈8 h
 
 ### #5 — Casos de uso de empleados ([`004-implement-usecase.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/004-implement-usecase.md))
 
 - **Aceptado:** `RegisterEmployee`, `UpdateEmployee`, `GetEmployee` y `ListEmployees` siguiendo el orden dominio → puerto → caso de uso → adaptador → controller → pruebas.
 - **Corregido:** [__]
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈3 h · **sin IA (est.):** ≈12 h
 
 ### #6 — Seguridad fase 1 ([`005-security-02.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/005-security-02.md))
 
@@ -80,7 +84,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - BCrypt solo compara los primeros 72 bytes: se rechazan contraseñas más largas antes de autenticar.
   - `InvalidRefreshTokenException` respondía 422 y `UnauthenticatedException` 500: ambas pasan a 401.
   - La creación de usuarios quedaba abierta a cualquier autenticado: regla de URL temporal con `user:manage`.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1,5 h · **sin IA (est.):** ≈10 h
 
 ### #7 — CI/CD ([`006-cicd.md`](https://github.com/christophersanz/AI-CICD/blob/33f74fc/docs/prompts/006-cicd.md))
 
@@ -90,7 +94,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - Faltaba `.mvn/wrapper/maven-wrapper.properties`: `./mvnw` y el `Dockerfile` fallaban.
   - `mvnw` estaba en git sin permiso de ejecución.
 - **Medido:** últimas 5 ejecuciones del pipeline en verde, entre 1 min 55 s y 3 min 11 s.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈2,5 h · **sin IA (est.):** ≈10 h
 
 ### #8 — Autorización con `@PreAuthorize` y colección Postman
 
@@ -100,7 +104,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - Un `AccessDeniedException` lanzado por `@PreAuthorize` habría llegado al manejador genérico y respondido 500: se añadió su traducción a 403.
   - El paso de la demo "EMPLOYEE → GET /employees → 403" era falso con el código de entonces: se cambió.
 - **Medido:** `./mvnw clean verify` en verde con 355 pruebas y 0 fallos; cobertura de líneas 95,3 % (domain), 96,7 % (application), 96,5 % (infrastructure). Colección ejecutada con newman contra una base limpia: 41/41 aserciones.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1,5 h · **sin IA (est.):** ≈6 h
 
 ### #9 — Presentación final
 
@@ -108,7 +112,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Corregido:**
   - Afirmaciones de autorización que no coincidían con el código (ver #8).
   - Datos de productividad: la IA no los inventa; quedan como campos a completar.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈4 h
 
 ### #10 — GitHub Flow, despliegue con aprobación y Render
 
@@ -116,7 +120,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Aceptado:** ruleset `master-protegida` con PR obligatorio, checks requeridos, solo *squash* y rama al día (ADR-0012); environment `production` con revisor obligatorio; job de verificación efímera con prueba de humo compartida (`.github/scripts/smoke-test.sh`); despliegue en Render desde Docker Hub por sha con `render.yaml` (ADR-0013).
 - **Corregido:** la primera aprobación de `production` no quedó registrada en GitHub (diálogo cerrado antes de confirmar); se detectó consultando la API y se repitió.
 - **Medido:** run `43076800725` con los tres jobs en verde; despliegue efímero de 31 s con login, `/auth/me` y `/employees` (200) y 401 sin token. Render queda pendiente de configurar (job *skipped*).
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈2 h · **sin IA (est.):** ≈6 h
 
 ### #11 — Jenkins por etapas, despliegue local y SonarQube
 
@@ -127,7 +131,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - Un commit no se hizo por mezclar `-a` con rutas en `git commit`; el build #6 corrió el código anterior. Se detectó al revisar el log y se repitió.
   - La prueba de humo habría impreso el JWT en el log de Jenkins (`::add-mask::` solo funciona en GitHub Actions): se limitó a GitHub Actions.
 - **Medido:** el primer análisis de SonarQube encontró 1 bug real (regex de `Permission` con `StackOverflowError` ante entradas largas, reproducido con una prueba) y 2 vulnerabilidades revisadas y justificadas en el código. Build #13 sobre `master`: 8 etapas en verde, Quality Gate con 0 bugs, 0 vulnerabilidades, rating A y 94,2 % de cobertura; rollback probado desplegando una imagen inválida.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈2 h · **sin IA (est.):** ≈6 h
 
 ### #12 — Prompts v2
 
@@ -142,7 +146,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - Los prompts tenían datos de `contract-api` escritos dentro (paquete, agregados, reglas, ADR, Jenkins, Render, puertos); se movieron a `CLAUDE.md` §5 como claves `DP.*` para reutilizarlos en otros proyectos.
   - Se revisaron los 60 archivos de prompts de CURS-000617 (18 distintos) y las transcripciones de las sesiones 01–05; se incorporó el prompt DevOps de `CURS-000617-CICD-v2`, que no se había leído.
   - El endpoint de *hotspots* de SonarQube usa `project`, no `projectKey`; se comprobó contra el SonarQube local.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈2,5 h · **sin IA (est.):** ≈10 h
 
 ### #13 — Ronda de revisión 002 con los prompts nuevos
 
@@ -159,7 +163,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - Cobertura de líneas de `domain` 95,3 % → 95,8 %.
   - Quality Gate de SonarQube: cobertura 94,2 % → 94,4 %, 0 bugs y 0 vulnerabilidades.
   - Jenkins #17 (rama) y #19 (`master`) en verde.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈8 h
 
 ### #14 — Evaluación de los 9 prompts
 
@@ -179,7 +183,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - Las 10 partes de la estructura común están en los 9 prompts (`06` no crea archivo de sesión, por diseño).
   - 0 roles con el stack fijo.
   - `verificar.sh`: 0 errores en el proyecto y en una instalación limpia del kit.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈4 h
 
 ### #15 — Pruebas de `ContractPeriod` con `/03-pruebas`
 
@@ -194,7 +198,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - `ContractPeriod`: líneas 97,3 % → 100 %, ramas 85,4 % → 100 %.
   - Ramas de `domain`: 90,3 % → 93,2 %.
   - 4 mutaciones temporales del código (solapamiento con indefinidos, fin exclusivo, igualdad sin fecha de fin, extensión a la misma fecha): las 4 detectadas y revertidas.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈3 h
 
 ### #16 — JavaDoc de `domain` y `application` con `/04-documentar javadoc`
 
@@ -210,7 +214,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - `javadoc -Xdoclint:all`: 353 comentarios faltantes → **0**, con 0 problemas de sintaxis, referencias o HTML.
   - 108 archivos cambian **solo en comentarios**, demostrado comparando el código sin comentarios contra `master`.
   - 409 pruebas en verde.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈6 h
 
 ### #17 — Jenkins dejaba de construir `master` después de probar una rama
 
@@ -219,7 +223,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Corregido:**
   - Build #24 lanzado a mano sobre `82d1e38`: las 9 etapas en SUCCESS y `contract-api:jenkins-24` desplegado en `localhost:8090`.
   - El procedimiento ahora exige un build sobre `master` al terminar. Está en el README de Jenkins (*Probar una rama antes de integrarla*), en la guía de CI/CD (con una fila nueva en *Problemas frecuentes*), en `DP.ci-local` y en los prompts `07-corregir` y `08-cambiar-pipeline`.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈0,5 h · **sin IA (est.):** ≈1,5 h
 
 ### #18 — Parseo duplicado de IDs con `/05-refactorizar`
 
@@ -234,7 +238,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - 0 usos restantes de `of(String)`;
   - regla de dependencia cumplida.
 - **Pendiente:** 94 bloques JavaDoc de #16 sin línea en blanco antes de los tags.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈2 h
 
 ### #19 — Prueba de reutilización del kit en el modelo del curso
 
@@ -259,7 +263,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - 4 casos negativos (documento faltante, plantilla, plantilla sobrante, wrapper faltante), todos detectados;
   - `--actualizar` conserva el `DP` del proyecto destino.
 - **Pendiente:** ejecutar un prompt completo en el proyecto del profe; hasta ahora solo se probó la instalación y la verificación.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈4 h
 
 ### #20 — Despliegue solo con Docker (sin Render)
 
@@ -279,7 +283,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - 0 enlaces a archivos o secciones eliminados;
   - `verificar.sh` da 0 errores.
 - **Fuera del repositorio:** queda el environment `production`, vacío y ya sin uso; borrarlo lo decide el autor.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈0,5 h · **sin IA (est.):** ≈2 h
 
 ### #21 — `/06-revisar dominio` en el modelo del curso
 
@@ -297,7 +301,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - creó la carpeta de la ronda, su README y el índice, que no existía.
 - **Mejorado en el prompt:** tres frases de `06-revisar` dominio que suponían el estilo de `contract-api` (escala fija de los importes, paquetes `common`/`shared` y el `code` del catálogo) ahora dependen de lo que defina el proyecto.
 - **Error de la IA corregido:** se afirmó que la máquina no tenía Java 25 porque `java_home` no lo listaba; estaba en el `PATH`. El build lo demostró antes de escribir el informe.
-- **Tiempo:** [__ h] · **sin IA (est.):** [__ h]
+- **Tiempo:** ≈1 h · **sin IA (est.):** ≈3 h
 
 ## Métricas del proyecto
 
