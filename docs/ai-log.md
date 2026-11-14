@@ -11,7 +11,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 > - **Con IA:** duración aproximada de cada tarea, según los registros de las sesiones de Claude Code (desde el 2026-10-16) y el historial de git. Las #1 a #5 son anteriores a esos registros y se estimaron por su alcance. Los registros no permiten medir con exactitud: anotan los eventos en bloques y no separan el trabajo de la IA del tiempo de lectura y aprobación del autor.
 > - **Sin IA:** estimación del tiempo que habría tomado hacer lo mismo a mano, según el alcance verificable de cada entrada (archivos, pruebas e informes).
 >
-> Los conteos de errores que siguen en `[__]` (#1 y #3 a #6) no se pueden estimar sin el registro de esas sesiones.
+> Los conteos de errores que siguen en `[__]` (#1 y #3 a #5) no se pueden estimar sin el registro de esas sesiones.
 
 ## Resumen
 
@@ -38,7 +38,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 19 | 2026-11-13 | Kit reutilizable en proyectos con documentos propios (prueba sobre el modelo del curso) | `09-mejorar-prompt.md` | ≈1 h | ≈4 h | 4 |
 | 20 | 2026-11-13 | Quitar Render: el despliegue es solo con Docker (ADR-0016) | — | ≈0,5 h | ≈2 h | 0 |
 | 21 | 2026-11-13 | `/06-revisar dominio` completo en el modelo del curso (segundo proyecto) | `06-revisar.md` | ≈1 h | ≈3 h | 1 |
-| | | **Total** | | **≈30 h** | **≈125,5 h** | **≥ 35** (sin contar #1 y #3–#6) |
+| | | **Total** | | **≈30 h** | **≈125,5 h** | **≥ 38** (sin contar #1 y #3–#5) |
 
 ## Entradas
 
