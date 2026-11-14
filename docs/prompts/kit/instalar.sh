@@ -3,7 +3,7 @@
 #   Uso: docs/prompts/kit/instalar.sh <proyecto-destino> [--actualizar]
 #
 # Copia lo que es del kit (genérico):
-#   docs/prompts/NN-*.md y README.md, docs/prompts/kit/, .claude/commands/NN-*.md, docs/sessions/README.md
+#   docs/prompts/NN-*.md, README.md y GUIA-RAPIDA.md, docs/prompts/kit/, .claude/commands/NN-*.md, docs/sessions/README.md
 # Documentos del proyecto (nunca los sobrescribe):
 #   Busca architecture.md, business-rules.md y technical.md en docs/ y en el resto del proyecto. Si existen, deja
 #   sus rutas en DP.doc-*; si no, crea docs/architecture.md y docs/business-rules.md desde las plantillas.
@@ -48,7 +48,7 @@ create_if_missing() {           # create_if_missing <plantilla> <destino>
 
 echo "Kit de prompts: $src → $dest"
 echo "1. Prompts, comandos y kit"
-for f in "$src"/docs/prompts/[0-9][0-9]-*.md "$src/docs/prompts/README.md"; do
+for f in "$src"/docs/prompts/[0-9][0-9]-*.md "$src/docs/prompts/README.md" "$src/docs/prompts/GUIA-RAPIDA.md"; do
   copy_kit_file "$f" "$dest/docs/prompts/$(basename "$f")"
 done
 for f in "$kit"/*; do copy_kit_file "$f" "$dest/docs/prompts/kit/$(basename "$f")"; done
