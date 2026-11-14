@@ -26,6 +26,7 @@ Los nombres de los tres documentos base (`architecture.md`, `business-rules.md`,
 | [docs/api/](docs/api/README.md) | Contrato OpenAPI 3.1 (`contract/openapi.yaml` y `.json`), cómo regenerarlo y la colección Postman (`postman/`) |
 | [docs/api/postman/](docs/api/postman/) | Colección Postman (login y endpoints, con aserciones de códigos HTTP) y entorno local, junto al contrato OpenAPI |
 | **Trabajo con IA** | |
+| [docs/prompts/GUIA-RAPIDA.md](docs/prompts/GUIA-RAPIDA.md) | **Guía rápida:** qué comando `/NN-…` usar según lo que quieras hacer |
 | [docs/prompts/](docs/prompts/README.md) | 9 prompts genéricos por orden de uso (`NN-nombre.md`), cada uno con su comando de Claude Code en `.claude/commands/`, y el kit para reutilizarlos en otros proyectos (`docs/prompts/kit/`) |
 | [docs/reviews/](docs/reviews/README.md) | Informes de revisión: una carpeta por ronda con su resumen, y su índice |
 | [docs/sessions/](docs/sessions/README.md) | Archivos de sesión: progreso de cada prompt para retomarlo sin perder contexto |
