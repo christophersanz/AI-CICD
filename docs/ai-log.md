@@ -38,7 +38,8 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 19 | 2026-11-13 | Kit reutilizable en proyectos con documentos propios (prueba sobre el modelo del curso) | `09-mejorar-prompt.md` | ≈1 h | ≈4 h | 4 |
 | 20 | 2026-11-13 | Quitar Render: el despliegue es solo con Docker (ADR-0016) | — | ≈0,5 h | ≈2 h | 0 |
 | 21 | 2026-11-13 | `/06-revisar dominio` completo en el modelo del curso (segundo proyecto) | `06-revisar.md` | ≈1 h | ≈3 h | 1 |
-| | | **Total** | | **≈30 h** | **≈125,5 h** | **≥ 38** (sin contar #1 y #3–#5) |
+| 22 | 2026-11-15 | Guía rápida de los prompts en una página (PR #26) | — | ≈0,5 h | ≈1,5 h | 0 |
+| | | **Total** | | **≈30,5 h** | **≈127 h** | **≥ 38** (sin contar #1 y #3–#5) |
 
 ## Entradas
 
@@ -302,6 +303,22 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Mejorado en el prompt:** tres frases de `06-revisar` dominio que suponían el estilo de `contract-api` (escala fija de los importes, paquetes `common`/`shared` y el `code` del catálogo) ahora dependen de lo que defina el proyecto.
 - **Error de la IA corregido:** se afirmó que la máquina no tenía Java 25 porque `java_home` no lo listaba; estaba en el `PATH`. El build lo demostró antes de escribir el informe.
 - **Tiempo:** ≈1 h · **sin IA (est.):** ≈3 h
+
+### #22 — Guía rápida de los prompts (PR #26)
+
+- **Origen:** el autor dijo que leer tantos prompts lo confundía y pidió una guía corta. Los 9 prompts siguen siendo las instrucciones para la IA; la guía es para la persona que los usa.
+- **Hecho:**
+  - `docs/prompts/GUIA-RAPIDA.md`, de una página, con cuatro secciones: *Qué comando uso* (Quiero… → Escribo… → Qué cambia, para los 9 comandos), *Cómo trabaja cada comando* (plan → aprobación → pasos → PR que integra el autor), *Combinaciones habituales* y *Dónde queda cada resultado*;
+  - la sintaxis de cada comando se copió de la cabecera de su propio prompt, para que la guía y los prompts no se contradigan;
+  - `kit/instalar.sh` copia la guía a los otros proyectos;
+  - enlaces a la guía desde el README de los prompts, el README del repositorio y `CLAUDE.md`.
+- **Verificado:**
+  - `bash -n` del instalador OK y `verificar.sh` con 0 errores;
+  - la guía llega a un proyecto nuevo al instalar el kit;
+  - checks del PR en verde;
+  - Jenkins #37 construyó `3c53ffc` (9 etapas en SUCCESS) y desplegó `contract-api:jenkins-37`, con `/actuator/health` en `UP`.
+- **Errores de la IA corregidos:** ninguno registrado.
+- **Tiempo:** ≈0,5 h · **sin IA (est.):** ≈1,5 h
 
 ## Métricas del proyecto
 
