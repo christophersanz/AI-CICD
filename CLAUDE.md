@@ -12,6 +12,7 @@ Contexto base del repositorio. Este archivo es el punto de entrada: es breve y e
 | docs/api/contract/openapi.yaml | Contrato OpenAPI 3.1 generado con springdoc (también en `openapi.json`); cómo regenerarlo en `docs/api/README.md` | Al cambiar endpoints o DTOs de la API (regenerarlo en el mismo cambio) |
 | docs/guides/diagramas-arquitectura.md | Guía visual de la arquitectura: diagramas de módulos, puertos y adaptadores, dominio y flujos | Para orientarse en el código; actualizar sus diagramas si cambia la estructura |
 | docs/guides/ci-cd.md | Guía práctica de CI/CD: GitHub Flow, pipeline, versiones, imágenes y despliegue con Docker | Al cambiar el pipeline, el `Dockerfile` o el flujo de ramas |
+| docs/prompts/GUIA-RAPIDA.md | Guía de una página: qué comando `/NN-…` usar según la tarea | Para elegir el prompt sin leerlos |
 | @docs/prompts/README.md | Índice de los prompts `docs/prompts/NN-nombre.md` (por orden de uso), sus comandos de Claude Code, la estructura común, las fuentes y el kit reutilizable | Al iniciar una tarea recurrente (requisitos, reglas de negocio, caso de uso, pruebas, documentación, revisión, pipeline) |
 | docs/design/seguridad.md | Diseño de la seguridad y sus fases | Al tocar autenticación, autorización o tokens |
 | docs/reviews/ | Informes de revisión: una carpeta por ronda (`AAAA-MM-DD-ronda-NNN/`, con su `README.md` de estado) y `pr/` para los PR; índice en `docs/reviews/README.md` | Antes de corregir (`/07-corregir`) o al hacer la revisión final |

@@ -1,5 +1,7 @@
 # Prompts
 
+> **¿Solo quieres usarlos?** Lee la [guía rápida](GUIA-RAPIDA.md): qué comando escribir según lo que quieras hacer, en una página. Este README explica cómo están hechos los prompts y cómo llevarlos a otro proyecto.
+
 Prompts genéricos para desarrollar con Claude Code una API Java con Clean Architecture y DDD (este archivo es la portada de la carpeta, no un prompt). Nacieron en `contract-api` y forman un **kit reutilizable** (§6).
 
 - **Nueve prompts, un archivo cada uno: `docs/prompts/NN-nombre.md`.** `NN` es el **orden** en que se usan (01 a 09). No hay versiones paralelas ni copias: para mejorar un prompt se edita **ese mismo archivo**, en un commit propio que explique el cambio. La historia queda en git (`git log -p docs/prompts/NN-nombre.md`).
