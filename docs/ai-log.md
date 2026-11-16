@@ -38,7 +38,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 | 19 | 2026-11-13 | Kit reutilizable en proyectos con documentos propios (prueba sobre el modelo del curso) | `09-mejorar-prompt.md` | ≈1 h | ≈4 h | 4 |
 | 20 | 2026-11-13 | Quitar Render: el despliegue es solo con Docker (ADR-0016) | — | ≈0,5 h | ≈2 h | 0 |
 | 21 | 2026-11-13 | `/06-revisar dominio` completo en el modelo del curso (segundo proyecto) | `06-revisar.md` | ≈1 h | ≈3 h | 1 |
-| 22 | 2026-11-15 | Guía rápida de los prompts en una página (PR #26) | — | ≈0,5 h | ≈1,5 h | 0 |
+| 22 | 2026-11-15 | Guía rápida de los prompts en una página y su registro en esta bitácora (PR #26, #27) | — | ≈0,5 h | ≈1,5 h | 0 |
 | | | **Total** | | **≈30,5 h** | **≈127 h** | **≥ 38** (sin contar #1 y #3–#5) |
 
 ## Entradas
@@ -304,7 +304,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
 - **Error de la IA corregido:** se afirmó que la máquina no tenía Java 25 porque `java_home` no lo listaba; estaba en el `PATH`. El build lo demostró antes de escribir el informe.
 - **Tiempo:** ≈1 h · **sin IA (est.):** ≈3 h
 
-### #22 — Guía rápida de los prompts (PR #26)
+### #22 — Guía rápida de los prompts (PR #26, #27)
 
 - **Origen:** el autor dijo que leer tantos prompts lo confundía y pidió una guía corta. Los 9 prompts siguen siendo las instrucciones para la IA; la guía es para la persona que los usa.
 - **Hecho:**
@@ -317,6 +317,7 @@ Registro del uso de asistentes de IA en `contract-api`: qué se pidió, qué se 
   - la guía llega a un proyecto nuevo al instalar el kit;
   - checks del PR en verde;
   - Jenkins #37 construyó `3c53ffc` (9 etapas en SUCCESS) y desplegó `contract-api:jenkins-37`, con `/actuator/health` en `UP`.
+- **Registro (PR #27):** se agregó esta entrada a la bitácora. Solo cambió documentación; los checks del PR quedaron en verde y Jenkins #38 construyó `4b5db09` (9 etapas en SUCCESS) y desplegó `contract-api:jenkins-38`, con `/actuator/health` en `UP`. Los PR que solo actualizan esta bitácora se anotan en la entrada de la tarea que registran, no como entradas nuevas.
 - **Errores de la IA corregidos:** ninguno registrado.
 - **Tiempo:** ≈0,5 h · **sin IA (est.):** ≈1,5 h
 
